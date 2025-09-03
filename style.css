@@ -1,0 +1,211 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+}
+.hidden { display: none; }
+.container {
+    display: flex;
+    height: 100vh;
+}
+.sidebar {
+    width: 220px;
+    background: #1a73e8;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+.sidebar h2 { margin-top: 0; }
+.sidebar nav ul { list-style: none; padding: 0; }
+.sidebar nav ul li { margin: 1rem 0; }
+.sidebar nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    padding: 0.5rem;
+    border-radius: 5px;
+}
+.sidebar nav ul li a.active,
+.sidebar nav ul li a:hover {
+    background: #1558b0;
+}
+.content {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}
+.page { display: none; }
+.page.active { display: block; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+table th, table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+.login-screen {
+    position: fixed; /* <- Importante */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #e9f1ff;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* <- Asegura que quede encima */
+}
+
+.login-screen.active {
+    display: flex;
+}
+
+.login-container {
+    text-align: center;
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.buttons { margin-top: 1.5rem; }
+button {
+    padding: 0.8rem 1.5rem;
+    margin: 0.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+.btn-primary { background: #1a73e8; color: white; }
+.btn-secondary { border: 2px solid #1a73e8; color: #1a73e8; background: transparent; }
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease;
+}
+.card:hover {
+    transform: translateY(-2px);
+}
+.card h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.2rem;
+    color: #1a73e8;
+}
+.card p {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+.sidebar nav ul li a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.material-icons {
+    font-size: 20px;
+}
+.bar-chart {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  height: 200px;
+  width: 200px;
+  border-left: 2px solid black;
+  border-bottom: 2px solid black;
+  padding: 5px;
+}
+
+.bar {
+  width: 50px;
+  background-color: teal;
+  text-align: center;
+  color: white;
+}
+.pie-chart {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: conic-gradient(
+    red 0% 40%,   /* primer sector */
+    blue 40% 70%, /* segundo sector */
+    green 70% 100% /* tercer sector */
+  );
+}
+.container-caja {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+  align-items: flex-start; /* opcional: alinea por arriba */
+  flex-wrap: nowrap;
+}
+
+.caja {
+  width: 200px;
+  height: 200px;
+}
+
+img {
+    width: 200px;
+    height: 200px;
+}
+
+.calendar {
+  width: 350px;
+  background: white;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  font-family: Arial, sans-serif;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  gap: 5px;
+}
+
+.calendar-days div {
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.calendar-days div:hover {
+  background: #1a73e8;
+  color: white;
+  cursor: pointer;
+}
+
+.empty {
+  background: none;
+}
