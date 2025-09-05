@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div id="app" class="container">
+        <aside class="sidebar">
+            <h2>AdminProp</h2>
+            <nav>
+                <ul>
+                    <li><a href="inicio.html" data-page="inicio">Inicio</a></li>
+                    <li><a href="clientes.html" data-page="clientes" class="active">Clientes</a></li>
+                    <li><a href="cargar_propiedad.html" data-page="cargar-propiedad">Cargar propiedad</a></li>
+                    <li><a href="consorcios.html" data-page="consorcios">Consorcios</a></li>
+                    <li><a href="rendiciones.html" data-page="rendiciones">Rendiciones</a></li>
+                    <li><a href="configuracion.html" data-page="configuracion">Configuración</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <section id="clientes" class="page active">
+                <h1>Clientes</h1>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Dirección</th>
+                        <th>
+                            Alquiler
+                            <button id="sort-alquiler-desc" title="Ordenar de mayor a menor">&#8595;</button>
+                        </th>
+                        <th>
+                            Ordinarias
+                            <button id="sort-ordinarias-desc" title="Ordenar de mayor a menor">&#8595;</button>
+                        </th>
+                        <th>
+                            Extraordinarias
+                            <button id="sort-extraordinarias-desc" title="Ordenar de mayor a menor">&#8595;</button>
+                        </th>
+                        <th>
+                            Deuda
+                            <button id="sort-deuda-desc" title="Ordenar de mayor a menor">&#8595;</button>
+                        </th>
+                        <th>
+                            Pago
+                            <button id="sort-pago-desc" title="Ordenar de mayor a menor">&#8595;</button>
+                        </th>
+                        <th>Pago al día</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Luciano Wilberger</td>
+                        <td>Anchorena 1200 5F</td>
+                        <td>$600.000</td>
+                        <td>$100.000</td>
+                        <td>$0</td>
+                        <td>$0</td>
+                        <td>$700.000</td>
+                        <td>&#9989;</td>
+                    </tr>
+                    <tr>
+                        <td>Zoilo Pazos</td>
+                        <td>Av. Santa Fe 3000 1A</td>
+                        <td>$800.000</td>
+                        <td>$150.000</td>
+                        <td>$110.000</td>
+                        <td>$120.000</td>
+                        <td>$940.000</td>
+                        <td>&#10060;</td>
+                    </tr>
+                    <tr>
+                        <td>Carmen Sandiego</td>
+                        <td>Charcas 1300</td>
+                        <td>$1.600.000</td>
+                        <td>$350.000</td>
+                        <td>$200.000</td>
+                        <td>$0</td>
+                        <td>$2.150.000</td>
+                        <td>&#9989;</td>
+                    </tr>
+                    <tr>
+                        <td>Flor Ramirez</td>
+                        <td>Lavalle 1000</td>
+                        <td>$500.000</td>
+                        <td>$50.000</td>
+                        <td>$0</td>
+                        <td>$50.000</td>
+                        <td>$500.000</td>
+                        <td>&#10060;</td>
+                    </tr>
+                    <tr>
+                        <td>Manuel Iglesias</td>
+                        <td>Av.Cordoba 3410</td>
+                        <td>$1.500.000 </td>
+                        <td>$50.000</td>
+                        <td>$0</td>
+                        <td>$0</td>
+                        <td>$1.550.000</td>
+                        <td>&#9989;</td>
+                    </tr>
+                    <tr>
+                        <td>Matias Flores </td>
+                        <td>Av. 9 de Julio 2310</td>
+                        <td>$2.500.000</td>
+                        <td>$50.000</td>
+                        <td>$210.000</td>
+                        <td>$210.000</td>
+                        <td>$2.340.000</td>
+                        <td>&#10060;</td>
+                    </tr>
+                    <tr>
+                        <td>Sergio Schwaab</td>
+                        <td>Gallo 500</td>
+                        <td>$1.100.000</td>
+                        <td>$50.000</td>
+                        <td>$300.000</td>
+                        <td>$300.000</td>
+                        <td>$1.150.000</td>
+                        <td>&#10060;</td>
+                    </tr>
+                    <tr>
+                        <td>Raquel Rios</td>
+                        <td>Arenales 4064</td>
+                        <td>$700.000</td>
+                        <td>$50.000</td>
+                        <td>$0</td>
+                        <td>$0</td>
+                        <td>$750.000</td>
+                        <td>&#9989;</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="container-caja">
+                    <div class="caja">
+                        <h1>Ingresos mensuales</h1>
+                        <div class="bar-chart">
+                            <div class="bar" style="height: 80%;">80%</div>
+                            <div class="bar" style="height: 50%;">50%</div>
+                            <div class="bar" style="height: 30%;">30%</div>
+                        </div>
+                    </div>
+                    <div class="caja">
+                        <h1>Pagos adeudados</h1>
+                        <div class="pie-chart"></div>
+                    </div>
+                    <div class="caja">
+                        <h1>Mapa propiedades</h1>
+                        <img src="../img/city.jpg" alt="alt">
+                    </div>
+                    <div class="caja">
+                        <h1>Calendario</h1>
+                        <div class="calendar">
+                            <div class="calendar-header">
+                                <button>&lt;</button>
+                                <h2>Septiembre 2025</h2>
+                                <button>&gt;</button>
+                            </div>
+                            <div class="calendar-weekdays">
+                                <div>Lun</div>
+                                <div>Mar</div>
+                                <div>Mié</div>
+                                <div>Jue</div>
+                                <div>Vie</div>
+                                <div>Sáb</div>
+                                <div>Dom</div>
+                            </div>
+                            <div class="calendar-days">
+                                <div class="empty"></div>
+                                <div class="empty"></div>
+                                <div>1</div>
+                                <div>2</div>
+                                <div>3</div>
+                                <div>4</div>
+                                <div>5</div>
+                                <div>6</div>
+                                <div>7</div>
+                                <div>8</div>
+                                <div>9</div>
+                                <div>10</div>
+                                <div>11</div>
+                                <div>12</div>
+                                <div>13</div>
+                                <div>14</div>
+                                <div>15</div>
+                                <div>16</div>
+                                <div>17</div>
+                                <div>18</div>
+                                <div>19</div>
+                                <div>20</div>
+                                <div>21</div>
+                                <div>22</div>
+                                <div>23</div>
+                                <div>24</div>
+                                <div>25</div>
+                                <div>26</div>
+                                <div>27</div>
+                                <div>28</div>
+                                <div>29</div>
+                                <div>30</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
