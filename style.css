@@ -81,6 +81,7 @@ button {
     border-radius: 5px;
     font-size: 1rem;
     cursor: pointer;
+    text-decoration: none;
 }
 .btn-primary { background: #1a73e8; color: white; }
 .btn-secondary { border: 2px solid #1a73e8; color: #1a73e8; background: transparent; }
@@ -208,4 +209,19 @@ img {
 
 .empty {
   background: none;
+}
+
+#login-form {
+    display: flex;
+    margin: auto;
+    flex-direction: column;
+    justify-content: center;
+    width: 50%;
+    input {
+        height: 2em;
+        margin-bottom: 0.5rem;
+    }
+    label {
+        align-self: flex-start;
+    }
 }
