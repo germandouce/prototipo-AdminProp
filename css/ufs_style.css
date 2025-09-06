@@ -1,0 +1,89 @@
+:root {
+    /*--bg: #f6f7fb;*/
+    /*--panel: #ffffff;*/
+    /*--panel-2: #f2f5fb;*/
+    --text: #0f141c;
+    /*--muted: #536179;*/
+    /*--primary: #335dff;*/
+    /*--ring: #dfe7ff;*/
+    --success: #14a76c;
+    --warning: #c89a17;
+    --danger: #d64545;
+    --border: #e6e9f0;
+    --chip: #f1f4fb;
+    /*--shadow: 0 10px 24px rgba(9, 14, 30, .08);*/
+    /*--radius: 14px;*/
+}
+
+#unidades-funcionales {
+    display: flex;
+}
+
+table, tr, td, thead, th{
+    border: none !important;
+}
+
+.table-wrap {
+    width: 60%;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0 0.2em;
+}
+
+#units-table-caption {
+    font-size: 1.5em;
+    div {
+        display: flex;
+        justify-content: space-between;
+    button:hover {
+        filter: brightness(90%);
+    }
+    }
+}
+
+tbody tr {
+    background-color: #e3e3e3;
+    transition: filter 0.2s ease;
+    td:first-child {
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+    td:last-child {
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+}
+
+tbody tr:hover {
+    filter: brightness(90%);
+}
+
+.unit .avatar {
+    padding: 0.2em;
+    background: #b6b6b6;
+    border-radius: 7px;
+}
+
+.status {
+     display: inline-flex
+; 
+     align-items: center; 
+     gap: 8px; 
+     font-weight: 700; 
+     font-size: 12px; 
+     letter-spacing: .02em; 
+     padding: 8px 10px; 
+     border-radius: 999px; 
+     border: 1px solid transparent; 
+}
+
+.status {
+    display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12px; letter-spacing: .02em;
+    padding: 8px 10px; border-radius: 999px; border: 1px solid transparent;
+    }
+    .status.paid { background: color-mix(in oklab, var(--success) 14%, var(--chip)); color: color-mix(in oklab, var(--success) 85%, var(--text)); border-color: color-mix(in oklab, var(--success) 35%, var(--border)); }
+    .status.pending { background: color-mix(in oklab, var(--warning) 14%, var(--chip)); color: color-mix(in oklab, var(--warning) 85%, var(--text)); border-color: color-mix(in oklab, var(--warning) 35%, var(--border)); }
+    .status.late { background: color-mix(in oklab, var(--danger) 14%, var(--chip)); color: color-mix(in oklab, var(--danger) 90%, var(--text)); border-color: color-mix(in oklab, var(--danger) 35%, var(--border)); }
+
