@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Rendiciones</title>
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+<div id="app" class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>AdminProp</h2>
+        <nav>
+            <ul>
+                <li><a href="inicio.html">Inicio</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="cargar_propiedad.html">Cargar propiedad</a></li>
+                <li><a href="consorcios.html">Consorcios</a></li>
+                <li><a href="rendiciones.html" class="active">Rendiciones</a></li>
+                <li><a href="comisiones.html">Comisiones</a></li>
+                <li><a href="configuracion.html">Configuración</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Contenido -->
+    <main class="content">
+        <section class="page active">
+            <h1>Gestión de rendiciones a propietarios</h1>
+
+            <!-- Filtros -->
+            <div class="form-row" style="margin-bottom:1rem;">
+                <label>Mes/Año
+                    <select id="selPeriodo"><option>09/2025</option><option>08/2025</option></select>
+                </label>
+                <label style="margin-left:1rem;">Propiedad/Consorcio
+                    <select id="selAmbito"><option>Edificio San Martín 1234</option><option>Casa Av. Belgrano 456</option></select>
+                </label>
+                <button id="btnCalcular" class="btn-primary" style="margin-left:1rem;">Calcular rendición</button>
+                <span id="badgeEstado" class="badge hidden"></span>
+            </div>
+
+            <div class="grid-2" id="bloquesRendicion">
+                <fieldset>
+                    <legend>Ingresos</legend>
+                    <p>Alquileres cobrados: <b>$500.000</b></p>
+                    <p>Expensas cobradas: <b>$100.000</b></p>
+                    <p><strong>TOTAL INGRESOS: $600.000</strong></p>
+                </fieldset>
+                <fieldset>
+                    <legend>Gastos</legend>
+                    <p>Gastos comunes: <b>$200.000</b></p>
+                    <p>Reparaciones: <b>$50.000</b></p>
+                    <p>Otros: <b>$20.000</b></p>
+                    <p><strong>TOTAL GASTOS: $270.000</strong></p>
+                </fieldset>
+                <fieldset>
+                    <legend>Comisión</legend>
+                    <p>% Comisión: <b>5%</b></p>
+                    <p>Monto: <b>$30.000</b></p>
+                </fieldset>
+                <fieldset>
+                    <legend>Saldo final</legend>
+                    <p style="font-size:1.1rem;"><strong>SALDO NETO A PROPIETARIO: $300.000</strong></p>
+                </fieldset>
+            </div>
+
+            <div style="margin-top:1rem;">
+                <button id="btnExportPdf" class="btn-secondary" disabled>Exportar PDF</button>
+                <button id="btnExportXls" class="btn-secondary" disabled>Exportar Excel</button>
+                <button class="btn-secondary" style="float:right;" onclick="history.back()">Volver</button>
+            </div>
+        </section>
+    </main>
+</div>
+<script src="../scripts/ui.js"></script>
+<script>
+    const $=s=>document.querySelector(s);
+    const bloques = $('#bloquesRendicion');
+
+    // 1) Calcular: habilita exportaciones + badge de estado
+    $('#btnCalcular').addEventListener('click', ()=>{
+        $('#btnExportPdf').disabled=false;
+        $('#btnExportXls').disabled=false;
+        const b=$('#badgeEstado');
+        b.textContent='Cálculo listo para ' + $('#selPeriodo').value + ' · ' + $('#selAmbito').value;
+        b.classList.remove('hidden'); b.classList.add('ok','badge');
+        UI.showToast('Rendición calculada');
+    });
+
+    // 2) Exportar: abre vista previa de lo que se exporta
+    function exportar(tipo){
+        const bodyHTML = `
+      <p><b>Período:</b> ${$('#selPeriodo').value}<br>
+         <b>Ámbito:</b> ${$('#selAmbito').value}</p>
+      ${bloques.outerHTML}
+    `;
+        UI.openModal({
+            title: 'Vista previa de ' + (tipo==='pdf'?'PDF':'Excel'),
+            bodyHTML,
+            onConfirm: ()=>{
+                const fn = `rendicion_${$('#selPeriodo').value.replace('/','-')}_${tipo}.`+(tipo==='pdf'?'pdf':'xlsx');
+                UI.showToast('Exportado: ' + fn, 2500);
+            }
+        });
+    }
+    $('#btnExportPdf').addEventListener('click', ()=>exportar('pdf'));
+    $('#btnExportXls').addEventListener('click', ()=>exportar('xls'));
+</script>
+</body>
+</html>

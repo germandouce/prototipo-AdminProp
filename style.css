@@ -209,3 +209,32 @@ img {
 .empty {
   background: none;
 }
+
+/* --- helpers para estas vistas --- */
+.form-row { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+fieldset { border:1px solid #ccc; border-radius:8px; padding:1rem; }
+legend { padding:0 .4rem; font-weight:bold; color:#555; }
+.grid-2 { display:grid; grid-template-columns: repeat(2, minmax(280px, 1fr)); gap:1rem; }
+
+/* Helpers UI para pruebas de usuario */
+.hidden{display:none!important}
+fieldset{border:1px solid #ccc;border-radius:8px;padding:12px}
+legend{padding:0 6px;font-weight:600;color:#555}
+.form-row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));gap:12px}
+.btn-primary,.btn-secondary{cursor:pointer}
+.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);
+    background:#111;color:#fff;padding:10px 14px;border-radius:8px;opacity:.95;
+    box-shadow:0 8px 22px rgba(0,0,0,.25);z-index:9999}
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9998}
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+    background:#fff;border:1px solid #ddd;border-radius:10px;max-width:760px;width:92%;
+    padding:16px;z-index:10000}
+.modal header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.modal footer{display:flex;justify-content:flex-end;gap:.5rem;margin-top:12px}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(160px,1fr));gap:10px}
+.kpi{border:1px solid #ddd;border-radius:8px;padding:12px}
+.bars{display:flex;gap:8px;align-items:flex-end;height:110px}
+.bars .bar{flex:1;background:#cfe3ff;min-height:4px;transition:height .6s}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:.85rem}
+.badge.ok{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
