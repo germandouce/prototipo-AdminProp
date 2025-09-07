@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Comisiones</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/comisiones_styles.css" />
+    <style>
+        /* extras mínimos para esta vista */
+
+    </style>
+</head>
+<body>
+<div id="app" class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>AdminProp</h2>
+        <nav>
+            <ul>
+                <li><a href="inicio.html">Inicio</a></li>
+                <li><a href="clientes.html">Clientes</a></li>
+                <li><a href="cargar_propiedad.html">Cargar propiedad</a></li>
+                <li><a href="consorcios.html">Consorcios</a></li>
+                <li><a href="rendiciones.html">Rendiciones</a></li>
+                <li><a href="comisiones.html" class="active">Comisiones</a></li>
+                <li><a href="configuracion.html">Configuración</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Contenido -->
+    <main class="content">
+        <section class="page active">
+            <h1>Gestión de comisión del administrador</h1>
+
+            <!-- Filtros (un solo Calcular) -->
+            <div class="form-row" style="margin-bottom:.5rem;">
+                <label>Mes/Año
+                    <select id="selPeriodo">
+                        <option>09/2025</option><option>08/2025</option><option>07/2025</option>
+                    </select>
+                </label>
+                <label>Propiedad/Consorcio
+                    <select id="selAmbito">
+                        <option>Edificio San Martín 1234</option>
+                        <option>Casa Av. Belgrano 456</option>
+                    </select>
+                </label>
+                <button id="btnCalcular" class="btn-primary">Calcular</button>
+            </div>
+
+            <!-- Banner de estado (verde) -->
+            <div id="status" class="status">Cálculo listo.</div>
+
+            <!-- Configuración (simple, sin botón duplicado) -->
+            <fieldset style="margin:.5rem 0 0;">
+                <legend>Configuración</legend>
+                <div class="form-row">
+                    <label>% Comisión:
+                        <input id="inpPct" type="number" value="5" min="0" max="100" style="width:80px;" /> %
+                    </label>
+                    <label><input type="radio" name="base" value="bruto" checked> Ingresos brutos</label>
+                    <label><input type="radio" name="base" value="neto"> Ingresos netos</label>
+                </div>
+                <label><input id="chkExcl" type="checkbox"> Excluir si admin = propietario</label>
+            </fieldset>
+
+            <!-- Resumen (como en propietarios) -->
+            <div id="kpiWrap" class="kpis" style="display:none">
+                <div class="kpi"><div>Total comisión</div><strong id="kpiTotal">$0</strong></div>
+                <div class="kpi"><div>Unidades incluidas</div><strong id="kpiUnits">0</strong></div>
+                <div class="kpi"><div>Promedio %</div><strong id="kpiPct">0%</strong></div>
+            </div>
+
+            <!-- Detalle colapsable -->
+            <details id="detTabla" class="tablebox" open>
+                <summary>Ver/ocultar detalle por unidad</summary>
+                <table id="tbl">
+                    <thead>
+                    <tr>
+                        <th>Propiedad / Unidad</th>
+                        <th>Inquilino</th>
+                        <th>Base $</th>
+                        <th>%</th>
+                        <th>Comisión $</th>
+                        <th>Estado</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Dpto 1 - Piso 1</td><td>Juan P.</td><td>100000</td><td>5</td><td>5000</td><td>Incl.</td>
+                    </tr>
+                    <tr>
+                        <td>Dpto 2 - Piso 1</td><td>Ana G.</td><td>120000</td><td>5</td><td>6000</td><td>Incl.</td>
+                    </tr>
+                    <tr>
+                        <td>Dpto 3 - Piso 2</td><td>Vacío</td><td>0</td><td>-</td><td>-</td><td>Excl.</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p id="totales" style="margin-top:.4rem;">Totales: 10 incl. | 2 excl. | Comisión total: $55.000</p>
+            </details>
+
+            <!-- Acciones finales -->
+            <div class="actions">
+                <button id="btnAplicar" class="btn-primary" disabled>Aplicar a rendición</button>
+                <button id="btnExportar" class="btn-secondary" disabled>Exportar</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- utilidades UI (toast + modal) -->
+<script>
+    function showToast(msg, ms=2000){
+        const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+        document.body.appendChild(t); setTimeout(()=>t.remove(), ms);
+    }
+    function openModal({title, bodyHTML, onConfirm}){
+        const bd=document.createElement('div'); bd.className='backdrop';
+        const m=document.createElement('div'); m.className='modal';
+        m.innerHTML=`
+      <header><h3>${title}</h3><button id="mClose" class="btn-secondary">✕</button></header>
+      <div class="modal-body">${bodyHTML}</div>
+      <footer>
+        <button id="mCancel" class="btn-secondary">Cancelar</button>
+        <button id="mOk" class="btn-primary">Confirmar exportación</button>
+      </footer>`;
+        function close(){ bd.remove(); m.remove(); }
+        bd.addEventListener('click', close);
+        m.querySelector('#mClose').addEventListener('click', close);
+        m.querySelector('#mCancel').addEventListener('click', close);
+        m.querySelector('#mOk').addEventListener('click', ()=>{ onConfirm&&onConfirm(); close(); });
+        document.body.append(bd,m);
+    }
+</script>
+
+<!-- lógica de la vista -->
+<script>
+    const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+    const num = t => parseInt(String(t).replace(/[^\d\-]/g,''))||0;
+
+    function leerTabla(){
+        let total=0, incl=0, sumPct=0;
+        $$('#tbl tbody tr').forEach(tr=>{
+            const est = (tr.cells[5]?.textContent||'').trim();
+            if(est.startsWith('Incl')){
+                total += num(tr.cells[4].textContent);
+                incl++;
+                sumPct += num(tr.cells[3].textContent);
+            }
+        });
+        return { total, incl, pct: incl? (sumPct/incl): 0 };
+    }
+
+    function refrescarKPI(){
+        const {total, incl, pct} = leerTabla();
+        $('#kpiTotal').textContent = '$' + total.toLocaleString('es-AR');
+        $('#kpiUnits').textContent = String(incl);
+        $('#kpiPct').textContent = pct.toFixed(1) + '%';
+    }
+
+    // CALCULAR
+    $('#btnCalcular').addEventListener('click', ()=>{
+        // feedback de avance
+        const periodo = $('#selPeriodo').value, amb = $('#selAmbito').value;
+        $('#status').textContent = `Cálculo listo para ${periodo} · ${amb}`;
+        $('#status').classList.add('active');
+
+        // mostrar KPIs, habilitar acciones
+        $('#kpiWrap').style.display='grid';
+        $('#btnAplicar').disabled=false;
+        $('#btnExportar').disabled=false;
+
+        // recalcular KPIs (usando la tabla actual como demo)
+        refrescarKPI();
+        showToast('Comisiones calculadas');
+    });
+
+    // APLICAR A RENDICIÓN
+    $('#btnAplicar').addEventListener('click', ()=>{
+        showToast('Comisión aplicada a la rendición de ' + $('#selPeriodo').value, 2500);
+    });
+
+    // EXPORTAR (vista previa)
+    $('#btnExportar').addEventListener('click', ()=>{
+        const bodyHTML = `
+      <p><b>Período:</b> ${$('#selPeriodo').value}<br>
+         <b>Ámbito:</b> ${$('#selAmbito').value}</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div><b>Total comisión</b><br>${$('#kpiTotal').textContent}</div>
+        <div><b>Unidades incluidas</b><br>${$('#kpiUnits').textContent}</div>
+        <div><b>Promedio %</b><br>${$('#kpiPct').textContent}</div>
+      </div>
+      <hr>
+      ${$('#detTabla').open ? document.querySelector('#detTabla table').outerHTML : ''}
+    `;
+        openModal({
+            title: 'Vista previa de exportación',
+            bodyHTML,
+            onConfirm: ()=>{
+                const fn = `comisiones_${$('#selPeriodo').value.replace('/','-')}.pdf`;
+                showToast('Exportado: ' + fn, 2500);
+            }
+        });
+    });
+
+    // si cambian % o base, simulamos “pendiente de recálculo”
+    $('#inpPct, input[name="base"], #chkExcl').forEach
+        ? $('#inpPct, input[name="base"], #chkExcl') // fallback muy básico
+        : null;
+</script>
+</body>
+</html>
