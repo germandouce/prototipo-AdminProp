@@ -81,6 +81,10 @@ button {
     border-radius: 5px;
     font-size: 1rem;
     cursor: pointer;
+    a {
+        text-decoration: none;
+        color: white;
+    }
 }
 .btn-primary { background: #1a73e8; color: white; }
 .btn-secondary { border: 2px solid #1a73e8; color: #1a73e8; background: transparent; }
