@@ -1,0 +1,57 @@
+.complejos-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+}
+
+.complejo-btn {
+    width: 80%;
+    max-width: 600px;
+    padding: 2rem 1rem;
+    font-size: 2rem;
+    background: linear-gradient(90deg, #4f8cff 0%, #6ee7b7 100%);
+    color: #fff;
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.complejo-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.complejo-btn .uf {
+    background: rgba(255,255,255,0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.agregar-complejo-btn {
+    width: 80%;
+    max-width: 600px;
+    padding: 1.5rem 1rem;
+    font-size: 1.5rem;
+    background: #fff;
+    color: #4f8cff;
+    border: 2px dashed #4f8cff;
+    border-radius: 1.5rem;
+    margin-top: 2rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.agregar-complejo-btn:hover {
+    background: #4f8cff;
+    color: #fff;
+}

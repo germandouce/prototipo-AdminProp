@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Complejos</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/complejos.css">
 </head>
 <body>
     <div id="app" class="container hidden">
@@ -14,7 +15,7 @@
                     <li><a href="inicio.html" data-page="inicio">Inicio</a></li>
                     <li><a href="clientes.html" data-page="clientes">Clientes</a></li>
                     <li><a href="cargar_propiedad.html" data-page="cargar-propiedad">Cargar propiedad</a></li>
-                    <li><a href="consorcios.html" data-page="consorcios" class="active">Consorcios</a></li>
+                    <li><a href="consorcios.html" data-page="consorcios" class="active">Complejos</a></li>
                     <li><a href="rendiciones.html" data-page="rendiciones">Rendiciones</a></li>
                     <li><a href="configuracion.html" data-page="configuracion">Configuración</a></li>
                 </ul>
@@ -22,15 +23,17 @@
         </aside>
 
         <main class="content">
-            <section id="consorcios" class="page active">
-                <h1>Consorcios</h1>
-                <ul>
-                    <li>Demaría 4550 - 154 UF</li>
-                    <li>Florida 1065 - 105 UF</li>
-                    <li>Balcarce 78 - 32 UF</li>
-                </ul>
+            <section id="complejos" class="page active">
+                <h1>Complejos</h1>
+                <div class="complejos-container">
+                    <button class="complejo-btn">Demaría 4550 <span class="uf">154 UF</span></button>
+                    <button class="complejo-btn">Florida 1065 <span class="uf">105 UF</span></button>
+                    <button class="complejo-btn">Balcarce 78 <span class="uf">32 UF</span></button>
+                    <button id="agregar-complejo-btn" class="agregar-complejo-btn">Agregar complejo</button>
+                </div>
             </section>
         </main>
     </div>
+    <script src="../scripts/complejos.js"></script>
 </body>
 </html>
