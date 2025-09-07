@@ -3,22 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdminProp - Administración de Alquileres</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+    <title>AdminProp</title>
+    <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-    <div id="login-screen" class="login-screen active">
-        <div class="login-container">
+    <header class="top-bar">
+        <div class="logo">
+            <i class="fa-solid fa-house"></i>
             <h1>AdminProp</h1>
-            <p>Tu herramienta para administrar propiedades y alquileres, todo en un lugar.</p>
-            <div class="buttons">
-                <button id="register-btn" class="btn-secondary">Registrarse</button>
-                <button id="login-btn" class="btn-primary"><a href="views/inicio.html">Iniciar sesión</a></button>
-            </div>
         </div>
-    </div>
+        <p class="slogan">Tu herramienta para administrar propiedades y alquileres, todo en un lugar.</p>
+        <nav class="menu">
+             <a href="#"><i class="fa-solid fa-dollar-sign"></i> Planes</a>
+            <a href="#"><i class="fa-solid fa-desktop"></i> Funcionalidades</a>
+            <a href="#"><i class="fa-solid fa-building"></i> Empresa</a>
+        </nav>
+    </header>
+    <main class="container">
+        <div class="image-section">
+            <img src="img/login.jpeg" alt="Personas trabajando en oficina">
+        </div>
+        <div class="login-section">
+            <h2>Software de gestión de alquileres y administración de pagos</h2>
+            <button class="btn login" id="login-btn"><i class="fa-solid fa-right-to-bracket"></i><a href="views/inicio.html" style="text-decoration: none; color: white;">Iniciar sesión</a></button>
+            <button class="btn register" id="register-btn"><i class="fa-solid fa-pen"></i> Registrarse</button>
+        </div>
+    </main>
+    <footer class="footer">
+        <a href="#"><i class="fa-solid fa-users"></i> Nosotros</a>
+        <a href="#"><i class="fa-solid fa-headset"></i> Soporte</a>
+        <a href="#"><i class="fa-solid fa-user-plus"></i> Unite al equipo</a>
+        <a href="#"><i class="fa-solid fa-envelope"></i> Contacto</a>
+    </footer>
     <script src="scripts/sort_table.js"></script>
 </body>
 </html>
