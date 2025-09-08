@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Redirección al hacer click en un complejo
     function handleComplejoClick(e) {
-        if (e.target.classList.contains('complejo-btn')) {
+        if (e.target.classList.contains('complejo-btn-funcional')) {
             const nombre = e.target.childNodes[0].textContent.trim();
             window.location.href = `unidades_funcionales.html?complejo=${encodeURIComponent(nombre)}`;
         }
