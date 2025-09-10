@@ -100,6 +100,92 @@
             </div>
 
         </section>
+        <section id="gastos-comunes" class="page active">
+            <div class="table-wrap">
+                <table role="table" aria-describedby="tabla-ayuda" id="tabla-expensas">
+                    <caption id="gastos-comunes-table-caption">
+                        <div class="titulo-tabla-y-boton">
+                            <div>Gastos comunes</div>
+                            <button id="add-expense-unit-btn">+ Agregar gasto</button>
+                        </div>
+                        <div>
+                            <form id="gastos-form" method="get">
+                                <label for="periodos">Selecciona un periodo</label>
+                                <select data-label="gastos-data-list" id="periodos" name="periodo">
+                                    <option value="septiembre-2025">Septiembre 2025</option>
+                                    <option value="agosto-2025">Agosto 2025</option>
+                                    <option value="julio-2025">Julio 2025</option>
+                                </select>
+                            </form>
+                        </div>
+                    </caption>
+
+                    <thead>
+                    <tr role="row">
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Detalle</th>
+                        <th scope="col">Monto</th>
+                    </tr>
+                    </thead>
+                    <tbody id="septiembre-2025" class="unidades-container periodo">
+                        <tr class="funcional">
+                            <td data-label="Fecha">8/9/2025</td>
+                            <td data-label="Detalle" class="tenant">ABL</td>
+                            <td data-label="Monto" class="rent">$400.000</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Fecha">9/9/2025</td>
+                            <td data-label="Detalle" class="tenant">EDENOR</td>
+                            <td data-label="Monto" class="rent">$1.000.000</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Fecha">10/9/2025</td>
+                            <td data-label="Detalle" class="tenant">AYSA</td>
+                            <td data-label="Monto" class="rent">$750.000</td>
+                        </tr>
+                    </tbody>
+                    <tbody id="agosto-2025" class="unidades-container periodo hidden">
+                        <tr class="funcional">
+                            <td data-label="Fecha">16/8/2025</td>
+                            <td data-label="Detalle" class="tenant">ABL</td>
+                            <td data-label="Monto" class="rent">$400.000</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Fecha">25/8/2025</td>
+                            <td data-label="Detalle" class="tenant">EDENOR</td>
+                            <td data-label="Monto" class="rent">$1.000.000</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Fecha">30/8/2025</td>
+                            <td data-label="Detalle" class="tenant">AYSA</td>
+                            <td data-label="Monto" class="rent">$750.000</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Fecha">31/8/2025</td>
+                            <td data-label="Detalle" class="tenant">Se rompió el ascensor :(</td>
+                            <td data-label="Monto" class="rent">$750.000</td>
+                        </tr>
+                    </tbody>
+                    <tbody id="julio-2025" class="unidades-container periodo hidden">
+                    <tr class="funcional">
+                        <td data-label="Fecha">8/9/2025</td>
+                        <td data-label="Detalle" class="tenant">ABL</td>
+                        <td data-label="Monto" class="rent">$400.000</td>
+                    </tr>
+                    <tr>
+                        <td data-label="Fecha">9/9/2025</td>
+                        <td data-label="Detalle" class="tenant">EDENOR</td>
+                        <td data-label="Monto" class="rent">$1.000.000</td>
+                    </tr>
+                    <tr>
+                        <td data-label="Fecha">10/9/2025</td>
+                        <td data-label="Detalle" class="tenant">AYSA</td>
+                        <td data-label="Monto" class="rent">$750.000</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
 </div>
 <script>
@@ -114,5 +200,6 @@
 </script>
 <script src="../scripts/redir_ufs_local.js"></script>
 <script src="../scripts/agregar_unidad.js"></script>
+<script src="../scripts/cambio_periodo_expensas.js"></script>
 </body>
 </html>

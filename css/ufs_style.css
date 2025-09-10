@@ -32,7 +32,7 @@ table {
     border-spacing: 0 0.2em;
 }
 
-#units-table-caption {
+#units-table-caption, #gastos-comunes-table-caption {
     font-size: 1.5em;
     div {
         display: flex;
@@ -41,6 +41,10 @@ table {
         filter: brightness(90%);
     }
     }
+}
+
+#gastos-comunes-table-caption {
+    margin-top: 2.5em;
 }
 
 tbody tr {
@@ -58,6 +62,7 @@ tbody tr {
 
 tbody tr:hover {
     filter: brightness(90%);
+    cursor: pointer;
 }
 
 .unit .avatar {
