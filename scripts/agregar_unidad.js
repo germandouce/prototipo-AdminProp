@@ -51,4 +51,46 @@ document.addEventListener('DOMContentLoaded', () => {
         form.reset();
         modalOverlay.style.display = 'none';
     });
+
+    // --- Agregar gasto a la tabla de septiembre ---
+    // Elementos para gastos
+    const gastosTable = document.getElementById('gastos-septiembre');
+    const addGastoBtn = document.getElementById('add-gasto-btn');
+    const gastoModalOverlay = document.getElementById('gasto-modal-overlay');
+    const gastoForm = document.getElementById('gasto-form');
+    const gastoCancelBtn = document.getElementById('gasto-cancel-btn');
+
+    if (addGastoBtn && gastoModalOverlay && gastoForm && gastosTable) {
+        // Mostrar modal de gasto
+        addGastoBtn.addEventListener('click', () => {
+            gastoModalOverlay.style.display = 'flex';
+        });
+
+        // Cancelar modal de gasto
+        gastoCancelBtn.addEventListener('click', () => {
+            gastoForm.reset();
+            gastoModalOverlay.style.display = 'none';
+        });
+
+        // Guardar nuevo gasto
+        gastoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const concepto = gastoForm.concepto.value.trim();
+            const monto = gastoForm.monto.value.trim();
+            const tipo = gastoForm.tipo.value.trim();
+
+            // Crear fila
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${concepto}</td>
+                <td>${monto}</td>
+                <td>${tipo}</td>
+            `;
+            gastosTable.querySelector('tbody').appendChild(tr);
+
+            // Resetear y cerrar modal
+            gastoForm.reset();
+            gastoModalOverlay.style.display = 'none';
+        });
+    }
 });

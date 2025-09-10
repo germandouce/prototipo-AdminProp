@@ -94,22 +94,22 @@ tbody tr:hover {
 
 .modal-overlay {
     position: fixed;
-    inset: 0; /* top:0; right:0; bottom:0; left:0 */
-    background: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    display: none;
     justify-content: center;
-    z-index: 9999;
+    align-items: center;
+    z-index: 9998;
 }
 
 .modal {
     background: #fff;
-    color: #000;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-    width: 300px;
-    max-width: 90%;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 92%;
+    padding: 16px;
+    z-index: 10000;
 }
 
 .modal h2 {
@@ -125,4 +125,11 @@ tbody tr:hover {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+}
+
+.modal footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: .5rem;
+    margin-top: 12px;
 }
