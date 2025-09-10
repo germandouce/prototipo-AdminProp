@@ -42,9 +42,10 @@
                             <th scope="col">Inquilino</th>
                             <th scope="col">Alquiler</th>
                             <th scope="col">Estado de pago</th>
+                            <th scope="col">Expensas septiembre</th>
                         </tr>
                     </thead>
-                    <tbody class="unidades-container">
+                    <tbody class="unidades-container" id="tabla-unidades-septiembre">
                         <tr class="funcional">
                             <td data-label="Unidad">
                                 <span class="unit"><span class="avatar">001</span> 1A</span>
@@ -52,6 +53,7 @@
                             <td data-label="Inquilino" class="tenant">Giacomo Guilizzo</td>
                             <td data-label="Alquiler" class="rent">$600.000</td>
                             <td data-label="Estado de pago"><span class="status paid" aria-label="Al día">● Al día</span></td>
+                            <td data-label="Expensas septiembre" class="expensas-septiembre"></td>
                         </tr>
                         <tr>
                             <td data-label="Unidad">
@@ -60,6 +62,7 @@
                             <td data-label="Inquilino" class="tenant">Marco Botto</td>
                             <td data-label="Alquiler" class="rent">$840.000</td>
                             <td data-label="Estado de pago"><span class="status pending" aria-label="Pendiente">● Pendiente</span></td>
+                            <td data-label="Expensas septiembre" class="expensas-septiembre"></td>
                         </tr>
                         <tr>
                             <td data-label="Unidad">
@@ -68,6 +71,7 @@
                             <td data-label="Inquilino" class="tenant">Mariah Maclachla</td>
                             <td data-label="Alquiler" class="rent">$360.000</td>
                             <td data-label="Estado de pago"><span class="status late" aria-label="Atrasado">● Atrasado</span></td>
+                            <td data-label="Expensas septiembre" class="expensas-septiembre"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -210,6 +214,9 @@
                         </footer>
                     </form>
                 </div>
+            </div>
+            <div style="margin-top:1rem;">
+                <button id="calcular-expensas-septiembre" class="btn-primary">Calcular expensas septiembre</button>
             </div>
         </section>
     </main>

@@ -16,4 +16,4 @@ selectMeses.addEventListener('change', () => {
 });
 
 // mostrar la inicial
-mostrarTabla(selectMeses.value);
+// mostrarTabla(selectMeses.value);
