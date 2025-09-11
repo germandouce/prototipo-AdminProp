@@ -1,111 +1,195 @@
-.local-container {
-  margin-top: 25px;
-}
+/* ===== Layout general ===== */
+.local-container { margin-top: 16px; }
 
-
+/* Contenido principal: de flex a grid para controlar blancos */
 .datos-principales {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  margin-bottom: 32px;
-  margin-left: 30px;
-  gap: 36px;
-  font-size: 15px;
+  display: grid;
+  grid-template-columns: 340px 1fr;   /* img + info */
+  align-items: start;
+  gap: 20px;                           /* menos espacio en blanco */
+  margin: 16px auto 20px auto;         /* centrado relativo al contenedor */
+  padding: 0 20px;                      /* respiración horizontal */
+  max-width: 1100px;                    /* no se estira infinito */
+  font-size: 14px;                      /* un toque más compacto */
 }
 
+/* Imagen: tamaño controlado y elegante */
 .imagen-local {
-  flex: 0 0 300px;
-  height: 300px;
-  width: 300px;
-  margin-right: 50px;
-  border-radius: 5px;
-  border: 1px solid gray;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 340px;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  transition: transform .2s ease;
 }
+.imagen-local:hover { transform: scale(1.01); }
 
-
+/* Cuadrícula de info: 2 columnas, cards compactas */
 .info-local {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px 32px;
-  padding: 18px 10px 10px 10px;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 12px 16px;
+  align-content: start;
 }
 
+/* Cada bloque de info como tarjeta compacta */
+.info-local > div {
+  background: #fff;
+  border: 1px solid #eceff1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+.info-local h4 {
+  margin: 0 0 4px 0;
+  font-weight: 600;
+  color: #6b7280;
+  font-size: 12px;
+  letter-spacing: .2px;
+}
+.info-local h1 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+  color: #111827;
+}
 
+/* ===== Resumen (tabla) ===== */
 .resumen-deuda {
-  border: 1px solid black;
-  width: 800px;
-  margin-left: 30px;
-  margin-bottom: 0;
-  background: #fafbfc;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  margin: 6px auto 0 auto;      /* centrado y menos blanco */
+  padding: 8px 12px;            /* acolchado interno */
+  max-width: 1100px;            /* fluido */
 }
 
+/* Tabla compacta, zebra y header sticky */
 .resumen-deuda table {
-  text-align: center;
-  border: 1px solid black;
-  margin-top: 0;
   width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;          /* columnas parejas */
+  font-size: 13px;
+}
+
+.resumen-deuda th,
+.resumen-deuda td {
+  padding: 8px 10px;            /* compacto */
+  border-bottom: 1px solid #eef2f7;
+  text-align: left;              /* más legible que centrado en todo */
 }
 
 .resumen-deuda th {
-  background-color: lightgray;
-  text-align: center;
+  position: sticky;
+  top: 0;
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 700;
+  z-index: 1;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.td-descripcion, .td-informacion {
-  width: 50%;
-  text-align: center;
+/* Zebra */
+.resumen-deuda tr:nth-child(even) td {
+  background: #fafbfc;
 }
 
-/* Botón desocupar + mensaje */
+/* Primera columna un poco más ancha para etiquetas */
+.td-descripcion { width: 40%; font-weight: 600; color: #374151; }
+.td-informacion { width: 60%; color: #111827; }
 
+/* ===== Botonera / acciones ===== */
 .acciones-local {
   display: flex;
-  flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 1.5rem;
-  margin: 20px 0 10px 0;
+  gap: 14px;
+  margin: 12px auto 16px auto;
+  padding: 6px 12px;
+  max-width: 1100px;
+  position: sticky;
+  bottom: 8px;                          /* se “pega” suave al hacer scroll */
+  backdrop-filter: blur(3px);
 }
 
 .boton-desocupar {
-  border: solid black 1px;
-  background: #f5f7f8;
-  padding: .5rem 1.2rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.07);
+  border: 1px solid #111827;
+  background: #111827;
+  color: #fff;
+  padding: .55rem 1.1rem;
+  border-radius: 8px;
+  font-size: .95rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
 }
+.boton-desocupar:hover { background:#0f172a; box-shadow:0 4px 14px rgba(0,0,0,.18); }
+.boton-desocupar:active { transform: translateY(1px); }
 
+/* Mensaje feedback */
 #mensaje-boton {
-  background-color: #e0ffe0;
-  padding: 10px 20px;
-  border: 1px solid green;
-  border-radius: 5px;
-  font-weight: bold;
-  color: green;
+  background: #e6f4ea;
+  padding: 8px 12px;
+  border: 1px solid #c7e8d0;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #1e7a2e;
   display: none;
   min-width: 220px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0,128,0,0.07);
+  box-shadow: 0 2px 8px rgba(16,185,129,0.12);
 }
 
-/* ====== AGREGADO MÍNIMO: Modal y botones ====== */
-.btn { cursor:pointer; padding:.5rem .8rem; border-radius:8px; border:1px solid #cfd8dc; background:#f5f7f8 }
-.btn-primary { background:#1976d2; color:#fff; border-color:#1976d2 }
-.btn-secondary { background:#eceff1 }
+/* ===== Modal y controles (mantengo tu estructura, solo mejoro look) ===== */
+.btn { cursor:pointer; padding:.5rem .8rem; border-radius:10px; border:1px solid #cfd8dc; background:#f8fafc; transition: background .2s ease, transform .08s ease; }
+.btn:hover { background:#eef2f7; }
+.btn:active { transform: translateY(1px); }
+.btn-primary { background:#2563eb; color:#fff; border-color:#2563eb; }
+.btn-primary:hover { background:#1d4ed8; }
+.btn-secondary { background:#f3f4f6; }
 
-.backdrop { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:9998; display:none }
+.backdrop {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.35);
+  z-index:9998; display:none;
+}
+
 .modal {
-  position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
-  background:#fff; border:1px solid #ddd; border-radius:10px; max-width:560px; width:92%;
+  position:fixed; left:50%; top:50%;
+  transform:translate(-50%,-50%);
+  background:#fff; border:1px solid #e5e7eb; border-radius:14px;
+  max-width:560px; width:92%;
   padding:16px; z-index:10000; display:none;
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
 }
 .modal header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px }
 .modal footer { display:flex; justify-content:flex-end; gap:.5rem; margin-top:12px }
-.form-grid { display:grid; grid-template-columns:1fr; gap:.6rem }
-.form-grid label { display:block; font-weight:600; margin-bottom:.15rem }
-.form-grid input { width:100%; padding:.45rem .6rem; border:1px solid #cfd8dc; border-radius:6px }
+
+.form-grid { display:grid; grid-template-columns:1fr; gap:.65rem }
+.form-grid label { display:block; font-weight:700; margin-bottom:.15rem; color:#374151; }
+.form-grid input {
+  width:100%; padding:.55rem .65rem;
+  border:1px solid #d1d5db; border-radius:10px;
+  background:#fff; transition: box-shadow .15s ease, border-color .15s ease;
+}
+.form-grid input:focus {
+  outline: none;
+  border-color:#60a5fa;
+  box-shadow: 0 0 0 3px rgba(96,165,250,.25);
+}
+
+/* ===== Responsivo ===== */
+@media (max-width: 980px) {
+  .datos-principales { grid-template-columns: 1fr; }
+  .imagen-local { max-width: 100%; height: 220px; }
+  .info-local { grid-template-columns: 1fr 1fr; gap: 10px; }
+}
+@media (max-width: 600px) {
+  .info-local { grid-template-columns: 1fr; }
+  .resumen-deuda, .acciones-local { padding: 8px; }
+  .boton-desocupar { width: 100%; }
+}
