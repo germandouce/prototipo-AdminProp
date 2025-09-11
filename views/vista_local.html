@@ -1,93 +1,116 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Title</title>
-        <link rel="stylesheet" href="../css/style.css">
-        <link rel="stylesheet" href="../css/vista_local.css">
-    </head>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Vista del Local</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/vista_local.css">
+</head>
+<body>
+  <div id="app" class="container">
+    <aside class="sidebar">
+      <h2>AdminProp</h2>
+      <nav>
+        <ul>
+          <li><a href="inicio.html" data-page="inicio">Inicio</a></li>
+          <li><a href="clientes.html" data-page="clientes">Clientes</a></li>
+          <li><a href="cargar_propiedad.html" data-page="cargar-propiedad">Cargar propiedad</a></li>
+          <li><a href="consorcios.html" data-page="consorcios">Consorcios</a></li>
+          <li><a href="rendiciones.html" data-page="rendiciones">Rendiciones</a></li>
+          <li><a href="configuracion.html" data-page="configuracion">Configuración</a></li>
+        </ul>
+      </nav>
+    </aside>
 
-
-<script src="../scripts/vista_local.js"></script>
-
-<body class="local-body">
-    <div id="app" class="container">
-        <aside class="sidebar">
-            <h2>AdminProp</h2>
-            <nav>
-                <ul>
-                    <li><a href="inicio.html" data-page="inicio">Inicio</a></li>
-                    <li><a href="clientes.html" data-page="clientes">Clientes</a></li>
-                    <li><a href="consorcios.html" data-page="consorcios">Consorcios</a></li>
-                    <li><a href="rendiciones.html" data-page="rendiciones">Rendiciones</a></li>
-                    <li><a href="configuracion.html" data-page="configuracion">Configuración</a></li>
-                </ul>
-            </nav>
-        </aside>
-        
-        <div class="local-container">
-            <main class="content">
-                <section class="mensaje-informacion">
-                    <div id="mensaje-boton"></div>
-                </section>
-                <section class="datos-principales">
-    
-                    <div>
-                        <img src="https://ba-h.com.ar/wp-content/uploads/2018/10/galerias-pacifico-3.jpg" alt="imagen del local" class="imagen-local">
-                    </div>
-    
-                    <div class= "info-local">
-                        <div>
-                            <h4>Nombre del consorcio</h4>
-                            <h1>Galerías Pacífico</h1>
-                        </div>
-                        <div>
-                            <h4>Local Número</h4>
-                            <h1>17</h1>
-                        </div>
-                        <div>
-                            <h4>Cliente</h4>
-                            <h1 data-nombre>Juan Pérez</h1>
-                        </div>
-                        <div>
-                            <h4>Deuda total</h4>
-                            <h1 class="deuda-total" data-deuda>$500000</h1>
-                        </div>
-                    </div>
-                    <div class="boton">
-                    </div>
-                    
-                </section>
-    
-                
-                <section class="resumen-deuda">
-                    
-                    <table>
-                        <tr>
-                            <th>
-                                Descripción
-                            </th>
-                            <th>
-                                Estado
-                            </th>
-                        </tr>
-                        <tr>
-                            <td class="td-descripcion">Ocupado</td>
-                            <td class="td-informacion">Sí</td>
-                        </tr>
-                        <tr>
-                            <td class="td-descripcion">Último mes pago</td>
-                            <td class="td-informacion">Julio 2025</td>
-                        </tr>
-                    </table>
-                    
-                </section>
-                <button class="boton-desocupar" onclick="toggleTodos()">Desocupar esta unidad</button>
-    
-            </main>
+    <main class="content">
+      <!-- DATOS PRINCIPALES -->
+      <section class="datos-principales">
+        <div>
+          <img src="https://ba-h.com.ar/wp-content/uploads/2018/10/galerias-pacifico-3.jpg" alt="imagen del local" class="imagen-local">
         </div>
+
+        <div class="info-local">
+          <div>
+            <h4>Nombre del consorcio</h4>
+            <h1 id="consorcioNombre">Galerías Pacífico</h1>
+          </div>
+          <div>
+            <h4>Local Número</h4>
+            <h1 id="numeroLocal">17</h1>
+          </div>
+          <div>
+            <h4>Cliente</h4>
+            <div style="display:flex; align-items:center; gap:.75rem;">
+              <h1 data-nombre>Juan Pérez</h1>
+              <button type="button" id="btnCambiarInq" class="btn btn-secondary">Cambiar inquilino</button>
+            </div>
+          </div>
+          <div>
+            <h4>Deuda total</h4>
+            <h1 class="deuda-total" data-deuda>$00000</h1>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESUMEN -->
+      <section class="resumen-deuda">
+        <table>
+          <tr>
+            <th>Descripción</th>
+            <th></th>
+          </tr>
+          <tr>
+            <td class="td-descripcion">Ocupado</td>
+            <td class="td-informacion" id="tdOcupado">No</td>
+          </tr>
+          <tr>
+            <td class="td-descripcion">Último mes pago</td>
+            <td class="td-informacion" id="tdUltimoMes">Septiembre 2025</td>
+          </tr>
+          <tr>
+            <td class="td-descripcion">Valor de alquiler</td>
+            <td class="td-informacion" id="tdAlquiler">$—</td>
+          </tr>
+          <tr>
+            <td class="td-descripcion">Fin de contrato</td>
+            <td class="td-informacion" id="tdFinContrato">—</td>
+          </tr>
+        </table>
+          <div class="acciones-local">
+            <button type="button" class="boton-desocupar" onclick="toggleTodos()">Desocupar</button>
+            <div id="mensaje-boton" style="display:none;"></div>
+          </div>
+        </section>
+    </main>
+  </div>
+
+  <!-- MODAL CAMBIAR INQUILINO (misma página) -->
+  <div id="backdrop" class="backdrop"></div>
+  <div id="modalInq" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <header>
+      <h3 id="modalTitle">Cambiar inquilino</h3>
+      <button type="button" id="btnCerrar" class="btn">✕</button>
+    </header>
+    <div class="form-grid">
+      <div>
+        <label for="inpNombre">Nombre del inquilino *</label>
+        <input id="inpNombre" type="text" placeholder="Ej: Martina López" required>
+      </div>
+      <div>
+        <label for="inpAlquiler">Valor del alquiler (ARS) *</label>
+        <input id="inpAlquiler" type="number" min="0" step="1" placeholder="Ej: 250000" required>
+      </div>
+      <div>
+        <label for="inpFinContrato">Fecha de fin de contrato *</label>
+        <input id="inpFinContrato" type="date" required>
+      </div>
     </div>
+    <footer>
+      <button type="button" id="btnCancelar" class="btn">Cancelar</button>
+      <button type="button" id="btnGuardar" class="btn btn-primary">Guardar cambios</button>
+    </footer>
+  </div>
+
+  <script src="../scripts/vista_local.js"></script>
 </body>
-
-
 </html>

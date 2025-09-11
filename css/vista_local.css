@@ -1,108 +1,111 @@
 .local-container {
-    margin-top: 25px;
+  margin-top: 25px;
 }
 
+
 .datos-principales {
-    display: flex;
-    justify-content: flex-start; /* pega los elementos a la izquierda */
-    align-items: flex-start;
-    margin-bottom: 20px;
-    margin-left: 30px;
-    gap: 20px; /* espacio entre la imagen y la info */
-    font-size: 13px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  margin-left: 30px;
+  gap: 36px;
+  font-size: 15px;
 }
 
 .imagen-local {
-    flex: 0 0 300px; /* no crece, ocupa 300px fijo */
-    height: 300px;
-    width: 300px;
-    margin-right: 50px;
-    border-radius: 5px;
-    border: 1px solid gray;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    overflow: hidden;
+  flex: 0 0 300px;
+  height: 300px;
+  width: 300px;
+  margin-right: 50px;
+  border-radius: 5px;
+  border: 1px solid gray;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.imagen-local img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
 
 .info-local {
-    flex: 1; /* ocupa todo el espacio restante */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding-left: 25px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 32px;
+  padding: 18px 10px 10px 10px;
 }
 
-.info-local h1 {
-    margin-top: 0px;
-}
-.info-local h4 {
-    margin-top: 10px;
-    margin-bottom: 0px;
-}
-.info-local div {
-    margin: 0px;
-}
-.deuda-total {
-    border: solid lightgray 1px;
-    border-radius: 10px;
-    width: 200px;
-    padding: 10px;
-}
 
 .resumen-deuda {
-    border: 1px solid black;  
-    margin-left: 30px;
-    width: 800px;
+  border: 1px solid black;
+  width: 800px;
+  margin-left: 30px;
+  margin-bottom: 0;
+  background: #fafbfc;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .resumen-deuda table {
-    text-align: center;
-    border: 1px solid black;
-    margin-top: 0px;
-    width: 100%;
+  text-align: center;
+  border: 1px solid black;
+  margin-top: 0;
+  width: 100%;
 }
 
 .resumen-deuda th {
-    background-color: lightgray;
-    text-align: center;
+  background-color: lightgray;
+  text-align: center;
 }
 
-.td-descripcion {
-    width: 50%;
-    text-align: center;
+.td-descripcion, .td-informacion {
+  width: 50%;
+  text-align: center;
 }
 
-.td-informacion {
-    width: 50%;
-    text-align: center;
+/* Botón desocupar + mensaje */
+
+.acciones-local {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 20px 0 10px 0;
 }
 
 .boton-desocupar {
-    position: absolute;
-    margin-top: 25px;
-    left: 50%;               /* centrado horizontal */
-    transform: translateX(-50%); /* centrado exacto */
-    border: solid black 1px;
-    margin-bottom: 0px;
+  border: solid black 1px;
+  background: #f5f7f8;
+  padding: .5rem 1.2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.07);
 }
 
 #mensaje-boton {
-    position: absolute;      /* lo saca del flujo normal */
-    top: 10px;               /* distancia desde arriba de la página o contenedor */
-    left: 50%;               /* centrado horizontal */
-    transform: translateX(-50%); /* centrado exacto */
-    background-color: #e0ffe0;  /* opcional: fondo para resaltar */
-    padding: 10px 20px;
-    border: 1px solid green;
-    border-radius: 5px;
-    font-weight: bold;
-    color: green;
-    display: none;           /* empieza oculto */
-    z-index: 1000;           /* por si hay otros elementos encima */
+  background-color: #e0ffe0;
+  padding: 10px 20px;
+  border: 1px solid green;
+  border-radius: 5px;
+  font-weight: bold;
+  color: green;
+  display: none;
+  min-width: 220px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,128,0,0.07);
 }
+
+/* ====== AGREGADO MÍNIMO: Modal y botones ====== */
+.btn { cursor:pointer; padding:.5rem .8rem; border-radius:8px; border:1px solid #cfd8dc; background:#f5f7f8 }
+.btn-primary { background:#1976d2; color:#fff; border-color:#1976d2 }
+.btn-secondary { background:#eceff1 }
+
+.backdrop { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:9998; display:none }
+.modal {
+  position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+  background:#fff; border:1px solid #ddd; border-radius:10px; max-width:560px; width:92%;
+  padding:16px; z-index:10000; display:none;
+}
+.modal header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px }
+.modal footer { display:flex; justify-content:flex-end; gap:.5rem; margin-top:12px }
+.form-grid { display:grid; grid-template-columns:1fr; gap:.6rem }
+.form-grid label { display:block; font-weight:600; margin-bottom:.15rem }
+.form-grid input { width:100%; padding:.45rem .6rem; border:1px solid #cfd8dc; border-radius:6px }
