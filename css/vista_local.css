@@ -1,15 +1,22 @@
+.local-container {
+    margin-top: 25px;
+}
+
 .datos-principales {
     display: flex;
     justify-content: flex-start; /* pega los elementos a la izquierda */
     align-items: flex-start;
     margin-bottom: 20px;
+    margin-left: 30px;
     gap: 20px; /* espacio entre la imagen y la info */
+    font-size: 13px;
 }
 
 .imagen-local {
     flex: 0 0 300px; /* no crece, ocupa 300px fijo */
     height: 300px;
     width: 300px;
+    margin-right: 50px;
     border-radius: 5px;
     border: 1px solid gray;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -48,18 +55,54 @@
     padding: 10px;
 }
 
-
 .resumen-deuda {
     border: 1px solid black;  
-    width: 90%;  
+    margin-left: 30px;
+    width: 800px;
 }
 
 .resumen-deuda table {
     text-align: center;
     border: 1px solid black;
     margin-top: 0px;
+    width: 100%;
 }
 
 .resumen-deuda th {
     background-color: lightgray;
+    text-align: center;
+}
+
+.td-descripcion {
+    width: 50%;
+    text-align: center;
+}
+
+.td-informacion {
+    width: 50%;
+    text-align: center;
+}
+
+.boton-desocupar {
+    position: absolute;
+    margin-top: 25px;
+    left: 50%;               /* centrado horizontal */
+    transform: translateX(-50%); /* centrado exacto */
+    border: solid black 1px;
+    margin-bottom: 0px;
+}
+
+#mensaje-boton {
+    position: absolute;      /* lo saca del flujo normal */
+    top: 10px;               /* distancia desde arriba de la página o contenedor */
+    left: 50%;               /* centrado horizontal */
+    transform: translateX(-50%); /* centrado exacto */
+    background-color: #e0ffe0;  /* opcional: fondo para resaltar */
+    padding: 10px 20px;
+    border: 1px solid green;
+    border-radius: 5px;
+    font-weight: bold;
+    color: green;
+    display: none;           /* empieza oculto */
+    z-index: 1000;           /* por si hay otros elementos encima */
 }

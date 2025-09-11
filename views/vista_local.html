@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/vista_local.css">
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+        <link rel="stylesheet" href="../css/style.css">
+        <link rel="stylesheet" href="../css/vista_local.css">
+    </head>
+
+
+<script src="../scripts/vista_local.js"></script>
+
+<body class="local-body">
     <div id="app" class="container">
         <aside class="sidebar">
             <h2>AdminProp</h2>
@@ -20,57 +24,70 @@
                 </ul>
             </nav>
         </aside>
-
-        <main class="content">
-            <section class="datos-principales">
-
-                <div>
-                    <img src="https://ba-h.com.ar/wp-content/uploads/2018/10/galerias-pacifico-3.jpg" alt="imagen del local" class="imagen-local">
-                </div>
-
-                <div class= "info-local">
+        
+        <div class="local-container">
+            <main class="content">
+                <section class="mensaje-informacion">
+                    <div id="mensaje-boton"></div>
+                </section>
+                <section class="datos-principales">
+    
                     <div>
-                        <h4>Nombre del consorcio</h4>
-                        <h1>Galerías Pacífico</h1>
+                        <img src="https://ba-h.com.ar/wp-content/uploads/2018/10/galerias-pacifico-3.jpg" alt="imagen del local" class="imagen-local">
                     </div>
-                    <div>
-                        <h4>Local Número</h4>
-                        <h1>17</h1>
+    
+                    <div class= "info-local">
+                        <div>
+                            <h4>Nombre del consorcio</h4>
+                            <h1>Galerías Pacífico</h1>
+                        </div>
+                        <div>
+                            <h4>Local Número</h4>
+                            <h1>17</h1>
+                        </div>
+                        <div>
+                            <h4>Cliente</h4>
+                            <h1 data-nombre>Juan Pérez</h1>
+                        </div>
+                        <div>
+                            <h4>Deuda total</h4>
+                            <h1 class="deuda-total" data-deuda>$500000</h1>
+                        </div>
                     </div>
-                    <div>
-                        <h4>Cliente</h4>
-                        <h1>Juan Pérez</h1>
+                    <div class="boton">
                     </div>
-                    <div>
-                        <h4>Deuda total</h4>
-                        <h1 class="deuda-total">$00000</h1>
-                    </div>
-                </div>
-
-            </section>
-
-            <section class="resumen-deuda">
-
-                <table>
-                    <tr>
-                        <th>
-                            Descripción
-                        </th>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td>Ocupado</td>
-                        <td>No</td>
-                    </tr>
-                    <tr>
-                        <td>Último mes pago</td>
-                        <td>Septiembre 2025</td>
-                    </tr>
-                </table>
-
-            </section>
-
-        </main>
+                    
+                </section>
+    
+                
+                <section class="resumen-deuda">
+                    
+                    <table>
+                        <tr>
+                            <th>
+                                Descripción
+                            </th>
+                            <th>
+                                Estado
+                            </th>
+                        </tr>
+                        <tr>
+                            <td class="td-descripcion">Ocupado</td>
+                            <td class="td-informacion">Sí</td>
+                        </tr>
+                        <tr>
+                            <td class="td-descripcion">Último mes pago</td>
+                            <td class="td-informacion">Julio 2025</td>
+                        </tr>
+                    </table>
+                    
+                </section>
+                <button class="boton-desocupar" onclick="toggleTodos()">Desocupar esta unidad</button>
+    
+            </main>
+        </div>
     </div>
 </body>
+
+
 </html>
