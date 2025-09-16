@@ -114,3 +114,60 @@ Devuelve:
   ]
 }
 ```
+
+## Rendición de propietarios
+### endpoint: /owners_reports
+### GET
+Pide:
+```json
+{
+  "consortium_id": 0,
+  "month_of_year": "2024-02"
+}
+```
+Devuelve:
+```json
+{
+  "owner_report": {
+    "consortium_address": "Av. Paseo Colón 850",
+    "month_of_year": "2024-02",
+    "total_incomes": 3000.00,
+    "total_outcomes": 800.00,
+    "administration_percentage": 10.0,
+    "administration_fee": 220.00,
+    "net_income": 1880.00
+  }
+}
+```
+## Comisión de administración
+### endpoint: /administration_fee
+### GET
+Pide:
+```json
+{
+  "month_of_year": "2024-02"
+}
+```
+Devuelve:
+```json
+{
+  "administration_fee": {
+    "month_of_year": "2024-02",
+    "total_administration_fee": 400.00,
+    "details": [
+      {
+        "consortium_address": "Av. Paseo Colón 850",
+        "administration_percentage": 10.0,
+        "total_incomes": 3000.00,
+        "administration_fee": 300.00
+      },
+      {
+        "consortium_address": "Calle Falsa 123",
+        "administration_percentage": 5.0,
+        "total_incomes": 2000.00,
+        "administration_fee": 100.00
+      }
+    ]
+  }
+}
+```
