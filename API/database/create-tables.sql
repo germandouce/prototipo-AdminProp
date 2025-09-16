@@ -18,7 +18,15 @@ CREATE TABLE IF NOT EXISTS consortiums (
 CREATE TABLE IF NOT EXISTS functional_units (
     id INT AUTO_INCREMENT PRIMARY KEY,
     unit_number INT NOT NULL,
-    unit_name VARCHAR (15) NOT NULL,
+    unit_name VARCHAR(15) NOT NULL,
+    surface_percentage DECIMAL(10,2) NOT NULL,
+    tentan VARCHAR(25),
     consortium INT NOT NULL,
     FOREIGN KEY (consortium) REFERENCES consortiums(id)
+);
+
+INSERT INTO users (name, surname, email, password)
+SELECT 'Joe', 'Doe', 'usuario@dominio.com', 'abc123'
+    WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'usuario@dominio.com'
 );

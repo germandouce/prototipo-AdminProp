@@ -1,3 +1,4 @@
+import requests
 from flask import Flask, render_template, request, make_response, redirect, url_for
 from config import *
 import datetime
@@ -32,6 +33,9 @@ def login():
         response = requests.post(f"{API_URL}/login", json={"email": email, "password": password})
         if response.status_code == 200:
             return redirect(url_for("inicio"))
+        else:
+            error_msg = response.json().get("error", "Error desconocido")
+            return render_template("login.html", error=error_msg)
     return render_template("login.html")
 
 @app.route("/clientes")
