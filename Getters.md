@@ -5,16 +5,18 @@
 Devuelve:
 ```json
 {
-  "Consortium1": {
-    "ID": 0,
-    "Address": "Av. Paseo Colón 850",
-    "UFs Amount": 1000
-  },
-  "Consortium2": {
-    "ID": 1,
-    "Address": "Calle Falsa 123",
-    "UFs Amount": 500
-  }
+  "consortiums": [
+      {
+        "ID": 0,
+        "Address": "Av. Paseo Colón 850",
+        "UFs Amount": 1000
+      },
+      {
+        "ID": 1,
+        "Address": "Calle Falsa 123",
+        "UFs Amount": 500
+      }
+  ]
 }
 ```
 POST
@@ -30,15 +32,15 @@ Pide:
 Devuelve:
 ```json
 {
-  "FunctionalUnit1": {
-    "ID": 0,
-    "ConsortiumID": 0,
-    "Type": "Apartment",
-    "Number": "101",
-    "Owner": "John Doe",
-    "Area": 75.5
+  "functional_units": [
+    {
+    "id": 0,
+    "number": "101",
+      
+    "owner": "John Doe",
+    "area": 75.5
   },
-  "FunctionalUnit2": {
+  {
     "ID": 1,
     "ConsortiumID": 0, 
     "Type": "Garage",
@@ -46,5 +48,6 @@ Devuelve:
     "Owner": "Jane Smith",
     "Area": 15.0
   }
+  ]
 }
 ```
