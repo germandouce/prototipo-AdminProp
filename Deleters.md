@@ -1,5 +1,6 @@
 ##  DELETE UNIDAD
-### POST
+### endpoint: /delete_unit
+### POST 
 
 Envio: 
 ```json
@@ -8,6 +9,7 @@ Envio:
 }
 ```
 # DELETE CONSORCIO
+### endpoint: /delete_consortium
 ### POST
 
 Envio: 
@@ -18,6 +20,7 @@ Envio:
 ```
 
 # DELETE GASTO
+### endpoint: /delete_expense
 ### POST
 
 Envio: 
@@ -28,6 +31,7 @@ Envio:
 ```
 
 # DELETE PAGO
+### endpoint: /delete_payment
 ### POST
 
 Envio:
