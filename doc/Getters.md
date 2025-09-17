@@ -28,7 +28,7 @@ Devuelve:
 Pide:
 ```json
 {
-  "consortium_id": 0 // Opcional para filtrar por consorcio
+  "consortium_id": 0 // Opcional para filtrar por consorcio, sino trae todas las unidades
 }
 ```
 Devuelve:
