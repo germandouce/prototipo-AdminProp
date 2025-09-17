@@ -44,6 +44,7 @@ Devuelve:
       "consortium_address": "Av. Paseo Colón 850",
       "rent_value": 1500.00,
       "expenses_value": 300.00,
+      "surface":10,
       "debt": 0.00
     },
     {
@@ -55,6 +56,7 @@ Devuelve:
       "consortium_address": "Av. Paseo Colón 850",
       "rent_value": 1200.00,
       "expenses_value": 250.00,
+      "surface":15,
       "debt": 100.00
     }
   ]
