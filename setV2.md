@@ -1,10 +1,10 @@
 ## SET PAGO
 ### POST
 
-Devuelve: 
+Envio: 
 ```json
 {
-    "nombre_inquilino":"inquilino_que_paga",
+    "nombre_inquilino":"Guillermo",
     "id_unidad":11111,
     "fecha_de_pago":"2025-08-31",
     "monto":1000
@@ -14,7 +14,7 @@ Devuelve:
 ## SET NUEVO COMPLEJO
 ### POST
 
-Devuelve:
+Envio:
 ```json
 {
     "nombre_complejo":"fiuba",
@@ -27,7 +27,7 @@ Devuelve:
 ## SET EDITAR COMISION
 ### POST
 
-Devuelve:
+Envio:
 ```json
 {
     "id_complejo":1,
@@ -38,18 +38,19 @@ Devuelve:
 ## SET NUEVA UNIDAD
 ### POST
 
-Devuelve:
+Envio:
 ```json
 {
-    "consorcio":"fiuba",
-    "nombre_unidad": "1A"
+    "id_consorcio": 2,
+    "nombre_unidad": "1A",
+    "metros_cuadrados": 50
 }
 ```
 
 ## SET NUEVO INQUILINO
 ### POST
 
-Devuelve:
+Envio:
 ```json
 {
     "nombre":"juan",
@@ -60,7 +61,7 @@ Devuelve:
 ## SET NUEVO GASTO
 ### POST
 
-Devuelve:
+Envio:
 ```json
 {
     "fecha":"2025-09-16",
@@ -73,7 +74,7 @@ Devuelve:
 ## SET DESOCUPAR
 ### POST
 
-Devuelve:
+Envio:
 ```json
 {
     "id_unidad":1

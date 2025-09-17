@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS functional_units (
     id INT AUTO_INCREMENT PRIMARY KEY,
     unit_number INT NOT NULL, -- e.g., 001
     unit_name VARCHAR(15) NOT NULL, -- e.g., 1A
+    surface DECIMAL(10,2) NOT NULL,
     surface_percentage DECIMAL(10,2) NOT NULL,
     tentan VARCHAR(25),
     debt DECIMAL(10,2) DEFAULT 0,
@@ -39,9 +40,11 @@ CREATE TABLE IF NOT EXISTS common_expenses (
 CREATE TABLE IF NOT EXISTS payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     functional_unit INT NOT NULL,
+    consortium INT NOT NULL,
     tentant VARCHAR(25) NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
     date DATE NOT NULL,
+    FOREIGN KEY (consortium) REFERENCES consortiums(id),
     FOREIGN KEY (functional_unit) REFERENCES functional_units(id)
 );
 

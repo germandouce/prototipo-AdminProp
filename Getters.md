@@ -66,7 +66,8 @@ Devuelve:
 Pide:
 ```json
 {
-  "tentant_id": 0 // Opcional para filtrar por inquilino
+  "tentant_name": "John Doe", 
+  "id_unit": 0
 }
 ```
 Devuelve:
