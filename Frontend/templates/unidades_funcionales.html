@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Unidades funcionales - AdminProp{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ufs_style.css') }}">
+    <script src="{{ url_for('static', filename='js/redir_ufs_local.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/agregar_unidad.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cambio_periodo_expensas.js') }}"></script>
+{% endblock %}
+{% block content %}
+        <div id="address">
+            <h1 id="direccion-complejo">Dirección</h1>
+        </div>
+        <section id="unidades-funcionales" class="page active">
+            <div class="table-wrap">
+                <table role="table" aria-describedby="tabla-ayuda">
+                    <caption id="units-table-caption">
+                        <div>
+                            <div>Unidades</div>
+                            <button id="add-unit-btn">+ Agregar unidad</button>
+                        </div>
+                    </caption>
+
+                    <thead>
+                        <tr role="row">
+                            <th scope="col">Unidad</th>
+                            <th scope="col">Inquilino</th>
+                            <th scope="col">Alquiler</th>
+                            <th scope="col">Estado de pago</th>
+                        </tr>
+                    </thead>
+                    <tbody class="unidades-container">
+                        <tr class="funcional">
+                            <td data-label="Unidad">
+                                <span class="unit"><span class="avatar">001</span> 1A</span>
+                            </td>
+                            <td data-label="Inquilino" class="tenant">Giacomo Guilizzo</td>
+                            <td data-label="Alquiler" class="rent">$600.000</td>
+                            <td data-label="Estado de pago"><span class="status paid" aria-label="Al día">● Al día</span></td>
+                        </tr>
+                        <tr>
+                            <td data-label="Unidad">
+                                <span class="unit"><span class="avatar">002</span> 1B</span>
+                            </td>
+                            <td data-label="Inquilino" class="tenant">Marco Botto</td>
+                            <td data-label="Alquiler" class="rent">$840.000</td>
+                            <td data-label="Estado de pago"><span class="status pending" aria-label="Pendiente">● Pendiente</span></td>
+                        </tr>
+                        <tr>
+                            <td data-label="Unidad">
+                                <span class="unit"><span class="avatar">003</span> 1C</span>
+                            </td>
+                            <td data-label="Inquilino" class="tenant">Mariah Maclachla</td>
+                            <td data-label="Alquiler" class="rent">$360.000</td>
+                            <td data-label="Estado de pago"><span class="status late" aria-label="Atrasado">● Atrasado</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section id="formulario-agregar-unidad">
+            <!-- Modal oculto por defecto -->
+            <div id="modal-overlay" class="modal-overlay" style="display: none;">
+                <div class="modal">
+                    <h2>Agregar unidad</h2>
+                    <form id="unit-form">
+                        <label>
+                            Unidad:
+                            <input type="text" name="unidad" required>
+                        </label>
+                        <label>
+                            Inquilino:
+                            <input type="text" name="inquilino" required>
+                        </label>
+                        <label>
+                            Alquiler:
+                            <input type="text" name="alquiler" required>
+                        </label>
+                        <div class="actions">
+                            <button type="submit">Guardar</button>
+                            <button type="button" id="cancel-btn">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </section>
+        <section id="gastos-comunes" class="page active">
+            <div class="table-wrap">
+                <table role="table" aria-describedby="tabla-ayuda" id="tabla-expensas">
+                    <caption id="gastos-comunes-table-caption">
+                        <div class="titulo-tabla-y-boton">
+                            <div>Gastos comunes</div>
+                            <button id="add-expense-unit-btn">+ Agregar gasto</button>
+                        </div>
+                        <div>
+                            <form id="gastos-form" method="get">
+                                <label for="periodos">Selecciona un periodo</label>
+                                <select data-label="gastos-data-list" id="periodos" name="periodo">
+                                    <option value="septiembre-2025">Septiembre 2025</option>
+                                    <option value="agosto-2025">Agosto 2025</option>
+                                    <option value="julio-2025">Julio 2025</option>
+                                </select>
+                            </form>
+                        </div>
+                    </caption>
+
+                    <thead>
+                    <tr role="row">
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Detalle</th>
+                        <th scope="col">Monto</th>
+                    </tr>
+                    </thead>
+                    <tbody id="septiembre-2025" class="unidades-container periodo">
+                        <tr class="funcional">
+                            <td data-label="Fecha">8/9/2025</td>
+                            <td data-label="Detalle" class="tenant">ABL</td>
+                            <td data-label="Monto" class="rent">$400.000</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Fecha">9/9/2025</td>
+                            <td data-label="Detalle" class="tenant">EDENOR</td>
+                            <td data-label="Monto" class="rent">$1.000.000</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Fecha">10/9/2025</td>
+                            <td data-label="Detalle" class="tenant">AYSA</td>
+                            <td data-label="Monto" class="rent">$750.000</td>
+                        </tr>
+                    </tbody>
+                    <tbody id="agosto-2025" class="unidades-container periodo hidden">
+                        <tr class="funcional">
+                            <td data-label="Fecha">16/8/2025</td>
+                            <td data-label="Detalle" class="tenant">ABL</td>
+                            <td data-label="Monto" class="rent">$400.000</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Fecha">25/8/2025</td>
+                            <td data-label="Detalle" class="tenant">EDENOR</td>
+                            <td data-label="Monto" class="rent">$1.000.000</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Fecha">30/8/2025</td>
+                            <td data-label="Detalle" class="tenant">AYSA</td>
+                            <td data-label="Monto" class="rent">$750.000</td>
+                        </tr>
+                        <tr>
+                            <td data-label="Fecha">31/8/2025</td>
+                            <td data-label="Detalle" class="tenant">Se rompió el ascensor :(</td>
+                            <td data-label="Monto" class="rent">$750.000</td>
+                        </tr>
+                    </tbody>
+                    <tbody id="julio-2025" class="unidades-container periodo hidden">
+                    <tr class="funcional">
+                        <td data-label="Fecha">8/9/2025</td>
+                        <td data-label="Detalle" class="tenant">ABL</td>
+                        <td data-label="Monto" class="rent">$400.000</td>
+                    </tr>
+                    <tr>
+                        <td data-label="Fecha">9/9/2025</td>
+                        <td data-label="Detalle" class="tenant">EDENOR</td>
+                        <td data-label="Monto" class="rent">$1.000.000</td>
+                    </tr>
+                    <tr>
+                        <td data-label="Fecha">10/9/2025</td>
+                        <td data-label="Detalle" class="tenant">AYSA</td>
+                        <td data-label="Monto" class="rent">$750.000</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+{% endblock %}
