@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const nombre = unidadCell ? unidadCell.textContent.trim() : "";
 
             // redirigir
-            window.location.href = `vista_local.html?unidad=${encodeURIComponent(nombre)}`;
+            window.location.href = `url_for('unidad_funcional')?unidad=${encodeURIComponent(nombre)}`;
         }
     }
 

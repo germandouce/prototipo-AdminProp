@@ -2,7 +2,6 @@
 {% block title %}Unidades funcionales - AdminProp{% endblock %}
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ufs_style.css') }}">
-    <script src="{{ url_for('static', filename='js/redir_ufs_local.js') }}"></script>
     <script src="{{ url_for('static', filename='js/agregar_unidad.js') }}"></script>
     <script src="{{ url_for('static', filename='js/cambio_periodo_expensas.js') }}"></script>
 {% endblock %}
@@ -29,7 +28,7 @@
                         </tr>
                     </thead>
                     <tbody class="unidades-container">
-                        <tr class="funcional">
+                        <tr class="funcional" onclick="window.location.href='{{ url_for('unidad_funcional') }}?unidad=Av.%20Córdoba%20550'">
                             <td data-label="Unidad">
                                 <span class="unit"><span class="avatar">001</span> 1A</span>
                             </td>

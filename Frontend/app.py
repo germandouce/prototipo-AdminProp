@@ -62,5 +62,9 @@ def configuracion():
 def unidades_funcionales():
     return render_template("unidades_funcionales.html", active_page='consorcios')
 
+@app.route("/unidad_funcional")
+def unidad_funcional():
+    return render_template("vista_local.html", active_page='consorcios')
+
 if __name__ == "__main__":
     app.run("0.0.0.0", port=FRONT_PORT, debug=DEBUG=="True")

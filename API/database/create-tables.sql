@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS consortiums (
     name VARCHAR(80) NOT NULL,
     address VARCHAR(500) NOT NULL,
     owner_name VARCHAR(80) NOT NULL,
-    admin_comission DECIMAL(10,2) NOT NULL,
+    admin_comission DECIMAL(10,2) NOT NULL
     -- user_in_charge INT NOT NULL,
     -- FOREIGN KEY (user_in_charge) REFERENCES users(id)
 );

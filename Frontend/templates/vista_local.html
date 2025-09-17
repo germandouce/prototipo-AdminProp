@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Configuracion - AdminProp{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/vista_local.css') }}">
+{% endblock %}
+{% block content %}
+<!-- DATOS PRINCIPALES -->
+<section class="datos-principales">
+    <div>
+        <img src="https://ba-h.com.ar/wp-content/uploads/2018/10/galerias-pacifico-3.jpg" alt="imagen del local" class="imagen-local">
+    </div>
+
+    <div class="info-local">
+        <div>
+            <h4>Nombre del consorcio</h4>
+            <h1 id="consorcioNombre">Galerías Pacífico</h1>
+        </div>
+        <div>
+            <h4>Local Número</h4>
+            <h1 id="numeroLocal">17</h1>
+        </div>
+        <div>
+            <h4>Cliente</h4>
+            <div style="display:flex; align-items:center; gap:.75rem;">
+                <h1 data-nombre>Juan Pérez</h1>
+                <button type="button" id="btnCambiarInq" class="btn btn-secondary">Cambiar inquilino</button>
+            </div>
+        </div>
+        <div>
+            <h4>Deuda total</h4>
+            <h1 class="deuda-total" data-deuda>$00000</h1>
+        </div>
+    </div>
+</section>
+
+<!-- RESUMEN -->
+<section class="resumen-deuda">
+    <table>
+        <tr>
+            <th>Descripción</th>
+            <th></th>
+        </tr>
+        <tr>
+            <td class="td-descripcion">Ocupado</td>
+            <td class="td-informacion" id="tdOcupado">No</td>
+        </tr>
+        <tr>
+            <td class="td-descripcion">Último mes pago</td>
+            <td class="td-informacion" id="tdUltimoMes">Septiembre 2025</td>
+        </tr>
+        <tr>
+            <td class="td-descripcion">Valor de alquiler</td>
+            <td class="td-informacion" id="tdAlquiler">$—</td>
+        </tr>
+        <tr>
+            <td class="td-descripcion">Fin de contrato</td>
+            <td class="td-informacion" id="tdFinContrato">—</td>
+        </tr>
+    </table>
+    <div class="acciones-local">
+        <button type="button" class="boton-desocupar" onclick="toggleTodos()">Desocupar</button>
+        <div id="mensaje-boton" style="display:none;"></div>
+    </div>
+</section>
+{% endblock %}
