@@ -1,11 +1,11 @@
 ## SET PAGO
 ### POST
 
-Devuelve: 
+Envio: 
 ```json
 {
-    "inquilino":"inquilino_que_paga",
-    "id_cliente":11111,
+    "nombre_inquilino":"Guillermo",
+    "id_unidad":11111,
     "fecha_de_pago":"2025-08-31",
     "monto":1000
 }
@@ -14,12 +14,12 @@ Devuelve:
 ## SET NUEVO COMPLEJO
 ### POST
 
-Devuelve:
+Envio:
 ```json
 {
     "nombre_complejo":"fiuba",
+    "nombre_propietario":"propietario_1",
     "direccion":"paseo_colon_850",
-    "cantidad_uf":50,
     "comision_porcentaje":5
 }
 ```
@@ -27,10 +27,10 @@ Devuelve:
 ## SET EDITAR COMISION
 ### POST
 
-Devuelve:
+Envio:
 ```json
 {
-    "nombre_complejo":"fiuba",
+    "id_complejo":1,
     "comision_porcentaje":5
 }
 ```
@@ -38,49 +38,45 @@ Devuelve:
 ## SET NUEVA UNIDAD
 ### POST
 
-Devuelve:
+Envio:
 ```json
 {
-    "consorcio":"fiuba",
-    "nro_unidad":25,
-    "ocupado":"no",
-    "cliente":"-",
-    "direc_imagen":"www.com",
-    "monto":1111
+    "id_consorcio": 2,
+    "nombre_unidad": "1A",
+    "metros_cuadrados": 50
 }
 ```
 
 ## SET NUEVO INQUILINO
 ### POST
 
-Devuelve:
+Envio:
 ```json
 {
     "nombre":"juan",
-    "consorcio":"fiuba",
-    "nro_unidad":25
+    "id_unidad":1
 }
 ```
 
 ## SET NUEVO GASTO
 ### POST
 
-Devuelve:
+Envio:
 ```json
 {
     "fecha":"2025-09-16",
     "detalle":"ABL",
-    "monto":555.15
+    "monto":555.15,
+    "id_complejo":1    
 }
 ```
 
 ## SET DESOCUPAR
 ### POST
 
-Devuelve:
+Envio:
 ```json
 {
-    "nro_unidad":1111,
-    "consorcio":"fiuba"
+    "id_unidad":1
 }
 ```
