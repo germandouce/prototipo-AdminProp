@@ -37,7 +37,8 @@ Devuelve:
   "functional_units": [
     {
       "id": 0,
-      "unit": "101",
+      "unit_number": "001",
+      "unit_name": "1A",
       "occupation_status": true,
       "tentant": "John Doe",
       "consortium_address": "Av. Paseo Colón 850",
@@ -47,10 +48,11 @@ Devuelve:
     },
     {
       "id": 1,
-      "unit": "1G",
+      "unit_number": "002",
+      "unit_name": "1B",
       "occupation_status": true,
       "tentant": "Jane Smith",
-      "consortium_address": "Calle Falsa 123",
+      "consortium_address": "Av. Paseo Colón 850",
       "rent_value": 1200.00,
       "expenses_value": 250.00,
       "debt": 100.00
