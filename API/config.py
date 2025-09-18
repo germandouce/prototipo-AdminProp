@@ -1,15 +1,11 @@
-from dotenv import dotenv_values
+import os
 
-env = dotenv_values()
+DB_USERNAME = os.environ["DB_USERNAME"]
+DB_PASSWORD = os.environ["DB_PASSWORD"]
+DB_NAME = os.environ["DB_NAME"]
+DB_HOST = os.environ["DB_HOST"]
+DB_PORT = os.environ["DB_PORT"]
 
-# db
-DB_USERNAME = env["DB_USERNAME"]
-DB_PASSWORD = env["DB_PASSWORD"]
-DB_NAME = env["DB_NAME"]
-DB_HOST = env["DB_HOST"]
-DB_PORT = env["DB_PORT"]
-
-# flask
-API_PORT = env["API_PORT"]
-DEBUG = env["DEBUG"]
-ISDOCKER = env["ISDOCKER"]
+API_PORT = os.environ["API_PORT"]
+DEBUG = os.environ["DEBUG"]
+ISDOCKER = os.environ["ISDOCKER"]
