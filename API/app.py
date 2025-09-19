@@ -87,7 +87,7 @@ def create_user():
 # Endpoint para consultar todos los usuarios
 @app.route("/users", methods=["GET"])
 def get_users():
-    query = "SELECT id, name, surname, email FROM users"
+    query = "SELECT * FROM users"
     try:
         conn = engine.connect()
         result = conn.execute(text(query))
