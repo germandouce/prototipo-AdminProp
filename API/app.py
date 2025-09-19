@@ -3,9 +3,19 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from config import *
 from datetime import datetime
+import os
 
 app = Flask(__name__)
-engine = create_engine(f"mysql+mysqlconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+
+# Lógica para conexión con o sin SSL
+connect_args = {}
+if os.environ.get("USE_SSL", "False") == "True":
+    connect_args["ssl_ca"] = "/etc/secrets/ca.pem"
+
+engine = create_engine(
+    f"mysql+mysqlconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}",
+    connect_args=connect_args
+)
 
 def send_query(query: str) -> tuple[bool, any]:
     """Send a query to the database and return the result, if any error occurred return False and the error message."""
