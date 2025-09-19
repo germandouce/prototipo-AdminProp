@@ -52,6 +52,53 @@ def login():
     else:
         return {"error": "Credenciales incorrectas"}, 401
 
+@app.route("/users", methods=["POST"])
+def create_user():
+    data = request.get_json()
+    name = data.get("name")
+    surname = data.get("surname")
+    email = data.get("email")
+    password = data.get("password")
+    if not all([name, surname, email, password]):
+        return {"error": "Faltan campos obligatorios"}, 400
+
+    query = """
+        INSERT INTO users (name, surname, email, password)
+        VALUES (:name, :surname, :email, :password)
+    """
+    try:
+        conn = engine.connect()
+        conn.execute(text(query), {
+            "name": name,
+            "surname": surname,
+            "email": email,
+            "password": password
+        })
+        conn.commit()
+        conn.close()
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err.__cause__}")
+        return {"error": str(err.__cause__)}, 500
+
+    return {"message": "Usuario creado"}, 201
+
+
+# Endpoint para consultar todos los usuarios
+@app.route("/users", methods=["GET"])
+def get_users():
+    query = "SELECT id, name, surname, email FROM users"
+    try:
+        conn = engine.connect()
+        result = conn.execute(text(query))
+        users = [dict(row) for row in result]
+        conn.close()
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err.__cause__}")
+        return {"error": str(err.__cause__)}, 500
+    return {"users": users}, 200
+
 
 
 if __name__ == "__main__":
