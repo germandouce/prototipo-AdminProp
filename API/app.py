@@ -9,8 +9,10 @@ app = Flask(__name__)
 
 # Lógica para conexión con o sin SSL
 connect_args = {}
-if os.environ.get("USE_SSL", "False") == "True":
-    connect_args["ssl_ca"] = "/etc/secrets/ca.pem"
+if USE_SSL == "True":
+    # Permite configurar la ruta del CA por variable de entorno, o usa una por defecto
+    ssl_ca = os.environ.get("MYSQL_SSL_CA", "/etc/secrets/ca.pem")
+    connect_args["ssl_ca"] = ssl_ca
 
 engine = create_engine(
     f"mysql+mysqlconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}",
