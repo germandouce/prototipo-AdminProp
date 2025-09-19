@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 import os
 
 DB_USERNAME = os.environ["DB_USERNAME"]
@@ -9,3 +13,4 @@ DB_PORT = os.environ["DB_PORT"]
 API_PORT = os.environ["API_PORT"]
 DEBUG = os.environ["DEBUG"]
 ISDOCKER = os.environ["ISDOCKER"]
+USE_SSL = os.environ["USE_SSL"]
