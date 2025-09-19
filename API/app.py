@@ -91,7 +91,7 @@ def get_users():
     try:
         conn = engine.connect()
         result = conn.execute(text(query))
-        users = [dict(row) for row in result]
+        users = [dict(zip(row.keys(), row)) for row in result]
         conn.close()
     except SQLAlchemyError as err:
         if DEBUG:
