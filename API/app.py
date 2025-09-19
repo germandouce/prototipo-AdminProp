@@ -91,7 +91,9 @@ def get_users():
     try:
         conn = engine.connect()
         result = conn.execute(text(query))
-        users = [dict(zip(row.keys(), row)) for row in result]
+        users = list(result.mappings())
+        for user in users:
+            print(user["id"], user["name"], user["email"])
         conn.close()
     except SQLAlchemyError as err:
         if DEBUG:
