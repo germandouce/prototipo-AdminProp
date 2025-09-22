@@ -202,5 +202,74 @@ def get_expenses():
 
     return jsonify(response), 200
 
+@app.route("/owners_reports", methods=["GET"])
+def get_owners_reports():
+    consortium_id = request.args.get("consortium_id", type=int)
+    month_of_year = request.args.get("month_of_year")  # "YYYY-MM"
+
+    if consortium_id is None or month_of_year is None:
+        return {"error": "consortium_id and month_of_year are required"}, 400
+
+    try:
+        datetime.strptime(month_of_year, "%Y-%m")
+    except ValueError:
+        return {"error": "month_of_year must be in format YYYY-MM"}, 400
+
+    query_payments = """
+        SELECT COALESCE(SUM(amount),0) AS total_payments
+        FROM payments
+        WHERE consortium = :consortium_id
+          AND DATE_FORMAT(date, '%Y-%m') = :month_of_year
+    """
+
+    query_expenses = """
+        SELECT COALESCE(SUM(amount),0) AS total_expenses
+        FROM common_expenses
+        WHERE consortium = :consortium_id
+          AND DATE_FORMAT(date, '%Y-%m') = :month_of_year
+    """
+
+    params = {"consortium_id": consortium_id, "month_of_year": month_of_year}
+
+    try:
+        with engine.connect() as conn:
+            total_payments_row = conn.execute(text(query_payments), params).fetchone()
+            total_income = float(total_payments_row.total_payments)
+
+            total_expenses_row = conn.execute(text(query_expenses), params).fetchone()
+            total_outcome = float(total_expenses_row.total_expenses)
+
+            addr_row = conn.execute(
+                text("SELECT address FROM consortiums WHERE id = :id"),
+                {"id": consortium_id}
+            ).fetchone()
+            consortium_address = addr_row.address if addr_row else None
+
+            admin_commission_row = conn.execute(
+                text("SELECT admin_comission FROM consortiums WHERE id = :id"),
+                {"id": consortium_id}
+            ).fetchone()
+            admin_commission = float(admin_commission_row.admin_comission) if admin_commission_row else 0.0
+
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    admin_fee = (total_income - total_outcome) * admin_commission
+    net_income = total_income - total_outcome - admin_fee
+
+    owner_report = {
+        "consortium_address": consortium_address,
+        "month_of_year": month_of_year,
+        "total_incomes": total_income,
+        "total_outcomes": total_outcome,
+        "administration_percentage": admin_commission,
+        "administration_fee": admin_fee,
+        "net_income": net_income,
+    }
+
+    return jsonify({"owner_report": owner_report}), 200
+
 if __name__ == "__main__":
     app.run("0.0.0.0", API_PORT, debug=DEBUG=="True")
