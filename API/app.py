@@ -122,7 +122,7 @@ def get_payments():
     id_unit = request.args.get("id_unit", type=int)
 
     if tentant_name is None or id_unit is None:
-        return {"error": "Se requieren tentant_name e id_unit"}, 400
+        return {"error": "tentant_name and id_unit are required"}, 400
 
     query = """
         SELECT p.id, p.amount, p.date
@@ -158,6 +158,46 @@ def get_payments():
         "tentant": tentant_name,
         "payments": payments,
         "latest_payment": latest_payment,
+    }
+
+    return jsonify(response), 200
+
+@app.route("/expenses", methods=["GET"])
+def get_expenses():
+    consortium_id = request.args.get("consortium_id", type=int)
+
+    if consortium_id is None:
+        return {"error": "consortium_id is required"}, 400
+
+    query = """
+            SELECT e.id, e.description, e.amount, e.date
+            FROM common_expenses e
+            WHERE e.consortium = :consortium_id
+            """
+
+    params = {"consortium_id": consortium_id}
+
+    try:
+        conn = engine.connect()
+        result = conn.execute(text(query), params)
+        rows = result.fetchall()
+        conn.close()
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    expenses = []
+    for row in rows:
+        expenses.append({
+            "id": row.id,
+            "description": row.description,
+            "amount": float(row.amount),
+            "date": str(row.date)
+        })
+
+    response = {
+        "expenses": expenses,
     }
 
     return jsonify(response), 200
