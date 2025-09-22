@@ -60,7 +60,45 @@ def configuracion():
 
 @app.route("/unidades_funcionales")
 def unidades_funcionales():
-    return render_template("unidades_funcionales.html", active_page='consorcios')
+    functional_units = [
+        {
+            "id": 0,
+            "unit_number": "001",
+            "unit_name": "1A",
+            "occupation_status": True,
+            "tentant": "John Doe",
+            "consortium_address": "Av. Paseo Colón 850",
+            "rent_value": 1500.00,
+            "expenses_value": 300.00,
+            "surface":10,
+            "debt": 0.00
+        },
+        {
+            "id": 1,
+            "unit_number": "002",
+            "unit_name": "1B",
+            "occupation_status": False,
+            "tentant": None,
+            "consortium_address": "Av. Paseo Colón 850",
+            "rent_value": 1200.00,
+            "expenses_value": 250.00,
+            "surface":8,
+            "debt": 150.00
+        },
+        {
+            "id": 2,
+            "unit_number": "003",
+            "unit_name": "2A",
+            "occupation_status": True,
+            "tentant": "Jane Smith",
+            "consortium_address": "Av. Paseo Colón 850",
+            "rent_value": 1800.00,
+            "expenses_value": 350.00,
+            "surface":12,
+            "debt": 0.00
+        }
+    ]
+    return render_template("unidades_funcionales.html", active_page='consorcios', units=functional_units)
 
 @app.route("/unidad_funcional")
 def unidad_funcional():

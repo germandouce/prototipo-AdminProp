@@ -28,30 +28,16 @@
                         </tr>
                     </thead>
                     <tbody class="unidades-container">
-                        <tr class="funcional" onclick="window.location.href='{{ url_for('unidad_funcional') }}?unidad=Av.%20Córdoba%20550'">
+                        {% for unit in units %}
+                        <tr onclick="window.location.href='{{ url_for('unidad_funcional') }}'">
                             <td data-label="Unidad">
-                                <span class="unit"><span class="avatar">001</span> 1A</span>
+                                <span class="unit"><span class="avatar">{{ unit.unit_number }}</span>{{ unit.unit_name }}</span>
                             </td>
-                            <td data-label="Inquilino" class="tenant">Giacomo Guilizzo</td>
-                            <td data-label="Alquiler" class="rent">$600.000</td>
+                            <td data-label="Inquilino" class="tenant">{{ unit.tentant }}</td>
+                            <td data-label="Alquiler" class="rent">${{ unit.rent_value }}</td>
                             <td data-label="Estado de pago"><span class="status paid" aria-label="Al día">● Al día</span></td>
                         </tr>
-                        <tr>
-                            <td data-label="Unidad">
-                                <span class="unit"><span class="avatar">002</span> 1B</span>
-                            </td>
-                            <td data-label="Inquilino" class="tenant">Marco Botto</td>
-                            <td data-label="Alquiler" class="rent">$840.000</td>
-                            <td data-label="Estado de pago"><span class="status pending" aria-label="Pendiente">● Pendiente</span></td>
-                        </tr>
-                        <tr>
-                            <td data-label="Unidad">
-                                <span class="unit"><span class="avatar">003</span> 1C</span>
-                            </td>
-                            <td data-label="Inquilino" class="tenant">Mariah Maclachla</td>
-                            <td data-label="Alquiler" class="rent">$360.000</td>
-                            <td data-label="Estado de pago"><span class="status late" aria-label="Atrasado">● Atrasado</span></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
