@@ -27,6 +27,7 @@ def inicio():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
@@ -37,6 +38,9 @@ def login():
             error_msg = response.json().get("error", "Error desconocido")
             return render_template("login.html", error=error_msg)
     return render_template("login.html")
+    DESCOMENTAR ARRIBA Y BORRAR ABAJO PARA EL LOGIN FUNCIONAL
+    """
+    return redirect(url_for("inicio"))
 
 @app.route("/clientes")
 def clientes():
