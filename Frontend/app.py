@@ -98,6 +98,9 @@ def unidades_funcionales():
             "debt": 0.00
         }
     ]
+    # BORRAR EL functional_units DE ARRIBA Y DESCOMENTAR LAS DOS LINEAS CUANDO EL BACKEND ESTE MERGEADO
+    # response = requests.get(f"{API_URL}/functional_units", params={"consortium_id": 1}).json()
+    # functional_units = response["functional_units"] if "functional_units" in response else []
     return render_template("unidades_funcionales.html", active_page='consorcios', units=functional_units)
 
 @app.route("/unidad_funcional")
