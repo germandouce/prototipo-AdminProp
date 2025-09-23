@@ -250,7 +250,6 @@ def get_owners_reports():
                 {"id": consortium_id}
             ).fetchone()
             admin_commission = float(admin_commission_row.admin_comission) if admin_commission_row else 0.0
-
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
@@ -270,6 +269,63 @@ def get_owners_reports():
     }
 
     return jsonify({"owner_report": owner_report}), 200
+
+@app.route("/administration_fee", methods=["POST"])
+def get_administration_fee():
+    data = request.get_json()
+    if not data or "month_of_year" not in data:
+        return {"error": "month_of_year is required in JSON body"}, 400
+
+    month_of_year = data["month_of_year"]
+
+    if month_of_year is None:
+        return {"error": "month_of_year is required"}, 400
+
+    try:
+        datetime.strptime(month_of_year, "%Y-%m")
+    except ValueError:
+        return {"error": "month_of_year must be in format YYYY-MM"}, 400
+
+    query = """
+        SELECT COALESCE(SUM(p.amount),0) AS total_payments, c.address, c.admin_comission
+        FROM payments p
+        JOIN consortiums c ON p.consortium = c.id
+        WHERE DATE_FORMAT(date, '%Y-%m') = :month_of_year
+        GROUP BY c.id, c.address, c.admin_comission
+    """
+
+    params = {"month_of_year": month_of_year}
+
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text(query), params)
+            rows = result.fetchall()
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    details = []
+    total_administration_fee = 0
+    for row in rows:
+        row_admin_commission = float(row.admin_comission)
+        row_total_income = float(row.total_payments)
+        row_admin_fee = row_total_income * row_admin_commission
+        total_administration_fee += row_admin_fee
+        details.append({
+            "consortium_address": row.address,
+            "administration_percentage": row_admin_commission,
+            "net_income": row_total_income,
+            "administration_fee": row_admin_fee,
+        })
+
+    administration_fee = {
+        "month_of_year": month_of_year,
+        "total_administration_fee": total_administration_fee,
+        "details": details,
+    }
+
+    return jsonify({"administration_fee": administration_fee}), 200
 
 if __name__ == "__main__":
     app.run("0.0.0.0", API_PORT, debug=DEBUG=="True")
