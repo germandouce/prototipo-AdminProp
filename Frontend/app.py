@@ -27,6 +27,7 @@ def inicio():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
@@ -37,6 +38,9 @@ def login():
             error_msg = response.json().get("error", "Error desconocido")
             return render_template("login.html", error=error_msg)
     return render_template("login.html")
+    DESCOMENTAR ARRIBA Y BORRAR ABAJO PARA EL LOGIN FUNCIONAL
+    """
+    return redirect(url_for("inicio"))
 
 @app.route("/clientes")
 def clientes():
@@ -98,6 +102,9 @@ def unidades_funcionales():
             "debt": 0.00
         }
     ]
+    # BORRAR EL functional_units DE ARRIBA Y DESCOMENTAR LAS DOS LINEAS CUANDO EL BACKEND ESTE MERGEADO
+    # response = requests.get(f"{API_URL}/functional_units", params={"consortium_id": 1}).json()
+    # functional_units = response["functional_units"] if "functional_units" in response else []
     return render_template("unidades_funcionales.html", active_page='consorcios', units=functional_units)
 
 @app.route("/unidad_funcional")
