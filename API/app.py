@@ -270,13 +270,9 @@ def get_owners_reports():
 
     return jsonify({"owner_report": owner_report}), 200
 
-@app.route("/administration_fee", methods=["POST"])
+@app.route("/administration_fee", methods=["GET"])
 def get_administration_fee():
-    data = request.get_json()
-    if not data or "month_of_year" not in data:
-        return {"error": "month_of_year is required in JSON body"}, 400
-
-    month_of_year = data["month_of_year"]
+    month_of_year = request.args.get("month_of_year")  # "YYYY-MM"
 
     if month_of_year is None:
         return {"error": "month_of_year is required"}, 400
