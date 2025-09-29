@@ -1,8 +1,8 @@
-<tr onclick="window.location.href='{{ url_for('unidad_funcional') }}'">
+<tr onclick="window.location.href='{{ url_for('unidad_funcional', unit_id=unit.id, consortium_id=consortium_id) }}'">
     <td data-label="Unidad">
         <span class="unit"><span class="avatar">{{ unit.unit_number }}</span>{{ unit.unit_name }}</span>
     </td>
-    <td data-label="Inquilino" class="tenant">{{ unit.tentant }}</td>
+    <td data-label="Inquilino" class="tenant">{{ unit.tenant if unit.tenant else '---' }}</td>
     <td data-label="Alquiler" class="rent">${{ unit.rent_value }}</td>
     <td data-label="Estado de pago"><span class="status paid" aria-label="Al día">● Al día</span></td>
 </tr>

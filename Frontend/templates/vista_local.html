@@ -13,22 +13,22 @@
     <div class="info-local">
         <div>
             <h4>Nombre del consorcio</h4>
-            <h1 id="consorcioNombre">Galerías Pacífico</h1>
+            <h1 id="consorcioNombre">{{ unit.consortium_address }}</h1>
         </div>
         <div>
             <h4>Local Número</h4>
-            <h1 id="numeroLocal">17</h1>
+            <h1 id="numeroLocal">{{ unit.unit_name }}</h1>
         </div>
         <div>
             <h4>Cliente</h4>
             <div style="display:flex; align-items:center; gap:.75rem;">
-                <h1 data-nombre>Juan Pérez</h1>
+                <h1 data-nombre>{{ unit.tentant if unit.tenant else '---' }}</h1>
                 <button type="button" id="btnCambiarInq" class="btn btn-secondary">Cambiar inquilino</button>
             </div>
         </div>
         <div>
             <h4>Deuda total</h4>
-            <h1 class="deuda-total" data-deuda>$00000</h1>
+            <h1 class="deuda-total" data-deuda>${{ unit.debt }}</h1>
         </div>
     </div>
 </section>
@@ -42,7 +42,7 @@
         </tr>
         <tr>
             <td class="td-descripcion">Ocupado</td>
-            <td class="td-informacion" id="tdOcupado">No</td>
+            <td class="td-informacion" id="tdOcupado">{{ 'Si' if unit.occupation_status else 'No' }}</td>
         </tr>
         <tr>
             <td class="td-descripcion">Último mes pago</td>

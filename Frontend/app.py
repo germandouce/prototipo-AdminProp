@@ -69,11 +69,15 @@ def unidades_funcionales():
     consortium_id = request.args.get("consortium_id")
     response = requests.get(f"{API_URL}/functional_units", params={"consortium_id": consortium_id}).json()
     functional_units = response["functional_units"] if "functional_units" in response else []
-    return render_template("unidades_funcionales.html", active_page='consorcios', units=functional_units)
+    return render_template("unidades_funcionales.html", active_page='consorcios', units=functional_units, consortium_id=consortium_id)
 
 @app.route("/unidad_funcional")
 def unidad_funcional():
-    return render_template("vista_local.html", active_page='consorcios')
+    consortium_id = request.args.get("consortium_id")
+    unit_id = request.args.get("unit_id")
+    response = requests.get(f"{API_URL}/functional_unit", params={"consortium_id": consortium_id, "unit_id": unit_id}).json()
+    unit = response["functional_unit"] if "functional_unit" in response else None
+    return render_template("vista_local.html", active_page='consorcios', unit=unit)
 
 if __name__ == "__main__":
     app.run("0.0.0.0", port=FRONT_PORT, debug=DEBUG=="True")
