@@ -340,6 +340,23 @@ def delete_unit(unit_id):
 
     return {"message": f"Unit {unit_id} deleted"}, 200
 
+@app.route("/delete_consortium/<int:consortium_id>", methods=["DELETE"])
+def delete_consortium(consortium_id):
+    query = """
+        DELETE FROM consortiums
+        WHERE id = :consortium_id 
+    """
+
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(query), {"consortium_id": consortium_id})
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    return {"message": f"Consortium {consortium_id} deleted"}, 200
+
 
 if __name__ == "__main__":
     app.run("0.0.0.0", API_PORT, debug=DEBUG=="True")
