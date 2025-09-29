@@ -8,9 +8,9 @@
     <section id="complejos" class="page active">
         <h1>Complejos</h1>
         <div class="complejos-container">
-            <button class="complejo-btn" onclick="window.location.href='{{ url_for('unidades_funcionales') }}'">Av. Córdoba 550 <span class="uf">154 UF</span></button>
-            <button class="complejo-btn">Florida 1065 <span class="uf">105 UF</span></button>
-            <button class="complejo-btn">Balcarce 78 <span class="uf">32 UF</span></button>
+            {% for consortium in consortiums %}
+                {% include "_components/_consorcio.html" %}
+            {% endfor %}
             <button id="agregar-complejo-btn" class="agregar-complejo-btn">Agregar complejo</button>
         </div>
     </section>
