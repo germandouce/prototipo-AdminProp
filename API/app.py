@@ -116,6 +116,53 @@ def get_functional_units():
 
     return jsonify({"functional_units": functional_units}), 200
 
+@app.route("/functional_unit", methods=["GET"])
+def get_functional_unit():
+    consortium_id = request.args.get("consortium_id", type=int)
+    unit_id = request.args.get("unit_id", type=int)
+
+    if unit_id is None:
+        return {"error": "Se requiere unit_id"}, 400
+
+    query = """
+        SELECT f.id, f.unit_number, f.unit_name, f.surface, f.surface_percentage,
+               f.tentan, f.debt, c.address AS consortium_address
+        FROM functional_units f
+        JOIN consortiums c ON f.consortium = c.id
+        WHERE f.id = :unit_id
+    """
+
+    params = {"unit_id": unit_id}
+
+    if consortium_id is not None:
+        query += " AND f.consortium = :consortium_id"
+        params["consortium_id"] = consortium_id
+
+    try:
+        conn = engine.connect()
+        result = conn.execute(text(query), params).fetchone()
+        conn.close()
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    if not result:
+        return {"error": "Unidad no encontrada"}, 404
+
+    functional_unit = {
+        "id": result.id,
+        "unit_number": str(result.unit_number).zfill(3),
+        "unit_name": result.unit_name,
+        "occupation_status": True if result.tentan else False,
+        "tenant": result.tentan,
+        "consortium_address": result.consortium_address,
+        "surface": float(result.surface),
+        "debt": float(result.debt)
+    }
+
+    return jsonify({"functional_unit": functional_unit}), 200
+
 @app.route("/payments", methods=["GET"])
 def get_payments():
     tentant_name = request.args.get("tentant_name", type=str)
