@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+<div id="login-screen" class="login-screen active">
+    <div class="login-container">
+        <h1>AdminProp</h1>
+        <h2>Tu herramienta para administrar propiedades y alquileres, todo en un lugar.</h2>
+        <div class="buttons">
+            <form id="login-form">
+                <div id="email-input-container" class="input-container">
+                    <label for="email-input">Email</label>
+                    <input id="email-input" type="email" placeholder="Email">
+                </div>
+                <div id="password-input-container" class="input-container">
+                    <label for="password-input">Password</label>
+                    <input id="password-input" type="password" placeholder="Password">
+                </div>
+                <div id="repeat-password-input-container" class="input-container">
+                    <label for="repeat-password-input">Repeat password</label>
+                    <input id="repeat-password-input" type="password" placeholder="Repeat password">
+                </div>
+                <a href="dashboard.html"><button class="btn-primary">Registrarse</button></a>
+                <p class="message">¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a></p>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
