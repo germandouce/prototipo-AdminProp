@@ -40,8 +40,17 @@ def login():
 #    DESCOMENTAR ARRIBA Y BORRAR ABAJO PARA EL LOGIN FUNCIONAL
 #    return redirect(url_for("inicio"))
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+        response = requests.post(f"{API_URL}/login", json={"email": email, "password": password})
+        if response.status_code == 200:
+            return redirect(url_for("login"))
+        else:
+            error_msg = response.json().get("error", "Error desconocido")
+            return render_template("register.html", error=error_msg)
     return render_template("register.html")
 
 @app.route("/clientes")

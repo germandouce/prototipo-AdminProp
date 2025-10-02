@@ -4,32 +4,50 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="../static/css/style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
 <div id="login-screen" class="login-screen active">
-    <div class="login-container">
-        <h1>AdminProp</h1>
+    <div class="auth-form-container">
+        <h1>AdminProp - Registrarse</h1>
         <h2>Tu herramienta para administrar propiedades y alquileres, todo en un lugar.</h2>
         <div class="buttons">
-            <form id="login-form">
+            <form id="register-form" class="auth-form" method="POST" action="{{ url_for('register') }}">
+                {% if error %}
+                    <p class="error-message" style="color: red;">{{ error }}</p>
+                {% endif %}
+                <div id="name-surname-input-container" class="double-input-container">
+                    <div id="name-input-container" class="input-container">
+                        <label for="name-input">Nombre</label>
+                        <input id="name-input" type="text" placeholder="Nombre" required>
+                    </div>
+                    <div id="surname-input-container" class="input-container">
+                        <label for="surname-input">Apellido</label>
+                        <input id="surname-input" type="text" placeholder="Apellido" required>
+                    </div>
+                </div>
                 <div id="email-input-container" class="input-container">
                     <label for="email-input">Email</label>
-                    <input id="email-input" type="email" placeholder="Email">
+                    <input id="email-input" type="email" placeholder="Email" required>
+                    <p class="password-match-message" style="color: red;"></p>
                 </div>
                 <div id="password-input-container" class="input-container">
-                    <label for="password-input">Password</label>
-                    <input id="password-input" type="password" placeholder="Password">
+                    <label for="password-input">Contraseña</label>
+                    <input id="password-input" type="password" placeholder="Contraseña" required>
                 </div>
                 <div id="repeat-password-input-container" class="input-container">
-                    <label for="repeat-password-input">Repeat password</label>
-                    <input id="repeat-password-input" type="password" placeholder="Repeat password">
+                    <label for="repeat-password-input">Repetir contraseña</label>
+                    <input id="repeat-password-input" type="password" placeholder="Repetir contraseña" required>
                 </div>
-                <a href="dashboard.html"><button class="btn-primary">Registrarse</button></a>
+                <div class="input-container">
+                    <input type="submit" id="submit-btn" value="Registrarme" class="btn-primary">
+                </div>
                 <p class="message">¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a></p>
             </form>
         </div>
     </div>
 </div>
+<script src="{{ url_for('static', filename='js/register-validation.js') }}"></script>
 </body>
 </html>
