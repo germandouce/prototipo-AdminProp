@@ -9,6 +9,9 @@ from datetime import datetime
 app = Flask(__name__)
 engine = create_engine(f"mysql+mysqlconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 app.config["JWT_SECRET_KEY"] = "una_clave_super_segura"  # cambiala en producción
+app.config["JWT_COOKIE_NAME"] = "access_token_cookie"
+app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 jwt = JWTManager(app)
 
 def send_query(query: str) -> tuple[bool, any]:
@@ -38,13 +41,15 @@ def login():
     try:
         conn = engine.connect()
         result = conn.execute(text(query), {"email": email, "password": password})
-        user = result.fetchone()
+        user = result.mappings().fetchone()  # <-- clave
         conn.close()
 
         if user:
-            user_id = user.id
-            access_token = create_access_token(identity=user_id)
-            return jsonify({"access_token": access_token}), 200
+            user_id = user["id"]
+            access_token = create_access_token(identity=str(user_id))  # <-- convertir a str
+            resp = jsonify({"access_token_cookie": access_token})
+            resp.set_cookie("access_token_cookie", access_token, httponly=True, secure=False)
+            return resp, 200
         else:
             return jsonify({"error": "Credenciales incorrectas"}), 401
 
@@ -55,31 +60,25 @@ def login():
 
 
 @app.route("/consortiums", methods=["GET"])
+@jwt_required()
 def get_consortiums():
+    user_id = int(get_jwt_identity())  # <-- convertir a int
     query = """
-        SELECT c.id, c.address, COUNT(f.id) AS ufs_amount
-        FROM consortiums c
-        LEFT JOIN functional_units f ON f.consortium = c.id
-        GROUP BY c.id, c.address
-    """
-    try:
-        conn = engine.connect()
-        result = conn.execute(text(query))
-        rows = result.fetchall()
-        conn.close()
-    except SQLAlchemyError as err:
-        if DEBUG:
-            print(f"DB_ERROR: {err.__cause__}")
-        return {"error": str(err.__cause__)}, 500
+            SELECT c.id, c.address, COUNT(f.id) AS ufs_amount
+            FROM consortiums c
+                     LEFT JOIN functional_units f ON f.consortium = c.id
+            WHERE c.user_id = :user_id
+            GROUP BY c.id, c.address
+            """
+    conn = engine.connect()
+    result = conn.execute(text(query), {"user_id": user_id})
+    rows = result.mappings().all()
+    conn.close()
 
-    consortiums = []
-    for row in rows:
-        consortiums.append({
-            "id": row.id,
-            "address": row.address,
-            "ufs_amount": int(row.ufs_amount) if row.ufs_amount is not None else 0
-        })
-
+    consortiums = [
+        {"id": row["id"], "address": row["address"], "ufs_amount": int(row["ufs_amount"] or 0)}
+        for row in rows
+    ]
     return jsonify({"consortiums": consortiums}), 200
 
 

@@ -32,9 +32,9 @@ def login():
         password = request.form.get("password")
         response = requests.post(f"{API_URL}/login", json={"email": email, "password": password})
         if response.status_code == 200:
-            token = response.json().get("access_token")
+            token = response.json().get("access_token_cookie")
             resp = make_response(redirect(url_for("inicio")))
-            resp.set_cookie("access_token", token, httponly=True, secure=False)
+            resp.set_cookie("access_token_cookie", token, httponly=True, secure=False)
             return resp
         else:
             error_msg = response.json().get("error", "Error desconocido")
@@ -62,7 +62,7 @@ def clientes():
 
 @app.route("/consorcios", methods=["GET", "POST"])
 def consorcios():
-    #----------POST----------
+    #----------POST----------#
     if request.method == "POST":
         name = request.form.get("name")
         address = request.form.get("address")
@@ -72,10 +72,12 @@ def consorcios():
         else:
             error_msg = response.json().get("error", "Error desconocido")
             return render_template("consorcios.html", error=error_msg)
-    #----------GET----------
-    response = requests.get(f"{API_URL}/consortiums").json()
-    consortiums = response["consortiums"] if "consortiums" in response else []
+    #----------GET----------#
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+    response = requests.get(f"{API_URL}/consortiums", cookies=cookies)
+    consortiums = response.json().get("consortiums", [])
     return render_template("consorcios.html", active_page='consorcios', consortiums=consortiums)
+
 
 @app.route("/rendiciones")
 def rendiciones():
