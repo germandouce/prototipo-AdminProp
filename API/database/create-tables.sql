@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(80) NOT NULL,
     surname VARCHAR(80) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(100) NOT NULL
+    password VARCHAR(128) NOT NULL
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS consortiums (

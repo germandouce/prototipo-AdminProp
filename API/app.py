@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from config import *
 from flask import jsonify
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 engine = create_engine(f"mysql+mysqlconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
@@ -380,7 +381,7 @@ def get_administration_fee():
 
     return jsonify({"administration_fee": administration_fee}), 200
 
-@app.route("/delete_unit/<int:unit_id>", methods=["DELETE"])
+@app.route("/functional_unit/<int:unit_id>", methods=["DELETE"])
 def delete_unit(unit_id):
     query = """
         DELETE FROM functional_units
@@ -397,7 +398,7 @@ def delete_unit(unit_id):
 
     return {"message": f"Unit {unit_id} deleted"}, 200
 
-@app.route("/delete_consortium/<int:consortium_id>", methods=["DELETE"])
+@app.route("/consortiums/<int:consortium_id>", methods=["DELETE"])
 def delete_consortium(consortium_id):
     query = """
         DELETE FROM consortiums
@@ -414,7 +415,7 @@ def delete_consortium(consortium_id):
 
     return {"message": f"Consortium {consortium_id} deleted"}, 200
 
-@app.route("/delete_expense/<int:expense_id>", methods=["DELETE"])
+@app.route("/expenses/<int:expense_id>", methods=["DELETE"])
 def delete_expense(expense_id):
     query = """
         DELETE FROM common_expenses
@@ -431,7 +432,7 @@ def delete_expense(expense_id):
 
     return {"message": f"Expense {expense_id} deleted"}, 200
 
-@app.route("/delete_payment/<int:payment_id>", methods=["DELETE"])
+@app.route("/payments/<int:payment_id>", methods=["DELETE"])
 def delete_payment(payment_id):
     query = """
         DELETE FROM payments
@@ -447,6 +448,36 @@ def delete_payment(payment_id):
         return {"error": str(err)}, 500
 
     return {"message": f"Payment {payment_id} deleted"}, 200
+
+@app.route("/users/register", methods=["POST"])
+def post_register():
+
+    data = request.get_json()
+    name = data.get("name")
+    surname = data.get("surname")
+    email = data.get("email")
+    password = generate_password_hash(data.get("password"), method="pbkdf2:sha256")
+
+    query = """
+            INSERT INTO users (name, surname, email, password)
+            VALUES (:name, :surname, :email, :password)
+            """
+
+    params = {}
+    params["name"] = name
+    params["surname"] = surname
+    params["email"] = email
+    params["password"] = password
+
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(query), params)
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    return {"message": f"User {name} created"}, 201
 
 if __name__ == "__main__":
     app.run("0.0.0.0", API_PORT, debug=DEBUG=="True")
