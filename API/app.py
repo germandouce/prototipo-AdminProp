@@ -553,5 +553,49 @@ def post_consortiums():
 
     return {"message": f"consortium {name} created"}, 201
 
+@app.route("/functional_units", methods=["POST"])
+@jwt_required()
+def post_functional_units():
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
+    unit_number = data.get("unit_number")
+    unit_name = data.get("unit_name")
+    surface = data.get("surface")
+    surface_percentage = data.get("surface_percentage")
+    tentan = data.get("tenant")
+    debt = data.get("debt")
+
+    query = """
+            INSERT INTO functional_units (unit_number, unit_name, surface, surface_percentage, tentan, debt, consortium)
+            VALUES (:unit_number, :unit_name, :surface, :surface_percentage, :tentan, :debt, :consortium)
+            """
+
+    query_get_consortium = """
+                           SELECT c.id
+                           FROM consortiums c
+                           WHERE c.user_id = :user_id \
+                           """
+
+    params = {}
+    params["unit_number"] = unit_number
+    params["unit_name"] = unit_name
+    params["surface"] = surface
+    params["surface_percentage"] = surface_percentage
+    params["tentan"] = tentan
+    params["debt"] = debt
+
+    try:
+        with engine.begin() as conn:
+            result_consortium_id = conn.execute(text(query_get_consortium), {"user_id": user_id})
+            consortium = result_consortium_id.mappings().first()
+            params["consortium"] = consortium["id"]
+            result = conn.execute(text(query), params)
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    return {"message": f"functional unit {unit_name} created"}, 201
+
 if __name__ == "__main__":
     app.run("0.0.0.0", API_PORT, debug=DEBUG=="True")
