@@ -19,7 +19,12 @@ body {
 }
 .sidebar h2 { margin-top: 0; }
 .sidebar nav ul { list-style: none; padding: 0; }
-.sidebar nav ul li { margin: 1rem 0; }
+.sidebar nav ul li {
+    margin: 1rem 0;
+    i {
+        width: 1.5rem;
+    }
+}
 .sidebar nav ul li a {
     color: white;
     text-decoration: none;
