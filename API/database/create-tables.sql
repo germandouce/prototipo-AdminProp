@@ -1,10 +1,13 @@
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(80) NOT NULL,
     surname VARCHAR(80) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(100) NOT NULL
-    );
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS consortiums (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -14,7 +17,7 @@ CREATE TABLE IF NOT EXISTS consortiums (
     admin_comission DECIMAL(10,2) NOT NULL,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
-    );
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS functional_units (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -26,7 +29,7 @@ CREATE TABLE IF NOT EXISTS functional_units (
     debt DECIMAL(10,2) DEFAULT 0,
     consortium INT NOT NULL,
     FOREIGN KEY (consortium) REFERENCES consortiums(id)
-    );
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS common_expenses (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -35,7 +38,7 @@ CREATE TABLE IF NOT EXISTS common_expenses (
     date DATE NOT NULL,
     consortium INT NOT NULL,
     FOREIGN KEY (consortium) REFERENCES consortiums(id)
-    );
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -46,7 +49,7 @@ CREATE TABLE IF NOT EXISTS payments (
     date DATE NOT NULL,
     FOREIGN KEY (consortium) REFERENCES consortiums(id),
     FOREIGN KEY (functional_unit) REFERENCES functional_units(id)
-    );
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AGREGAR DOS USUARIOS
 INSERT INTO users (name, surname, email, password)
