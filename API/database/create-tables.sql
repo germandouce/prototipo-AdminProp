@@ -11,9 +11,9 @@ CREATE TABLE IF NOT EXISTS consortiums (
     name VARCHAR(80) NOT NULL,
     address VARCHAR(500) NOT NULL,
     owner_name VARCHAR(80) NOT NULL,
-    admin_comission DECIMAL(10,2) NOT NULL
-    -- user_in_charge INT NOT NULL,
-    -- FOREIGN KEY (user_in_charge) REFERENCES users(id)
+    admin_comission DECIMAL(10,2) NOT NULL,
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
     );
 
 CREATE TABLE IF NOT EXISTS functional_units (
@@ -48,16 +48,22 @@ CREATE TABLE IF NOT EXISTS payments (
     FOREIGN KEY (functional_unit) REFERENCES functional_units(id)
     );
 
--- AGREGAR UN USUARIO (AÚN NO SE USA PARA NADA)
+-- AGREGAR DOS USUARIOS
 INSERT INTO users (name, surname, email, password)
-SELECT 'John', 'Doe', 'usuario@dominio.com', 'abc123'
+SELECT 'John', 'Doe', 'usuario@dominio.com', 'Abcde.12345'
     WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE email = 'usuario@dominio.com'
 );
 
+INSERT INTO users (name, surname, email, password)
+SELECT 'Martin', 'Fowler', 'martinfowler@gmail.com', 'StrongP@ssw0rd'
+    WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE email = 'martinfowler@gmail.com'
+);
+
 -- AGREGAR UN CONSORCIO CON UNIDADES FUNCIONALES DE EJEMPLO
-INSERT INTO consortiums (name, address, owner_name, admin_comission)
-SELECT 'Galerías pacífico', 'Av. Corrientes 1234, CABA', 'Juan Pérez', 10.00
+INSERT INTO consortiums (name, address, owner_name, admin_comission, user_id)
+SELECT 'Galerías pacífico', 'Av. Corrientes 1234, CABA', 'Juan Pérez', 10.00, 1
     WHERE NOT EXISTS (
     SELECT 1 FROM consortiums WHERE name = "Galerías pacífico");
 
@@ -74,8 +80,8 @@ SELECT 2, '1B', 25.00, 2.50, 1, 'Carlos López', 1500.00
 );
 
 -- AGREGAR OTRO CONSORCIO CON UNIDADES FUNCIONALES DE EJEMPLO
-INSERT INTO consortiums (name, address, owner_name, admin_comission)
-SELECT 'Condominio La Plata', 'Calle 50 Nro 1234, La Plata', 'María Gómez', 8.00
+INSERT INTO consortiums (name, address, owner_name, admin_comission, user_id)
+SELECT 'Condominio La Plata', 'Calle 50 Nro 1234, La Plata', 'María Gómez', 8.00, 1
     WHERE NOT EXISTS (
     SELECT 1 FROM consortiums WHERE name = "Condominio La Plata");
 
