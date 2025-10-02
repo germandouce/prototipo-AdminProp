@@ -37,16 +37,18 @@ def login():
     if not email or not password:
         return {"error": "Email and password are required"}, 400
 
-    query = "SELECT * FROM users WHERE email=:email AND password=:password"
+    query = "SELECT * FROM users WHERE email=:email"
 
     try:
         conn = engine.connect()
         result = conn.execute(text(query), {"email": email, "password": password})
-        user = result.mappings().fetchone()  # <-- clave
+        user = result.mappings().fetchone()
         conn.close()
 
         if user:
             user_id = user["id"]
+            if not (check_password_hash(user["password"], password)):
+                return jsonify({"error": "Credenciales incorrectas"}), 401
             access_token = create_access_token(identity=str(user_id))  # <-- convertir a str
             resp = jsonify({"access_token_cookie": access_token})
             resp.set_cookie("access_token_cookie", access_token, httponly=True, secure=False)

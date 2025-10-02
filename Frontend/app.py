@@ -46,10 +46,12 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
+        name = request.form.get("name")
+        surname = request.form.get("surname")
         email = request.form.get("email")
         password = request.form.get("password")
-        response = requests.post(f"{API_URL}/login", json={"email": email, "password": password})
-        if response.status_code == 200:
+        response = requests.post(f"{API_URL}/users/register", json={"name":name, "surname":surname, "email": email, "password": password})
+        if response.status_code == 201:
             return redirect(url_for("login"))
         else:
             error_msg = response.json().get("error", "Error desconocido")

@@ -53,13 +53,13 @@ CREATE TABLE IF NOT EXISTS payments (
 
 -- AGREGAR DOS USUARIOS
 INSERT INTO users (name, surname, email, password)
-SELECT 'John', 'Doe', 'usuario@dominio.com', 'Abcde.12345'
+SELECT 'John', 'Doe', 'usuario@dominio.com', 'pbkdf2:sha256:600000$5awvOCLwNzLQmVlq$73fef6846f25d4e137e495578a92c8f876273e64d4f35e0a8553d97322589bde' -- Abcde.12345 hasheado
     WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE email = 'usuario@dominio.com'
 );
 
 INSERT INTO users (name, surname, email, password)
-SELECT 'Martin', 'Fowler', 'martinfowler@gmail.com', 'StrongP@ssw0rd'
+SELECT 'Martin', 'Fowler', 'martinfowler@gmail.com', 'pbkdf2:sha256:600000$DBqEiZaiRnqMemr4$5eb6adc4fdfbbc7aa49952707bb9e0deb554ce77e18cac70ffec05ef20a4fe24' -- StrongP@ssw0rd hasheado
     WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE email = 'martinfowler@gmail.com'
 );
