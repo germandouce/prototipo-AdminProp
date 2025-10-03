@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS functional_units (
     unit_name VARCHAR(15) NOT NULL, -- e.g., 1A
     surface DECIMAL(10,2) NOT NULL,
     surface_percentage DECIMAL(10,2) NOT NULL,
-    tentan VARCHAR(25) DEFAULT NULL,
+    tenant VARCHAR(25) DEFAULT NULL,
     debt DECIMAL(10,2) DEFAULT 0,
     consortium INT NOT NULL,
     FOREIGN KEY (consortium) REFERENCES consortiums(id)
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     functional_unit INT NOT NULL,
     consortium INT NOT NULL,
-    tentant VARCHAR(25) NOT NULL,
+    tenant VARCHAR(25) NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
     date DATE NOT NULL,
     FOREIGN KEY (consortium) REFERENCES consortiums(id),
@@ -76,7 +76,7 @@ SELECT 1, '1A', 50.00, 5.00, 1
     SELECT 1 FROM functional_units WHERE unit_name = "1A" AND consortium = 1
 );
 
-INSERT INTO functional_units (unit_number, unit_name, surface, surface_percentage, consortium, tentan, debt)
+INSERT INTO functional_units (unit_number, unit_name, surface, surface_percentage, consortium, tenant, debt)
 SELECT 2, '1B', 25.00, 2.50, 1, 'Carlos López', 1500.00
     WHERE NOT EXISTS (
     SELECT 1 FROM functional_units WHERE unit_name = "1B" AND consortium = 1

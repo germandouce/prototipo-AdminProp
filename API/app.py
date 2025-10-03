@@ -91,7 +91,7 @@ def get_functional_units():
 
     query = """
         SELECT f.id, f.unit_number, f.unit_name, f.surface, f.surface_percentage,
-               f.tentan, f.debt, c.address AS consortium_address
+               f.tenant, f.debt, c.address AS consortium_address
         FROM functional_units f
         JOIN consortiums c ON f.consortium = c.id
     """
@@ -120,8 +120,8 @@ def get_functional_units():
             "id": row.id,
             "unit_number": str(row.unit_number).zfill(3),
             "unit_name": row.unit_name,
-            "occupation_status": True if row.tentan else False,
-            "tenant": row.tentan,
+            "occupation_status": True if row.tenant else False,
+            "tenant": row.tenant,
             "consortium_address": row.consortium_address,
             "surface": float(row.surface),
             "debt": float(row.debt)
@@ -139,7 +139,7 @@ def get_functional_unit():
 
     query = """
         SELECT f.id, f.unit_number, f.unit_name, f.surface, f.surface_percentage,
-               f.tentan, f.debt, c.address AS consortium_address
+               f.tenant, f.debt, c.address AS consortium_address
         FROM functional_units f
         JOIN consortiums c ON f.consortium = c.id
         WHERE f.id = :unit_id
@@ -167,8 +167,8 @@ def get_functional_unit():
         "id": result.id,
         "unit_number": str(result.unit_number).zfill(3),
         "unit_name": result.unit_name,
-        "occupation_status": True if result.tentan else False,
-        "tenant": result.tentan,
+        "occupation_status": True if result.tenant else False,
+        "tenant": result.tenant,
         "consortium_address": result.consortium_address,
         "surface": float(result.surface),
         "debt": float(result.debt)
@@ -178,20 +178,20 @@ def get_functional_unit():
 
 @app.route("/payments", methods=["GET"])
 def get_payments():
-    tentant_name = request.args.get("tentant_name", type=str)
+    tenant_name = request.args.get("tenant_name", type=str)
     id_unit = request.args.get("id_unit", type=int)
 
-    if tentant_name is None or id_unit is None:
-        return {"error": "tentant_name and id_unit are required"}, 400
+    if tenant_name is None or id_unit is None:
+        return {"error": "tenant_name and id_unit are required"}, 400
 
     query = """
         SELECT p.id, p.amount, p.date
         FROM payments p
-        WHERE p.tentant = :tentant_name AND p.functional_unit = :id_unit
+        WHERE p.tenant = :tenant_name AND p.functional_unit = :id_unit
         ORDER BY p.date DESC
     """
 
-    params = {"tentant_name": tentant_name, "id_unit": id_unit}
+    params = {"tenant_name": tenant_name, "id_unit": id_unit}
 
     try:
         conn = engine.connect()
@@ -215,7 +215,7 @@ def get_payments():
             latest_payment = float(row.amount)
 
     response = {
-        "tentant": tentant_name,
+        "tenant": tenant_name,
         "payments": payments,
         "latest_payment": latest_payment,
     }
@@ -492,7 +492,7 @@ def post_payments():
     amount = data.get("amount")
 
     query = """
-            INSERT INTO payments (consortium, tentant, functional_unit, date, amount)
+            INSERT INTO payments (consortium, tenant, functional_unit, date, amount)
             VALUES (:consortium_id, :tenant_name, :id_unit, :date, :amount)
             """
 
