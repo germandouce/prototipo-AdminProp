@@ -2,7 +2,6 @@
 {% block title %}Mis Consorcios - AdminProp{% endblock %}
 {% block head %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/complejos.css') }}">
-    <script src="{{ url_for('static', filename='js/complejos.js') }}"></script>
 {% endblock %}
 {% block content %}
     <section id="complejos" class="page active">
@@ -14,4 +13,7 @@
             <button id="agregar-complejo-btn" class="agregar-complejo-btn">Agregar complejo</button>
         </div>
     </section>
+{% endblock %}
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/complejos.js') }}"></script>
 {% endblock %}
