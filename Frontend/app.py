@@ -21,8 +21,15 @@ def error(e):
 def base():
     return render_template("index.html")
 
+def require_login():
+    if not request.cookies.get("access_token_cookie"):
+        return redirect(url_for("base"))
+
 @app.route("/inicio")
 def inicio():
+    login_check = require_login()
+    if login_check:
+        return login_check
     return render_template("inicio.html", active_page='inicio')
 
 @app.route("/login", methods=["GET", "POST"])
@@ -60,15 +67,23 @@ def register():
 
 @app.route("/clientes")
 def clientes():
+    login_check = require_login()
+    if login_check:
+        return login_check
     return render_template("clientes.html", active_page='clientes')
 
 @app.route("/consorcios", methods=["GET", "POST"])
 def consorcios():
+    login_check = require_login()
+    if login_check:
+        return login_check
     #----------POST----------#
     if request.method == "POST":
         name = request.form.get("name")
         address = request.form.get("address")
-        response = requests.post(f"{API_URL}/consortiums", json={"name": name, "address": address})
+        admin_commission = request.form.get("admin_commission")
+        owner_name = request.form.get("owner_name")
+        response = requests.post(f"{API_URL}/consortiums", json={"name": name, "address": address, "admin_commission": admin_commission, "owner_name": owner_name})
         if response.status_code == 201:
             return redirect(url_for("consorcios"))
         else:
@@ -83,18 +98,30 @@ def consorcios():
 
 @app.route("/rendiciones")
 def rendiciones():
+    login_check = require_login()
+    if login_check:
+        return login_check
     return render_template("rendiciones.html", active_page='rendiciones')
 
 @app.route("/comisiones")
 def comisiones():
+    login_check = require_login()
+    if login_check:
+        return login_check
     return render_template("comisiones.html", active_page='comisiones')
 
 @app.route("/configuracion")
 def configuracion():
+    login_check = require_login()
+    if login_check:
+        return login_check
     return render_template("configuracion.html", active_page='configuracion')
 
 @app.route("/unidades_funcionales")
 def unidades_funcionales():
+    login_check = require_login()
+    if login_check:
+        return login_check
     consortium_id = request.args.get("consortium_id")
     response = requests.get(f"{API_URL}/functional_units", params={"consortium_id": consortium_id}).json()
     functional_units = response["functional_units"] if "functional_units" in response else []
@@ -102,6 +129,9 @@ def unidades_funcionales():
 
 @app.route("/unidad_funcional")
 def unidad_funcional():
+    login_check = require_login()
+    if login_check:
+        return login_check
     consortium_id = request.args.get("consortium_id")
     unit_id = request.args.get("unit_id")
     response = requests.get(f"{API_URL}/functional_unit", params={"consortium_id": consortium_id, "unit_id": unit_id}).json()

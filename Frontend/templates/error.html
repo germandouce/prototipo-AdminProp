@@ -22,11 +22,13 @@
             border: 1px solid #f5c6cb;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <h1 id="error-msg">500 - internal server error</h1>
+    <h1 id="error-msg">{{ error }}</h1>
     <a href="{{ url_for('inicio') }}" class="btn">Volver al inicio</a>
 </body>
 </html>
