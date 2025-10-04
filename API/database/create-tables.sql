@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS consortiums (
     name VARCHAR(80) NOT NULL,
     address VARCHAR(500) NOT NULL,
     owner_name VARCHAR(80) NOT NULL,
-    admin_comission DECIMAL(10,2) NOT NULL,
+    admin_commission DECIMAL(10,2) NOT NULL,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -65,7 +65,7 @@ SELECT 'Martin', 'Fowler', 'martinfowler@gmail.com', 'pbkdf2:sha256:600000$DBqEi
 );
 
 -- AGREGAR UN CONSORCIO CON UNIDADES FUNCIONALES DE EJEMPLO
-INSERT INTO consortiums (name, address, owner_name, admin_comission, user_id)
+INSERT INTO consortiums (name, address, owner_name, admin_commission, user_id)
 SELECT 'Galerías pacífico', 'Av. Corrientes 1234, CABA', 'Juan Pérez', 10.00, 1
     WHERE NOT EXISTS (
     SELECT 1 FROM consortiums WHERE name = "Galerías pacífico");
@@ -83,7 +83,7 @@ SELECT 2, '1B', 25.00, 2.50, 1, 'Carlos López', 1500.00
 );
 
 -- AGREGAR OTRO CONSORCIO CON UNIDADES FUNCIONALES DE EJEMPLO
-INSERT INTO consortiums (name, address, owner_name, admin_comission, user_id)
+INSERT INTO consortiums (name, address, owner_name, admin_commission, user_id)
 SELECT 'Condominio La Plata', 'Calle 50 Nro 1234, La Plata', 'María Gómez', 8.00, 1
     WHERE NOT EXISTS (
     SELECT 1 FROM consortiums WHERE name = "Condominio La Plata");
