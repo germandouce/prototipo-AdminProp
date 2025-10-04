@@ -1,19 +1,28 @@
-from flask import Flask, request
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask import Flask, request, url_for
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from config import *
 from flask import jsonify
-from datetime import datetime
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 engine = create_engine(f"mysql+mysqlconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 app.config["JWT_SECRET_KEY"] = "una_clave_super_segura"  # cambiala en producción
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.config["JWT_COOKIE_NAME"] = "access_token_cookie"
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 jwt = JWTManager(app)
+
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USERNAME"] = "gsdia186@gmail.com"
+app.config["MAIL_PASSWORD"] = "cctz dmyf sowk jqhh"
+mail = Mail(app)
 
 def send_query(query: str) -> tuple[bool, any]:
     """Send a query to the database and return the result, if any error occurred return False and the error message."""
@@ -474,12 +483,53 @@ def post_register():
     try:
         with engine.begin() as conn:
             result = conn.execute(text(query), params)
+        verify_token = create_access_token(
+            identity=email, additional_claims={"action": "verify_email"}
+        )
+        verify_link = url_for("verify_email", token=verify_token, _external=True)
+        msg = Message(
+            "Verificá tu cuenta",
+            sender="gsdia186@gmail.com",
+            recipients=[email],
+        )
+        msg.body = f"Hola {name}, hacé clic en este enlace para verificar tu cuenta:\n\n{verify_link}\n\nEl enlace expira en 1 hora."
+        mail.send(msg)
+
+        return {"message": "Usuario creado. Revisá tu correo para verificar la cuenta."}, 201
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
         return {"error": str(err)}, 500
 
     return {"message": f"User {name} created"}, 201
+
+@app.route("/verify/<token>")
+def verify_email(token):
+    try:
+        decoded = decode_token(token)
+        email = decoded["sub"]  # identidad del token
+        action = decoded.get("action")
+
+        if action != "verify_email":
+            return {"error": "Token inválido"}, 400
+
+    except Exception as e:
+        return {"error": f"Token inválido o expirado: {e}"}, 400
+
+    query = """
+        UPDATE users
+        SET verified = TRUE
+        WHERE email = :email
+    """
+
+    with engine.begin() as conn:
+        result = conn.execute(text(query), {"email": email})
+
+    if result.rowcount == 0:
+        return {"error": "Usuario no encontrado"}, 404
+
+    return {"message": "Cuenta verificada con éxito. Ya podés iniciar sesión."}, 200
+
 
 @app.route("/payments", methods=["POST"])
 @jwt_required()
