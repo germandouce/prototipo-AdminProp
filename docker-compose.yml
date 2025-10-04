@@ -4,6 +4,8 @@ services:
     command: sh -c "sleep 10s ; python3 app.py"
     depends_on:
       - mysql
+    ports:
+      - "5001:5001"
 
   front:
     build: ./Frontend/
