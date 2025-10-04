@@ -3,8 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>Error - AdminProp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            background-color: #f8d7da;
+            color: #721c24;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #error-msg {
+            background-color: #f5c6cb;
+            padding: 20px;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 <body>
-    <p>{{ error }}</p>
+    <h1 id="error-msg">500 - internal server error</h1>
+    <a href="{{ url_for('inicio') }}" class="btn">Volver al inicio</a>
 </body>
 </html>
