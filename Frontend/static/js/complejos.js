@@ -1,17 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const agregarBtn = document.getElementById('agregar-complejo-btn');
-    const container = document.querySelector('.complejos-container');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const form = document.getElementById('block-form');
 
     agregarBtn.addEventListener('click', () => {
-        const nombre = prompt('Ingrese el nombre/dirección del complejo:');
-        if (!nombre) return;
-        const uf = prompt('Ingrese la cantidad de UF:');
-        if (!uf || isNaN(uf)) return;
+        modalOverlay.style.display = 'flex';
+    });
 
-        const btn = document.createElement('button');
-        btn.className = 'complejo-btn';
-        btn.innerHTML = `${nombre} <span class="uf">${uf} UF</span>`;
-        // Inserta antes del botón "Agregar complejo"
-        container.insertBefore(btn, agregarBtn);
+    cancelBtn.addEventListener('click', () => {
+        form.reset();
+        modalOverlay.style.display = 'none';
     });
 });

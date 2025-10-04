@@ -13,6 +13,36 @@
             <button id="agregar-complejo-btn" class="agregar-complejo-btn">Agregar complejo</button>
         </div>
     </section>
+    <section id="formulario-agregar-unidad">
+        <!-- Modal oculto por defecto -->
+        <div id="modal-overlay" class="modal-overlay" style="display: none;">
+            <div class="modal">
+                <h2>Agregar unidad</h2>
+                <form id="block-form" action="{{ url_for('consorcios') }}" method="POST">
+                    <label>
+                        Nombre del complejo:
+                        <input type="text" id="nombre-complejo-input" name="name" required>
+                    </label>
+                    <label>
+                        Dirección del complejo:
+                        <input type="text" id="direccion-complejo-input" name="address" required>
+                    </label>
+                    <label>
+                        Comision para el administrador:
+                        <input type="text" id="comision-de-administracion" name="admin_commission" required>
+                    </label>
+                    <label>
+                        Nombre del propietario:
+                        <input type="text" id="nombre-propietario-input" name="owner_name" required>
+                    </label>
+                    <div class="actions">
+                        <button type="submit">Guardar</button>
+                        <button type="button" id="cancel-btn">Cancelar</button>
+                    </div>
+                </form>
+        </div>
+
+    </section>
 {% endblock %}
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/complejos.js') }}"></script>

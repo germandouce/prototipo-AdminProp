@@ -77,20 +77,21 @@ def consorcios():
     login_check = require_login()
     if login_check:
         return login_check
+
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
     #----------POST----------#
     if request.method == "POST":
         name = request.form.get("name")
         address = request.form.get("address")
         admin_commission = request.form.get("admin_commission")
         owner_name = request.form.get("owner_name")
-        response = requests.post(f"{API_URL}/consortiums", json={"name": name, "address": address, "admin_commission": admin_commission, "owner_name": owner_name})
+        response = requests.post(f"{API_URL}/consortiums", json={"name": name, "address": address, "admin_commission": admin_commission, "owner_name": owner_name}, cookies=cookies)
         if response.status_code == 201:
             return redirect(url_for("consorcios"))
         else:
             error_msg = response.json().get("error", "Error desconocido")
             return render_template("consorcios.html", error=error_msg)
     #----------GET----------#
-    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
     response = requests.get(f"{API_URL}/consortiums", cookies=cookies)
     consortiums = response.json().get("consortiums", [])
     return render_template("consorcios.html", active_page='consorcios', consortiums=consortiums)

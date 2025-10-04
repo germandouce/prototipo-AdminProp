@@ -149,3 +149,7 @@
             </div>
         </section>
 {% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/agregar_unidad.js') }}"></script>
+<script src="{{ url_for('static', filename='js/cambio_periodo_expensas.js') }}"></script>
+{% endblock %}
