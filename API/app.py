@@ -528,19 +528,19 @@ def post_consortiums():
     data = request.get_json()
     name = data.get("name")
     address = data.get("address")
-    admin_comission = data.get("admin_comission")
+    admin_commission = data.get("admin_commission")
     owner_name = data.get("owner_name")
 
     query = """
-            INSERT INTO consortiums (name, address, owner_name, admin_comission, user_id)
-            VALUES (:name, :address, :owner_name, :admin_comission, :user_id)
+            INSERT INTO consortiums (name, address, owner_name, admin_commission, user_id)
+            VALUES (:name, :address, :owner_name, :admin_commission, :user_id)
             """
 
     params = {}
     params["name"] = name
     params["address"] = address
     params["owner_name"] = owner_name
-    params["admin_comission"] = admin_comission
+    params["admin_commission"] = admin_commission
     params["user_id"] = user_id
 
     try:
@@ -596,6 +596,44 @@ def post_functional_units():
         return {"error": str(err)}, 500
 
     return {"message": f"functional unit {unit_name} created"}, 201
+
+@app.route("/expenses", methods=["POST"])
+@jwt_required()
+def post_expenses():
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
+    description = data.get("description")
+    amount = data.get("amount")
+    date = data.get("date")
+
+    query = """
+            INSERT INTO common_expenses (description, amount, date, consortium)
+            VALUES (:description, :amount, :date, :consortium)
+            """
+
+    query_get_consortium = """
+                           SELECT c.id
+                           FROM consortiums c
+                           WHERE c.user_id = :user_id
+                           """
+
+    params = {}
+    params["description"] = description
+    params["amount"] = amount
+    params["date"] = date
+
+    try:
+        with engine.begin() as conn:
+            result_consortium_id = conn.execute(text(query_get_consortium), {"user_id": user_id})
+            consortium = result_consortium_id.mappings().first()
+            params["consortium"] = consortium["id"]
+            result = conn.execute(text(query), params)
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    return {"message": f"expense {description} created"}, 201
 
 if __name__ == "__main__":
     app.run("0.0.0.0", API_PORT, debug=DEBUG=="True")
