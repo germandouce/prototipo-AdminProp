@@ -553,5 +553,137 @@ def post_consortiums():
 
     return {"message": f"consortium {name} created"}, 201
 
+@app.route("/functional_units", methods=["PUT"])
+@jwt_required()
+def put_functional_units():
+    data = request.get_json()
+    id = data.get("id")
+    unit_number = data.get("unit_number")
+    unit_name = data.get("unit_name")
+    tenant = data.get("tenant")
+    debt = data.get("debt")
+
+    query = """
+        UPDATE functional_units
+        SET unit_number = :unit_number,
+            unit_name = :unit_name,
+            tenant = :tenant,
+            debt = :debt
+        WHERE id = :id
+    """
+
+    params = {}
+    params["id"] = id
+    params["unit_number"] = unit_number
+    params["unit_name"] = unit_name
+    params["tenant"] = tenant
+    params["debt"] = debt
+
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(query), params)
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+    
+    return {"message":"updated functional unit"}, 200
+
+@app.route("/payments", methods=["PUT"])
+@jwt_required()
+def put_payments():
+    data = request.get_json()
+    id = data.get("id")
+    tenant = data.get("tenant")
+    date = data.get("date")
+    amount = data.get("amount")
+
+    query = """
+        UPDATE payments
+        SET tenant = :tenant,
+            date = :date,
+            amount = :amount
+        WHERE id = :id
+    """
+
+    params = {}
+    params["id"] = id
+    params["tenant"] = tenant
+    params["date"] = date
+    params["amount"] = amount
+
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(query), params)
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+    
+    return {"message":"updated payment"}, 200
+
+@app.route("/consortiums", methods=["PUT"])
+@jwt_required()
+def put_consortiums():
+    data = request.get_json()
+    id = data.get("id")
+    address = data.get("address")
+
+    query = """
+        UPDATE consortiums
+        SET address = :address
+        WHERE id = :id
+    """
+
+    params = {}
+    params["id"] = id
+    params["address"] = address
+
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(query), params)
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+    
+    return {"message":"updated consortium"}, 200
+
+@app.route("/expenses", methods=["PUT"])
+@jwt_required()
+def put_expenses():
+    data = request.get_json()
+    id = data.get("id")
+    description = data.get("description")
+    amount = data.get("amount")
+    date = data.get("date")
+    consortium = data.get("consortium")
+
+    query = """
+        UPDATE common_expenses
+        SET description = :description,
+            amount = :amount,
+            date = :date,
+            consortium = :consortium
+        WHERE id = :id
+    """
+    
+    params = {}
+    params["id"] = id
+    params["description"] = description
+    params["amount"] = amount
+    params["date"] = date
+    params["consortium"] = consortium
+
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(query), params)
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+    
+    return {"message":"updated expenses"}, 200
+
 if __name__ == "__main__":
     app.run("0.0.0.0", API_PORT, debug=DEBUG=="True")
