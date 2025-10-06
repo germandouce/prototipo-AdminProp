@@ -91,7 +91,7 @@ def get_functional_units():
 
     query = """
         SELECT f.id, f.unit_number, f.unit_name, f.surface, f.surface_percentage,
-               f.tenant, f.debt, c.address AS consortium_address
+               f.tenant, f.rent_value, f.debt, c.address AS consortium_address
         FROM functional_units f
         JOIN consortiums c ON f.consortium = c.id
     """
@@ -124,7 +124,8 @@ def get_functional_units():
             "tenant": row.tenant,
             "consortium_address": row.consortium_address,
             "surface": float(row.surface),
-            "debt": float(row.debt)
+            "debt": float(row.debt),
+            "rent_value": float(row.rent_value)
         })
 
     return jsonify({"functional_units": functional_units}), 200
