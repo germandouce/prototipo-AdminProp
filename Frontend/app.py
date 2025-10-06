@@ -118,12 +118,32 @@ def configuracion():
         return login_check
     return render_template("configuracion.html", active_page='configuracion')
 
-@app.route("/unidades_funcionales")
+@app.route("/unidades_funcionales", methods=["GET", "POST"])
 def unidades_funcionales():
     login_check = require_login()
     if login_check:
         return login_check
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+
     consortium_id = request.args.get("consortium_id")
+    if request.method == "POST":
+        unit_number = request.form.get("unit_number")
+        unit_name = request.form.get("unit_name")
+        surface_area = request.form.get("surface_area")
+        surface_percentage = 10.00
+        tenant = ""
+        debt = 0.00
+        params = {
+            "unit_number": unit_number,
+            "unit_name": unit_name,
+            "surface": surface_area,
+            "surface_percentage": surface_percentage,
+            "tenant": tenant,
+            "debt": debt
+        }
+        response = requests.post(f"{API_URL}/functional_units", json=params, cookies=cookies)
+        if response.status_code == 201:
+            return redirect(url_for("unidades_funcionales", consortium_id=consortium_id))
     response = requests.get(f"{API_URL}/functional_units", params={"consortium_id": consortium_id}).json()
     functional_units = response["functional_units"] if "functional_units" in response else []
     return render_template("unidades_funcionales.html", active_page='consorcios', units=functional_units, consortium_id=consortium_id)

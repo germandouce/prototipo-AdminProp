@@ -40,18 +40,18 @@
             <div id="modal-overlay" class="modal-overlay" style="display: none;">
                 <div class="modal">
                     <h2>Agregar unidad</h2>
-                    <form id="unit-form">
+                    <form id="unit-form" action="{{ url_for('unidades_funcionales', consortium_id=consortium_id) }}" method="POST">
                         <label>
-                            Unidad:
-                            <input type="text" name="unidad" required>
+                            Unidad #:
+                            <input type="text" name="unit_number" required>
                         </label>
                         <label>
-                            Inquilino:
-                            <input type="text" name="inquilino" required>
+                            Unidad funcional:
+                            <input type="text" name="unit_name" required>
                         </label>
                         <label>
-                            Alquiler:
-                            <input type="text" name="alquiler" required>
+                            Superficie:
+                            <input type="number" name="surface_area" required>
                         </label>
                         <div class="actions">
                             <button type="submit">Guardar</button>
@@ -151,5 +151,5 @@
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/agregar_unidad.js') }}"></script>
-<script src="{{ url_for('static', filename='js/cambio_periodo_expensas.js') }}"></script>
+<!--<script src="{{ url_for('static', filename='js/cambio_periodo_expensas.js') }}"></script>-->
 {% endblock %}
