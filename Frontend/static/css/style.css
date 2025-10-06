@@ -301,6 +301,7 @@ button.upgrade-btn {
     background-color: #9000ff;
     color: white;
     cursor: pointer;
+    border: none;
     i {
         color: goldenrod;
         margin-right: 1rem;

@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS functional_units (
     surface DECIMAL(10,2) NOT NULL,
     surface_percentage DECIMAL(10,2) NOT NULL,
     tenant VARCHAR(25) DEFAULT NULL,
+    rent_value INT NOT NULL DEFAULT 0,
     debt DECIMAL(10,2) DEFAULT 0,
     consortium INT NOT NULL,
     FOREIGN KEY (consortium) REFERENCES consortiums(id)
@@ -76,8 +77,8 @@ SELECT 1, '1A', 50.00, 5.00, 1
     SELECT 1 FROM functional_units WHERE unit_name = "1A" AND consortium = 1
 );
 
-INSERT INTO functional_units (unit_number, unit_name, surface, surface_percentage, consortium, tenant, debt)
-SELECT 2, '1B', 25.00, 2.50, 1, 'Carlos López', 1500.00
+INSERT INTO functional_units (unit_number, unit_name, surface, surface_percentage, consortium, tenant, rent_value, debt)
+SELECT 2, '1B', 25.00, 2.50, 1, 'Carlos López', 350000, 700000
     WHERE NOT EXISTS (
     SELECT 1 FROM functional_units WHERE unit_name = "1B" AND consortium = 1
 );
