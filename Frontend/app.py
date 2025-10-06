@@ -94,7 +94,10 @@ def consorcios():
     #----------GET----------#
     response = requests.get(f"{API_URL}/consortiums", cookies=cookies)
     consortiums = response.json().get("consortiums", [])
-    return render_template("consorcios.html", active_page='consorcios', consortiums=consortiums)
+    free_limit_reached = False
+    if len(consortiums) > 0:
+        free_limit_reached = True
+    return render_template("consorcios.html", active_page='consorcios', free_limit_reached=free_limit_reached, consortiums=consortiums)
 
 
 @app.route("/rendiciones")
@@ -158,6 +161,10 @@ def unidad_funcional():
     response = requests.get(f"{API_URL}/functional_unit", params={"consortium_id": consortium_id, "unit_id": unit_id}).json()
     unit = response["functional_unit"] if "functional_unit" in response else None
     return render_template("vista_local.html", active_page='consorcios', unit=unit)
+
+@app.route("/suscribirse")
+def suscribirse():
+    return render_template("suscribirse.html")
 
 if __name__ == "__main__":
     app.run("0.0.0.0", port=FRONT_PORT, debug=DEBUG=="True")

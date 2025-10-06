@@ -296,3 +296,13 @@ legend{padding:0 6px;font-weight:600;color:#555}
 .bars .bar{flex:1;background:#cfe3ff;min-height:4px;transition:height .6s}
 .badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:.85rem}
 .badge.ok{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+
+button.upgrade-btn {
+    background-color: #9000ff;
+    color: white;
+    cursor: pointer;
+    i {
+        color: goldenrod;
+        margin-right: 1rem;
+    }
+}

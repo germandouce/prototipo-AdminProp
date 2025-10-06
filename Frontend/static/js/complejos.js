@@ -4,9 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalOverlay = document.getElementById('modal-overlay');
     const form = document.getElementById('block-form');
 
-    agregarBtn.addEventListener('click', () => {
-        modalOverlay.style.display = 'flex';
-    });
+    if(agregarBtn) {
+        agregarBtn.addEventListener('click', () => {
+            modalOverlay.style.display = 'flex';
+        });
+    }
 
     cancelBtn.addEventListener('click', () => {
         form.reset();

@@ -10,7 +10,11 @@
             {% for consortium in consortiums %}
                 {% include "_components/_consorcio.html" %}
             {% endfor %}
-            <button id="agregar-complejo-btn" class="agregar-complejo-btn">Agregar complejo</button>
+            {% if not free_limit_reached %}
+                <button id="agregar-complejo-btn" class="agregar-complejo-btn">Agregar complejo</button>
+            {% else %}
+                <button id="upgrade-agregar-complejo-btn" class="agregar-complejo-btn upgrade-btn" onclick="window.location.href='{{ url_for('suscribirse')}}'"><i class="fa-solid fa-crown"></i>Agregar complejo</button>
+            {% endif %}
         </div>
     </section>
     <section id="formulario-agregar-unidad">
