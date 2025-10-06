@@ -3,6 +3,6 @@
         <span class="unit"><span class="avatar">{{ unit.unit_number }}</span>{{ unit.unit_name }}</span>
     </td>
     <td data-label="Inquilino" class="tenant">{{ unit.tenant if unit.tenant else '---' }}</td>
-    <td data-label="Alquiler" class="rent">${{ unit.rent_value if unit.rent_value else 'TODAVIA NO HAY PRECIO DE ALQUILER!!' }}</td>
+    <td data-label="Alquiler" class="rent">${{ unit.rent_value if unit.rent_value else 0.0 }}</td>
     <td data-label="Estado de pago"><span class="status paid" aria-label="Al día">● Al día</span></td>
 </tr>
