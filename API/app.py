@@ -562,13 +562,10 @@ def post_functional_units():
     unit_number = data.get("unit_number")
     unit_name = data.get("unit_name")
     surface = data.get("surface")
-    surface_percentage = data.get("surface_percentage")
-    tentan = data.get("tenant")
-    debt = data.get("debt")
 
     query = """
-            INSERT INTO functional_units (unit_number, unit_name, surface, surface_percentage, tentan, debt, consortium)
-            VALUES (:unit_number, :unit_name, :surface, :surface_percentage, :tentan, :debt, :consortium)
+            INSERT INTO functional_units (unit_number, unit_name, surface, consortium)
+            VALUES (:unit_number, :unit_name, :surface, :consortium)
             """
 
     query_get_consortium = """
@@ -581,9 +578,6 @@ def post_functional_units():
     params["unit_number"] = unit_number
     params["unit_name"] = unit_name
     params["surface"] = surface
-    params["surface_percentage"] = surface_percentage
-    params["tentan"] = tentan
-    params["debt"] = debt
 
     try:
         with engine.begin() as conn:
