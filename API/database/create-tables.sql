@@ -70,14 +70,14 @@ SELECT 'Galerías pacífico', 'Av. Corrientes 1234, CABA', 'Juan Pérez', 10.00,
     WHERE NOT EXISTS (
     SELECT 1 FROM consortiums WHERE name = "Galerías pacífico");
 
-INSERT INTO functional_units (unit_number, unit_name, surface, surface_percentage, consortium)
-SELECT 1, '1A', 50.00, 5.00, 1
+INSERT INTO functional_units (unit_number, unit_name, surface, consortium)
+SELECT 1, '1A', 50.00, 1
     WHERE NOT EXISTS (
     SELECT 1 FROM functional_units WHERE unit_name = "1A" AND consortium = 1
 );
 
-INSERT INTO functional_units (unit_number, unit_name, surface, surface_percentage, consortium, tenant, rent_value, debt)
-SELECT 2, '1B', 25.00, 2.50, 1, 'Carlos López', 350000.00, 700000
+INSERT INTO functional_units (unit_number, unit_name, surface, consortium, tenant, rent_value, debt)
+SELECT 2, '1B', 25.00, 1, 'Carlos López', 350000.00, 700000
     WHERE NOT EXISTS (
     SELECT 1 FROM functional_units WHERE unit_name = "1B" AND consortium = 1
 );
@@ -88,8 +88,8 @@ SELECT 'Condominio La Plata', 'Calle 50 Nro 1234, La Plata', 'María Gómez', 8.
     WHERE NOT EXISTS (
     SELECT 1 FROM consortiums WHERE name = "Condominio La Plata");
 
-INSERT INTO functional_units (unit_number, unit_name, surface, surface_percentage, consortium)
-SELECT 1, '1A', 75.00, 7.50,2
+INSERT INTO functional_units (unit_number, unit_name, surface, consortium)
+SELECT 1, '1A', 75.00,2
     WHERE NOT EXISTS (
     SELECT 1 FROM functional_units WHERE unit_name = "2A" AND consortium = 2
 );

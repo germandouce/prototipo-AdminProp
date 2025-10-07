@@ -90,7 +90,7 @@ def get_functional_units():
     consortium_id = request.args.get("consortium_id", type=int)
 
     query = """
-        SELECT f.id, f.unit_number, f.unit_name, f.surface, f.surface_percentage,
+        SELECT f.id, f.unit_number, f.unit_name, f.surface,
                f.tenant, f.rent_value, f.debt, c.address AS consortium_address
         FROM functional_units f
         JOIN consortiums c ON f.consortium = c.id
