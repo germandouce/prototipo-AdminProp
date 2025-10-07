@@ -133,16 +133,10 @@ def unidades_funcionales():
         unit_number = request.form.get("unit_number")
         unit_name = request.form.get("unit_name")
         surface_area = request.form.get("surface_area")
-        surface_percentage = 10.00
-        tenant = ""
-        debt = 0.00
         params = {
             "unit_number": unit_number,
             "unit_name": unit_name,
-            "surface": surface_area,
-            "surface_percentage": surface_percentage,
-            "tenant": tenant,
-            "debt": debt
+            "surface": surface_area
         }
         response = requests.post(f"{API_URL}/functional_units", json=params, cookies=cookies)
         if response.status_code == 201:
