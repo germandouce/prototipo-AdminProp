@@ -139,7 +139,7 @@ def get_functional_unit():
         return {"error": "Se requiere unit_id"}, 400
 
     query = """
-        SELECT f.id, f.unit_number, f.unit_name, f.surface, f.surface_percentage,
+        SELECT f.id, f.unit_number, f.unit_name, f.surface,
                f.tenant, f.debt, c.address AS consortium_address
         FROM functional_units f
         JOIN consortiums c ON f.consortium = c.id
