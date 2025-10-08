@@ -585,35 +585,25 @@ def post_expenses():
 def put_functional_units():
     data = request.get_json()
     id = data.get("id")
-    unit_number = data.get("unit_number")
-    unit_name = data.get("unit_name")
-    tenant = data.get("tenant")
-    debt = data.get("debt")
 
-    query = """
-        UPDATE functional_units
-        SET unit_number = :unit_number,
-            unit_name = :unit_name,
-            tenant = :tenant,
-            debt = :debt
-        WHERE id = :id
-    """
+    optional_data = ["unit_number", "unit_name", "tenant", "debt"]
+    received_data = {key: data.get(key) for key in optional_data if key in data}
+    if not received_data:
+        return {"error": "No fields to update"}, 400
 
-    params = {}
-    params["id"] = id
-    params["unit_number"] = unit_number
-    params["unit_name"] = unit_name
-    params["tenant"] = tenant
-    params["debt"] = debt
+    set_clause = ", ".join([f"{key} = :{key}" for key in received_data.keys()])
+
+    query = f"UPDATE functional_units SET {set_clause} WHERE id = :id"
+    received_data["id"] = data.get("id")
 
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(query), params)
+            result = conn.execute(text(query), received_data)
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
         return {"error": str(err)}, 500
-    
+
     return {"message":"updated functional unit"}, 200
 
 @app.route("/payments", methods=["PUT"])
