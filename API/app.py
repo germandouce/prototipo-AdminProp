@@ -91,10 +91,16 @@ def get_functional_units():
 
     query = """
         SELECT f.id, f.unit_number, f.unit_name, f.surface,
-               f.tenant, f.rent_value, f.debt, c.address AS consortium_address
+               f.tenant, f.rent_value, f.debt
         FROM functional_units f
         JOIN consortiums c ON f.consortium = c.id
     """
+
+    query_address = """
+                    SELECT c.address
+                    FROM   consortiums c
+                    WHERE c.id = :consortium_id
+                    """
 
     params = {}
     if consortium_id is not None:
@@ -107,6 +113,7 @@ def get_functional_units():
             result = conn.execute(text(query), params)
         else:
             result = conn.execute(text(query))
+        consortium_address_result = conn.execute(text(query_address), params).fetchone()
         rows = result.fetchall()
         conn.close()
     except SQLAlchemyError as err:
@@ -122,13 +129,17 @@ def get_functional_units():
             "unit_name": row.unit_name,
             "occupation_status": True if row.tenant else False,
             "tenant": row.tenant,
-            "consortium_address": row.consortium_address,
             "surface": float(row.surface),
             "debt": float(row.debt),
             "rent_value": float(row.rent_value)
         })
 
-    return jsonify({"functional_units": functional_units}), 200
+    response = {
+        "consortium_address": consortium_address_result.address,
+        "functional_units": functional_units
+    }
+
+    return jsonify(response), 200
 
 @app.route("/functional_unit", methods=["GET"])
 def get_functional_unit():
