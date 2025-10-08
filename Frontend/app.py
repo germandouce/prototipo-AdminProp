@@ -143,7 +143,8 @@ def unidades_funcionales():
             return redirect(url_for("unidades_funcionales", consortium_id=consortium_id))
     response = requests.get(f"{API_URL}/functional_units", params={"consortium_id": consortium_id}).json()
     functional_units = response["functional_units"] if "functional_units" in response else []
-    return render_template("unidades_funcionales.html", active_page='consorcios', units=functional_units, consortium_id=consortium_id)
+    address = response["address"] if "address" in response else "Dirección"
+    return render_template("unidades_funcionales.html", active_page='consorcios', units=functional_units, consortium_id=consortium_id, address=address)
 
 @app.route("/unidad_funcional")
 def unidad_funcional():

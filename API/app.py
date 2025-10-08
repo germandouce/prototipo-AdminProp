@@ -135,7 +135,7 @@ def get_functional_units():
         })
 
     response = {
-        "consortium_address": consortium_address_result.address,
+        "address": consortium_address_result.address,
         "functional_units": functional_units
     }
 
