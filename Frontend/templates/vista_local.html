@@ -21,9 +21,13 @@
         </div>
         <div>
             <h4>Cliente</h4>
-            <div style="display:flex; align-items:center; gap:.75rem;">
+            <div style="display:flex; align-items:center; gap:.75rem; justify-content: space-between;">
                 <h1 data-nombre>{{ unit.tenant if unit.tenant else '---' }}</h1>
-                <button type="button" id="btnCambiarInq" class="btn btn-secondary">Cambiar inquilino</button>
+                {% if unit.tenant %}
+                    <button type="button" id="btnCambiarInq" class="btn btn-secondary">Desocupar</button>
+                {% else %}
+                    <button type="button" id="btnAgregarInq" class="btn btn-primary">Establecer inquilino</button>
+                {% endif %}
             </div>
         </div>
         <div>
