@@ -40,7 +40,7 @@ Devuelve:
       "unit_number": "001",
       "unit_name": "1A",
       "occupation_status": true,
-      "tentant": "John Doe",
+      "tenant": "John Doe",
       "consortium_address": "Av. Paseo Colón 850",
       "rent_value": 1500.00,
       "expenses_value": 300.00,
@@ -52,7 +52,7 @@ Devuelve:
       "unit_number": "002",
       "unit_name": "1B",
       "occupation_status": true,
-      "tentant": "Jane Smith",
+      "tenant": "Jane Smith",
       "consortium_address": "Av. Paseo Colón 850",
       "rent_value": 1200.00,
       "expenses_value": 250.00,
@@ -68,7 +68,7 @@ Devuelve:
 Pide:
 ```json
 {
-  "tentant_name": "John Doe", 
+  "tenant_name": "John Doe", 
   "id_unit": 0
 }
 ```
@@ -87,7 +87,7 @@ Devuelve:
       "date": "2024-01-20"
     }
   ],
-  "tentant": "John Doe",
+  "tenant": "John Doe",
   "last_payment": 1800.00
 }
 ```

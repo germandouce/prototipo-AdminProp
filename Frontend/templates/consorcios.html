@@ -2,16 +2,52 @@
 {% block title %}Mis Consorcios - AdminProp{% endblock %}
 {% block head %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/complejos.css') }}">
-    <script src="{{ url_for('static', filename='js/complejos.js') }}"></script>
 {% endblock %}
 {% block content %}
     <section id="complejos" class="page active">
         <h1>Complejos</h1>
         <div class="complejos-container">
-            <button class="complejo-btn" onclick="window.location.href='{{ url_for('unidades_funcionales') }}?unidad=Av.%20Córdoba%20550'">Av. Córdoba 550 <span class="uf">154 UF</span></button>
-            <button class="complejo-btn">Florida 1065 <span class="uf">105 UF</span></button>
-            <button class="complejo-btn">Balcarce 78 <span class="uf">32 UF</span></button>
-            <button id="agregar-complejo-btn" class="agregar-complejo-btn">Agregar complejo</button>
+            {% for consortium in consortiums %}
+                {% include "_components/_consorcio.html" %}
+            {% endfor %}
+            {% if not free_limit_reached %}
+                <button id="agregar-complejo-btn" class="agregar-complejo-btn">Agregar complejo</button>
+            {% else %}
+                <button id="upgrade-agregar-complejo-btn" class="agregar-complejo-btn upgrade-btn" onclick="window.location.href='{{ url_for('suscribirse')}}'"><i class="fa-solid fa-crown"></i>Agregar complejo</button>
+            {% endif %}
         </div>
     </section>
+    <section id="formulario-agregar-unidad">
+        <!-- Modal oculto por defecto -->
+        <div id="modal-overlay" class="modal-overlay" style="display: none;">
+            <div class="modal">
+                <h2>Agregar unidad</h2>
+                <form id="block-form" action="{{ url_for('consorcios') }}" method="POST">
+                    <label>
+                        Nombre del complejo:
+                        <input type="text" id="nombre-complejo-input" name="name" required>
+                    </label>
+                    <label>
+                        Dirección del complejo:
+                        <input type="text" id="direccion-complejo-input" name="address" required>
+                    </label>
+                    <label>
+                        Comision para el administrador:
+                        <input type="text" id="comision-de-administracion" name="admin_commission" required>
+                    </label>
+                    <label>
+                        Nombre del propietario:
+                        <input type="text" id="nombre-propietario-input" name="owner_name" required>
+                    </label>
+                    <div class="actions">
+                        <button type="submit">Guardar</button>
+                        <button type="button" id="cancel-btn">Cancelar</button>
+                    </div>
+                </form>
+        </div>
+
+    </section>
+{% endblock %}
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/complejos.js') }}"></script>
 {% endblock %}

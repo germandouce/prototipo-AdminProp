@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://kit.fontawesome.com/e0bd69fefa.js" crossorigin="anonymous"></script>
     {% block head %}{% endblock %}
 </head>
 <body>
@@ -12,12 +13,12 @@
         <h2>AdminProp</h2>
         <nav>
             <ul>
-                <li><a href="{{ url_for('inicio') }}" data-page="inicio" id="navbar-inicio" class="{% if active_page == 'inicio' %}active{% endif %}">Inicio</a></li>
-                <li><a href="{{ url_for('clientes') }}" data-page="clientes" id="navbar-clientes" class="{% if active_page == 'clientes' %}active{% endif %}">Clientes</a></li>
-                <li><a href="{{ url_for('consorcios') }}" data-page="consorcios" id="navbar-consorcios" class="{% if active_page == 'consorcios' %}active{% endif %}">Consorcios</a></li>
-                <li><a href="{{ url_for('rendiciones') }}" data-page="rendiciones" id="navbar-rendiciones" class="{% if active_page == 'rendiciones' %}active{% endif %}">Rendiciones</a></li>
-                <li><a href="{{ url_for('comisiones') }}" id="navbar-comisiones" class="{% if active_page == 'comisiones' %}active{% endif %}">Comisiones</a></li>
-                <li><a href="{{ url_for('configuracion') }}" data-page="configuracion" id="navbar-configuracion" class="{% if active_page == 'configuracion' %}active{% endif %}">Configuración</a></li>
+                <li><a href="{{ url_for('inicio') }}" data-page="inicio" id="navbar-inicio" class="{% if active_page == 'inicio' %}active{% endif %}"><i class="fa-solid fa-house"></i>Inicio</a></li>
+                <li><a href="{{ url_for('clientes') }}" data-page="clientes" id="navbar-clientes" class="{% if active_page == 'clientes' %}active{% endif %}"><i class="fa-solid fa-users"></i>Clientes</a></li>
+                <li><a href="{{ url_for('consorcios') }}" data-page="consorcios" id="navbar-consorcios" class="{% if active_page == 'consorcios' %}active{% endif %}"><i class="fa-solid fa-building"></i>Consorcios</a></li>
+                <li><a href="{{ url_for('rendiciones') }}" data-page="rendiciones" id="navbar-rendiciones" class="{% if active_page == 'rendiciones' %}active{% endif %}"><i class="fa-solid fa-file-lines"></i>Rendiciones</a></li>
+                <li><a href="{{ url_for('comisiones') }}" id="navbar-comisiones" class="{% if active_page == 'comisiones' %}active{% endif %}"><i class="fa-solid fa-dollar-sign"></i>Comisiones</a></li>
+                <li><a href="{{ url_for('configuracion') }}" data-page="configuracion" id="navbar-configuracion" class="{% if active_page == 'configuracion' %}active{% endif %}"><i class="fa-solid fa-gear"></i>Configuración</a></li>
             </ul>
         </nav>
     </aside>
@@ -26,5 +27,6 @@
         {% block content %}{% endblock %}
     </main>
 </div>
+{% block scripts %}{% endblock %}
 </body>
 </html>

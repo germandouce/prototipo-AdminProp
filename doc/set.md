@@ -4,7 +4,7 @@ Envio:
 ```json
 POST /payments
 {
-  "tentant_name": "John Doe",
+  "tenant_name": "John Doe",
   "id_unit": 0,
   "date": "2025-08-31",
   "amount": 1000
@@ -29,7 +29,7 @@ POST /functional_units
   "unit_number": "001",
   "unit_name": "1A",
   "occupation_status": true,
-  "tentant": "John Doe",
+  "tenant": "John Doe",
   "consortium_id": 0,              // ID del consorcio al que pertenece la unidad
   //no hace falta el nombre del consorcio lo obtenemos dde el endpoint con otra consulta
   // o lo dejamos para no equivocarenos ni en pedo en nignun lado?

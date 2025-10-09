@@ -1,6 +1,6 @@
 ## PUT /functional_units 
 ## Actualizar datos de una unidad funcional
-## TAMbien sirve para desocupar. le ponemos "-" en el tentant 
+## TAMbien sirve para desocupar. le ponemos "-" en el tenant 
 PUT /functional_units
 ```json
 {
@@ -8,7 +8,7 @@ PUT /functional_units
     "unit_number": "003",
     "unit_name": "1B",
     "occupation_status": true,    //ESTEEEEE
-    "tentant": "Juan Pérez",      //Y ESTEEEE SONN LOS IMPORTANTES. PERO MANDAMOS TDOOS PARA SEGUIR REST DE MANUAL
+    "tenant": "Juan Pérez",      //Y ESTEEEE SONN LOS IMPORTANTES. PERO MANDAMOS TDOOS PARA SEGUIR REST DE MANUAL
     "consortium_address": "paseo_colon_900",
     "rent_value": 1300.00,
     "expenses_value": 350.00,
@@ -62,7 +62,7 @@ Envio:
 PUT /payments
 {
     "id": 123,                    // ID del pago a modificar
-    "tentant_name": "Guillermo",
+    "tenant_name": "Guillermo",
     "id_unit": 11111,
     "date": "2025-09-01",
     "amount": 1200

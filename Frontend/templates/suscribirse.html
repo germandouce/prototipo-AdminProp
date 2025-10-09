@@ -1,0 +1,83 @@
+<!-- Frontend/templates/suscripcion.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Suscribirse a Premium | AdminProp</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .comparativa-table { width: 100%; border-collapse: collapse; margin: 2em 0; }
+        .comparativa-table th, .comparativa-table td { border: 1px solid #ccc; padding: 1em; text-align: center; }
+        .comparativa-table th { background: #f5f5f5; }
+        .premium { color: #ffd700; font-weight: bold; }
+        .check { color: green; }
+        .cross { color: red; }
+        .suscribirse-btn { background: #ffd700; color: #333; padding: 1em 2em; border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; }
+    </style>
+</head>
+<body>
+<header class="top-bar">
+    <div class="logo">
+        <i class="fa-solid fa-house"></i>
+        <h1>AdminProp</h1>
+    </div>
+    <nav class="menu">
+        <a href="{{ url_for('inicio') }}"><i class="fa-solid fa-home"></i> Inicio</a>
+        <a href="{{ url_for('login') }}"><i class="fa-solid fa-right-to-bracket"></i> Iniciar sesión</a>
+    </nav>
+</header>
+<main class="container">
+    <h2>Compará y suscribite a <span class="premium">AdminProp Premium</span></h2>
+    <table class="comparativa-table">
+        <thead>
+        <tr>
+            <th>Funcionalidad</th>
+            <th>Gratuito</th>
+            <th class="premium">Premium</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Tener más de un consorcio</td>
+            <td><i class="fa-solid fa-xmark cross"></i></td>
+            <td><i class="fa-solid fa-check check"></i></td>
+        </tr>
+        <tr>
+            <td>Soporte prioritario</td>
+            <td><i class="fa-solid fa-xmark cross"></i></td>
+            <td><i class="fa-solid fa-check check"></i></td>
+        </tr>
+        <tr>
+            <td>Gestión de pagos automatizada</td>
+            <td><i class="fa-solid fa-xmark cross"></i></td>
+            <td><i class="fa-solid fa-check check"></i></td>
+        </tr>
+        <tr>
+            <td>Reportes avanzados</td>
+            <td><i class="fa-solid fa-xmark cross"></i></td>
+            <td><i class="fa-solid fa-check check"></i></td>
+        </tr>
+        <tr>
+            <td>Acceso móvil</td>
+            <td><i class="fa-solid fa-check check"></i></td>
+            <td><i class="fa-solid fa-check check"></i></td>
+        </tr>
+        <tr>
+            <td>Actualizaciones automáticas</td>
+            <td><i class="fa-solid fa-check check"></i></td>
+            <td><i class="fa-solid fa-check check"></i></td>
+        </tr>
+        </tbody>
+    </table>
+    <div style="text-align:center;">
+        <a href="#"><button class="suscribirse-btn"><i class="fa-solid fa-star"></i> Suscribirse a Premium</button></a>
+    </div>
+</main>
+<footer class="footer">
+    <a href="#"><i class="fa-solid fa-users"></i> Nosotros</a>
+    <a href="#"><i class="fa-solid fa-headset"></i> Soporte</a>
+    <a href="#"><i class="fa-solid fa-envelope"></i> Contacto</a>
+</footer>
+</body>
+</html>

@@ -4,6 +4,8 @@ services:
     command: sh -c "sleep 10s ; python3 app.py"
     depends_on:
       - mysql
+    ports:
+      - "5001:5001"
 
   front:
     build: ./Frontend/
@@ -21,3 +23,16 @@ services:
         MYSQL_DATABASE: 'adminprop'
         MYSQL_USER: 'user'
         MYSQL_PASSWORD: 'pass'
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: user
+      PMA_PASSWORD: pass
+    depends_on:
+      - mysql
