@@ -580,11 +580,11 @@ def post_expenses():
 
     return {"message": f"expense {description} created"}, 201
 
-@app.route("/functional_units", methods=["PUT"])
+
+@app.route("/functional_units/<int:id>", methods=["PATCH"])
 @jwt_required()
-def put_functional_units():
+def patch_functional_unit(id):
     data = request.get_json()
-    id = data.get("id")
 
     optional_data = ["unit_number", "unit_name", "tenant", "debt"]
     received_data = {key: data.get(key) for key in optional_data if key in data}
@@ -592,46 +592,53 @@ def put_functional_units():
         return {"error": "No fields to update"}, 400
 
     set_clause = ", ".join([f"{key} = :{key}" for key in received_data.keys()])
-
     query = f"UPDATE functional_units SET {set_clause} WHERE id = :id"
-    received_data["id"] = data.get("id")
+    received_data["id"] = id
 
     try:
         with engine.begin() as conn:
+            exists = conn.execute(text("SELECT 1 FROM functional_units WHERE id = :id"), {"id": id}).fetchone()
+            if not exists:
+                return {"error": f"Functional unit with id {id} not found"}, 404
+
             result = conn.execute(text(query), received_data)
+            if result.rowcount == 0:
+                return {"error": "Functional unit not found"}, 404
+
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
         return {"error": str(err)}, 500
 
-    return {"message":"updated functional unit"}, 200
+    return {"message": "Functional unit updated"}, 200
 
-@app.route("/payments", methods=["PUT"])
+
+
+@app.route("/payments/<int:id>", methods=["PATCH"])
 @jwt_required()
-def put_payments():
+def patch_payments(id):
     data = request.get_json()
-    id = data.get("id")
-    tenant = data.get("tenant")
-    date = data.get("date")
-    amount = data.get("amount")
 
-    query = """
-        UPDATE payments
-        SET tenant = :tenant,
-            date = :date,
-            amount = :amount
-        WHERE id = :id
-    """
+    optional_data = ["tenant", "date", "amount"]
+    received_data = {key: data.get(key) for key in optional_data if key in data}
+    if not received_data:
+        return {"error": "No fields to update"}, 400
 
-    params = {}
-    params["id"] = id
-    params["tenant"] = tenant
-    params["date"] = date
-    params["amount"] = amount
+
+    set_clause = ", ".join([f"{key} = :{key}" for key in received_data.keys()])
+    query = f"UPDATE payments SET {set_clause} WHERE id = :id"
+    received_data["id"] = id
 
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(query), params)
+            exists = conn.execute(text("SELECT 1 FROM payments WHERE id = :id"), {"id": id}).fetchone()
+            if not exists:
+                return {"error": f"Payment with id {id} not found"}, 404
+            
+            result = conn.execute(text(query), received_data)
+            if result.rowcount == 0:
+                return {"error": "Payment not found"}, 404
+            
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
@@ -640,36 +647,30 @@ def put_payments():
     return {"message":"updated payment"}, 200
 
 
-
-@app.route("/expenses", methods=["PUT"])
+@app.route("/expenses/<int:id>", methods=["PATCH"])
 @jwt_required()
-def put_expenses():
+def patch_expenses(id):
     data = request.get_json()
-    id = data.get("id")
-    description = data.get("description")
-    amount = data.get("amount")
-    date = data.get("date")
-    consortium = data.get("consortium")
 
-    query = """
-        UPDATE common_expenses
-        SET description = :description,
-            amount = :amount,
-            date = :date,
-            consortium = :consortium
-        WHERE id = :id
-    """
-    
-    params = {}
-    params["id"] = id
-    params["description"] = description
-    params["amount"] = amount
-    params["date"] = date
-    params["consortium"] = consortium
+    optional_data = ["description", "amount", "date", "consortium"]
+    received_data = {key: data.get(key) for key in optional_data if key in data}
+    if not received_data:
+        return {"error": "No fields to update"}, 400
+
+    set_clause = ", ".join([f"{key} = :{key}" for key in received_data.keys()])
+    query = f"UPDATE common_expenses SET {set_clause} WHERE id = :id"
+    received_data["id"] = id
 
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(query), params)
+            exists = conn.execute(text("SELECT 1 FROM common_expenses WHERE id = :id"), {"id": id}).fetchone()
+            if not exists:
+                return {"error": f"Common expense with id {id} not found"}, 404
+            
+            result = conn.execute(text(query), received_data)
+            if result.rowcount == 0:
+                return {"error": "Common expense not found"}, 404
+            
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")

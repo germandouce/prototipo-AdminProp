@@ -83,26 +83,30 @@ def post_consortiums():
     return {"message": f"consortium {name} created"}, 201
 
 
-@consortiums_bp.route("/consortiums", methods=["PUT"])
+@consortiums_bp.route("/consortiums/<int:id>", methods=["PATCH"])
 @jwt_required()
-def put_consortiums():
+def patch_consortiums(id):
     data = request.get_json()
-    id = data.get("id")
-    address = data.get("address")
 
-    query = """
-            UPDATE consortiums
-            SET address = :address
-            WHERE id = :id \
-            """
-
-    params = {}
-    params["id"] = id
-    params["address"] = address
+    optional_data = ["address"]
+    received_data = {key: data.get(key) for key in optional_data if key in data}
+    if not received_data:
+        return {"error": "No fields to update"}, 400
+    
+    set_clause = ", ".join([f"{key} = :{key}" for key in received_data.keys()])
+    query = f"UPDATE consortiums SET {set_clause} WHERE id = :id"
+    received_data["id"] = id
 
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(query), params)
+            exists = conn.execute(text("SELECT 1 FROM consortiums WHERE id = :id"), {"id": id}).fetchone()
+            if not exists:
+                return {"error":f"consortium with id {id} not found"}, 404
+
+            result = conn.execute(text(query), received_data)
+            if result.rowcount == 0:
+                return {"error": "Consortium not found"}, 404
+            
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
