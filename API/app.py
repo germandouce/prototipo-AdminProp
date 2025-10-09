@@ -5,6 +5,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from config import *
 from flask import jsonify
 from datetime import datetime
+# <<<<<<< render
+import os
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import create_engine
 from routes.consortiums import consortiums_bp
@@ -16,6 +19,21 @@ app.config["JWT_COOKIE_NAME"] = "access_token_cookie"
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 jwt = JWTManager(app)
+
+# app = Flask(__name__)
+
+# Lógica para conexión con o sin SSL
+connect_args = {}
+if USE_SSL == "True":
+    # Permite configurar la ruta del CA por variable de entorno, o usa una por defecto
+    ssl_ca = os.environ.get("MYSQL_SSL_CA", "/etc/secrets/ca.pem")
+    connect_args["ssl_ca"] = ssl_ca
+
+engine = create_engine(
+    f"mysql+mysqlconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}",
+    connect_args=connect_args
+)
+
 
 def send_query(query: str) -> tuple[bool, any]:
     """Send a query to the database and return the result, if any error occurred return False and the error message."""
@@ -216,7 +234,11 @@ def get_payments():
         "latest_payment": latest_payment,
     }
 
-    return jsonify(response), 200
+# <<<<<<< render
+# @app.route("/users", methods=["POST"])
+# def create_user():
+# =======
+#     return jsonify(response), 200
 
 @app.route("/expenses", methods=["GET"])
 def get_expenses():
@@ -435,6 +457,7 @@ def delete_payment(payment_id):
 @app.route("/users/register", methods=["POST"])
 def post_register():
 
+# >>>>>>> mergeo-render
     data = request.get_json()
     name = data.get("name")
     surname = data.get("surname")
