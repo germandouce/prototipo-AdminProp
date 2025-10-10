@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, url_for
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
 from sqlalchemy import create_engine, text
@@ -62,14 +63,17 @@ def login():
 
     try:
         conn = engine.connect()
-        result = conn.execute(text(query), {"email": email, "password": password})
+        result = conn.execute(text(query), {"email": email})
         user = result.mappings().fetchone()
         conn.close()
 
         if user:
-            user_id = user["id"]
             if not (check_password_hash(user["password"], password)):
                 return jsonify({"error": "Credenciales incorrectas"}), 401
+            if not user["verified"]:
+                return jsonify(
+                    {"error": "La cuenta no ha sido verificada. Por favor, revisa tu correo electrónico."}), 403
+            user_id = user["id"]
             access_token = create_access_token(identity=str(user_id))  # <-- convertir a str
             resp = jsonify({"access_token_cookie": access_token})
             resp.set_cookie("access_token_cookie", access_token, httponly=True, secure=False)
@@ -229,7 +233,8 @@ def post_register():
         verify_token = create_access_token(
             identity=email, additional_claims={"action": "verify_email"}
         )
-        verify_link = url_for("verify_email", token=verify_token, _external=True)
+        API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:5001")
+        verify_link = f"{API_BASE_URL}{url_for('verify_email', token=verify_token)}"
         msg = Message(
             "Verificá tu cuenta",
             sender="gsdia186@gmail.com",
@@ -243,8 +248,6 @@ def post_register():
         if DEBUG:
             print(f"DB_ERROR: {err}")
         return {"error": str(err)}, 500
-
-    return {"message": f"User {name} created"}, 201
 
 @app.route("/verify/<token>")
 def verify_email(token):
