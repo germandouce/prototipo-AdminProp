@@ -6,6 +6,7 @@ from config import *
 from flask import jsonify
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_mail import Mail, Message
 from sqlalchemy import create_engine
 
 from routes.consortiums import consortiums_bp
