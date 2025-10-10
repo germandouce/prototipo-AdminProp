@@ -1,11 +1,13 @@
-from flask import Flask, request
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from sqlalchemy import text
+import os
+from flask import Flask, request, url_for
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
+from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from config import *
 from flask import jsonify
-from datetime import datetime
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_mail import Mail, Message
 from sqlalchemy import create_engine
 
 from routes.consortiums import consortiums_bp
@@ -13,13 +15,22 @@ from routes.functional_units import functional_units_bp
 from routes.payments import payments_bp
 from routes.expenses import expenses_bp
 from database import engine, DEBUG
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "una_clave_super_segura"  # cambiala en producción
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.config["JWT_COOKIE_NAME"] = "access_token_cookie"
 app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
 app.config["JWT_COOKIE_CSRF_PROTECT"] = False
 jwt = JWTManager(app)
+
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USERNAME"] = "gsdia186@gmail.com"
+app.config["MAIL_PASSWORD"] = "cctz dmyf sowk jqhh"
+mail = Mail(app)
 
 def send_query(query: str) -> tuple[bool, any]:
     """Send a query to the database and return the result, if any error occurred return False and the error message."""
@@ -52,14 +63,17 @@ def login():
 
     try:
         conn = engine.connect()
-        result = conn.execute(text(query), {"email": email, "password": password})
+        result = conn.execute(text(query), {"email": email})
         user = result.mappings().fetchone()
         conn.close()
 
         if user:
-            user_id = user["id"]
             if not (check_password_hash(user["password"], password)):
                 return jsonify({"error": "Credenciales incorrectas"}), 401
+            if not user["verified"]:
+                return jsonify(
+                    {"error": "La cuenta no ha sido verificada. Por favor, revisa tu correo electrónico."}), 403
+            user_id = user["id"]
             access_token = create_access_token(identity=str(user_id))  # <-- convertir a str
             resp = jsonify({"access_token_cookie": access_token})
             resp.set_cookie("access_token_cookie", access_token, httponly=True, secure=False)
@@ -216,13 +230,206 @@ def post_register():
     try:
         with engine.begin() as conn:
             result = conn.execute(text(query), params)
+        verify_token = create_access_token(
+            identity=email, additional_claims={"action": "verify_email"}
+        )
+        API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:5001")
+        verify_link = f"{API_BASE_URL}{url_for('verify_email', token=verify_token)}"
+        msg = Message(
+            "Verificá tu cuenta",
+            sender="gsdia186@gmail.com",
+            recipients=[email],
+        )
+        msg.body = f"Hola {name}, hacé clic en este enlace para verificar tu cuenta:\n\n{verify_link}\n\nEl enlace expira en 1 hora."
+        mail.send(msg)
+
+        return {"message": "Usuario creado. Revisá tu correo para verificar la cuenta."}, 201
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
         return {"error": str(err)}, 500
 
-    return {"message": f"User {name} created"}, 201
+@app.route("/verify/<token>")
+def verify_email(token):
+    try:
+        decoded = decode_token(token)
+        email = decoded["sub"]  # identidad del token
+        action = decoded.get("action")
 
+        if action != "verify_email":
+            return {"error": "Token inválido"}, 400
+
+    except Exception as e:
+        return {"error": f"Token inválido o expirado: {e}"}, 400
+
+    query = """
+        UPDATE users
+        SET verified = TRUE
+        WHERE email = :email
+    """
+
+    with engine.begin() as conn:
+        result = conn.execute(text(query), {"email": email})
+
+    if result.rowcount == 0:
+        return {"error": "Usuario no encontrado"}, 404
+
+    return {"message": "Cuenta verificada con éxito. Ya podés iniciar sesión."}, 200
+
+
+@app.route("/payments", methods=["POST"])
+@jwt_required()
+def post_payments():
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
+    tenant_name = data.get("tenant_name")
+    id_unit = data.get("id_unit")
+    date = data.get("date")
+    amount = data.get("amount")
+
+    query = """
+            INSERT INTO payments (consortium, tenant, functional_unit, date, amount)
+            VALUES (:consortium_id, :tenant_name, :id_unit, :date, :amount)
+            """
+
+    query_get_consortium = """
+                            SELECT c.id
+                            FROM consortiums c
+                            WHERE c.user_id = :user_id
+                           """
+
+    params = {}
+    params["tenant_name"] = tenant_name
+    params["id_unit"] = id_unit
+    params["date"] = date
+    params["amount"] = amount
+
+    try:
+        with engine.begin() as conn:
+            result_consortium_id = conn.execute(text(query_get_consortium), {"user_id": user_id})
+            consortium_id = result_consortium_id.mappings().first()
+            params["consortium_id"] = consortium_id["id"]
+            result = conn.execute(text(query), params)
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    return {"message": f"payment for unit {id_unit} created"}, 201
+
+@app.route("/consortiums", methods=["POST"])
+@jwt_required()
+def post_consortiums():
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
+    name = data.get("name")
+    address = data.get("address")
+    admin_commission = data.get("admin_commission")
+    owner_name = data.get("owner_name")
+
+    query = """
+            INSERT INTO consortiums (name, address, owner_name, admin_commission, user_id)
+            VALUES (:name, :address, :owner_name, :admin_commission, :user_id)
+            """
+
+    params = {}
+    params["name"] = name
+    params["address"] = address
+    params["owner_name"] = owner_name
+    params["admin_commission"] = admin_commission
+    params["user_id"] = user_id
+
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text(query), params)
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    return {"message": f"consortium {name} created"}, 201
+
+@app.route("/functional_units", methods=["POST"])
+@jwt_required()
+def post_functional_units():
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
+    unit_number = data.get("unit_number")
+    unit_name = data.get("unit_name")
+    surface = data.get("surface")
+    surface_percentage = data.get("surface_percentage")
+    tentan = data.get("tenant")
+    debt = data.get("debt")
+
+    query = """
+            INSERT INTO functional_units (unit_number, unit_name, surface, surface_percentage, tentan, debt, consortium)
+            VALUES (:unit_number, :unit_name, :surface, :surface_percentage, :tentan, :debt, :consortium)
+            """
+
+    query_get_consortium = """
+                           SELECT c.id
+                           FROM consortiums c
+                           WHERE c.user_id = :user_id \
+                           """
+
+    params = {}
+    params["unit_number"] = unit_number
+    params["unit_name"] = unit_name
+    params["surface"] = surface
+    params["surface_percentage"] = surface_percentage
+    params["tentan"] = tentan
+    params["debt"] = debt
+
+    try:
+        with engine.begin() as conn:
+            result_consortium_id = conn.execute(text(query_get_consortium), {"user_id": user_id})
+            consortium = result_consortium_id.mappings().first()
+            params["consortium"] = consortium["id"]
+            result = conn.execute(text(query), params)
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    return {"message": f"functional unit {unit_name} created"}, 201
+
+@app.route("/expenses", methods=["POST"])
+@jwt_required()
+def post_expenses():
+    user_id = int(get_jwt_identity())
+    data = request.get_json()
+    description = data.get("description")
+    amount = data.get("amount")
+    date = data.get("date")
+
+    query = """
+            INSERT INTO common_expenses (description, amount, date, consortium)
+            VALUES (:description, :amount, :date, :consortium)
+            """
+
+    query_get_consortium = """
+                           SELECT c.id
+                           FROM consortiums c
+                           WHERE c.user_id = :user_id
+                           """
+
+    params = {}
+    params["description"] = description
+    params["amount"] = amount
+    params["date"] = date
+
+    try:
+        with engine.begin() as conn:
+            result_consortium_id = conn.execute(text(query_get_consortium), {"user_id": user_id})
+            consortium = result_consortium_id.mappings().first()
+            params["consortium"] = consortium["id"]
+            result = conn.execute(text(query), params)
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    return {"message": f"expense {description} created"}, 201
 
 if __name__ == "__main__":
     app.run("0.0.0.0", API_PORT, debug=DEBUG=="True")
