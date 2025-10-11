@@ -53,14 +53,14 @@ CREATE TABLE IF NOT EXISTS payments (
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AGREGAR DOS USUARIOS
-INSERT INTO users (name, surname, email, password)
-SELECT 'John', 'Doe', 'usuario@dominio.com', 'pbkdf2:sha256:600000$5awvOCLwNzLQmVlq$73fef6846f25d4e137e495578a92c8f876273e64d4f35e0a8553d97322589bde' -- Abcde.12345 hasheado
+INSERT INTO users (name, surname, email, password, verified)
+SELECT 'John', 'Doe', 'usuario@dominio.com', 'pbkdf2:sha256:600000$5awvOCLwNzLQmVlq$73fef6846f25d4e137e495578a92c8f876273e64d4f35e0a8553d97322589bde', TRUE -- Abcde.12345 hasheado
     WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE email = 'usuario@dominio.com'
 );
 
-INSERT INTO users (name, surname, email, password)
-SELECT 'Martin', 'Fowler', 'martinfowler@gmail.com', 'pbkdf2:sha256:600000$DBqEiZaiRnqMemr4$5eb6adc4fdfbbc7aa49952707bb9e0deb554ce77e18cac70ffec05ef20a4fe24' -- StrongP@ssw0rd hasheado
+INSERT INTO users (name, surname, email, password, verified)
+SELECT 'Martin', 'Fowler', 'martinfowler@gmail.com', 'pbkdf2:sha256:600000$DBqEiZaiRnqMemr4$5eb6adc4fdfbbc7aa49952707bb9e0deb554ce77e18cac70ffec05ef20a4fe24', TRUE -- StrongP@ssw0rd hasheado
     WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE email = 'martinfowler@gmail.com'
 );
@@ -69,25 +69,25 @@ SELECT 'Martin', 'Fowler', 'martinfowler@gmail.com', 'pbkdf2:sha256:600000$DBqEi
 INSERT INTO consortiums (name, address, owner_name, admin_commission, user_id)
 SELECT 'Galerías pacífico', 'Av. Corrientes 1234, CABA', 'Juan Pérez', 10.00, 1
     WHERE NOT EXISTS (
-    SELECT 1 FROM consortiums WHERE name = "Galerías pacífico");
+    SELECT 1 FROM consortiums WHERE name = 'Galerías pacífico');
 
 INSERT INTO functional_units (unit_number, unit_name, surface, consortium)
 SELECT 1, '1A', 50.00, 1
     WHERE NOT EXISTS (
-    SELECT 1 FROM functional_units WHERE unit_name = "1A" AND consortium = 1
+    SELECT 1 FROM functional_units WHERE unit_name = '1A' AND consortium = 1
 );
 
 INSERT INTO functional_units (unit_number, unit_name, surface, consortium, tenant, rent_value, debt)
 SELECT 2, '1B', 25.00, 1, 'Carlos López', 350000.00, 700000
     WHERE NOT EXISTS (
-    SELECT 1 FROM functional_units WHERE unit_name = "1B" AND consortium = 1
+    SELECT 1 FROM functional_units WHERE unit_name = '1B' AND consortium = 1
 );
 
 -- AGREGAR OTRO CONSORCIO CON UNIDADES FUNCIONALES DE EJEMPLO
 INSERT INTO consortiums (name, address, owner_name, admin_commission, user_id)
 SELECT 'Condominio La Plata', 'Calle 50 Nro 1234, La Plata', 'María Gómez', 8.00, 1
     WHERE NOT EXISTS (
-    SELECT 1 FROM consortiums WHERE name = "Condominio La Plata");
+    SELECT 1 FROM consortiums WHERE name = 'Condominio La Plata');
 
 INSERT INTO functional_units (unit_number, unit_name, surface, consortium)
 SELECT 1, '1A', 75.00,2
