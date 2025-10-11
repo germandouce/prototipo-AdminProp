@@ -6,8 +6,6 @@ services:
       - mysql
     ports:
       - "5001:5001"
-    environment:
-      - API_BASE_URL=http://localhost:5001
 
   front:
     build: ./Frontend/

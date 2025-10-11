@@ -233,7 +233,6 @@ def post_register():
         verify_token = create_access_token(
             identity=email, additional_claims={"action": "verify_email"}
         )
-        API_BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:5001")
         verify_link = f"{API_BASE_URL}{url_for('verify_email', token=verify_token)}"
         msg = Message(
             "Verificá tu cuenta",
