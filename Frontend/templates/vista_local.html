@@ -24,9 +24,15 @@
             <div style="display:flex; align-items:center; gap:.75rem; justify-content: space-between;">
                 <h1 data-nombre>{{ unit.tenant if unit.tenant else '---' }}</h1>
                 {% if unit.tenant %}
-                    <button type="button" id="btnCambiarInq" class="btn btn-secondary">Desocupar</button>
+                    <button type="button" id="btnDesocupar" class="btn btn-secondary" data-consortium-id="{{ consortium_id }}" data-unit-id="{{ unit.id }}">
+                        Desocupar
+                    </button>
                 {% else %}
-                    <button type="button" id="btnAgregarInq" class="btn btn-primary">Establecer inquilino</button>
+                    <form id="formOcupar" data-consortium-id="{{ consortium_id }}" data-unit-id="{{ unit.id }}">
+                        <input type="text" id="inputInquilino" name="ocupar" placeholder="Nombre de nuevo inquilino">
+                        <button type="submit" class="btn btn-primary">Establecer</button>
+                    </form>
+<!--                    <button type="button" id="btnOcupar" class="btn btn-primary">Establecer inquilino</button>-->
                 {% endif %}
             </div>
         </div>
@@ -66,4 +72,7 @@
         <div id="mensaje-boton" style="display:none;"></div>
     </div>
 </section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/desocupar_unidad.js') }}"></script>
 {% endblock %}

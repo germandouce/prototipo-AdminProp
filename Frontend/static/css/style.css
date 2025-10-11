@@ -9,6 +9,12 @@ body {
     display: flex;
     height: 100vh;
 }
+
+#app {
+    max-width: 100%;
+    --bs-gutter-x: 0;
+}
+
 .sidebar {
     width: 220px;
     background: #1a73e8;

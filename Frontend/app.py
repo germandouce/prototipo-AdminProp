@@ -99,6 +99,66 @@ def consorcios():
         free_limit_reached = True
     return render_template("consorcios.html", active_page='consorcios', free_limit_reached=free_limit_reached, consortiums=consortiums)
 
+@app.route("/consorcios/<int:consortium_id>/unidades_funcionales", methods=["GET", "POST"])
+def unidades_funcionales(consortium_id):
+    login_check = require_login()
+    if login_check:
+        return login_check
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+
+    if request.method == "POST":
+        unit_number = request.form.get("unit_number")
+        unit_name = request.form.get("unit_name")
+        surface_area = request.form.get("surface_area")
+        params = {
+            "unit_number": unit_number,
+            "unit_name": unit_name,
+            "surface": surface_area,
+            "consortium_id": consortium_id
+        }
+        response = requests.post(f"{API_URL}/functional_units", json=params, cookies=cookies)
+        if response.status_code == 201:
+            return redirect(url_for("unidades_funcionales", consortium_id=consortium_id))
+    response = requests.get(f"{API_URL}/functional_units", params={"consortium_id": consortium_id}).json()
+    functional_units = response.get("functional_units", [])
+    address = response.get("address", "Dirección")
+    return render_template("unidades_funcionales.html", active_page='consorcios', units=functional_units, consortium_id=consortium_id, address=address)
+
+@app.route("/consorcios/<int:consortium_id>/unidades_funcionales/<int:unit_id>")
+def unidad_funcional(consortium_id, unit_id):
+    login_check = require_login()
+    if login_check:
+        return login_check
+    response = requests.get(f"{API_URL}/functional_unit", params={"consortium_id": consortium_id, "unit_id": unit_id}).json()
+    unit = response["functional_unit"] if "functional_unit" in response else None
+    return render_template("vista_local.html", active_page='consorcios', unit=unit, consortium_id=consortium_id)
+
+@app.route("/consorcios/<int:consortium_id>/unidades_funcionales/<int:unit_id>/desocupar", methods=["PATCH"])
+def desocupar_unidad(consortium_id, unit_id):
+    login_check = require_login()
+    if login_check:
+        return login_check
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+    response = requests.patch(
+        f"{API_URL}/functional_units/{unit_id}",
+        json={"tenant": ""},
+        cookies=cookies
+    )
+    return redirect(url_for("unidad_funcional", consortium_id=consortium_id, unit_id=unit_id))
+
+@app.route("/consorcios/<int:consortium_id>/unidades_funcionales/<int:unit_id>/ocupar", methods=["PATCH"])
+def ocupar_unidad(consortium_id, unit_id):
+    login_check = require_login()
+    if login_check:
+        return login_check
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+    tenant = request.json.get("tenant")
+    response = requests.patch(
+        f"{API_URL}/functional_units/{unit_id}",
+        json={"tenant": tenant},
+        cookies=cookies
+    )
+    return redirect(url_for("unidad_funcional", consortium_id=consortium_id, unit_id=unit_id))
 
 @app.route("/rendiciones")
 def rendiciones():
@@ -120,42 +180,6 @@ def configuracion():
     if login_check:
         return login_check
     return render_template("configuracion.html", active_page='configuracion')
-
-@app.route("/unidades_funcionales", methods=["GET", "POST"])
-def unidades_funcionales():
-    login_check = require_login()
-    if login_check:
-        return login_check
-    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
-
-    consortium_id = request.args.get("consortium_id")
-    if request.method == "POST":
-        unit_number = request.form.get("unit_number")
-        unit_name = request.form.get("unit_name")
-        surface_area = request.form.get("surface_area")
-        params = {
-            "unit_number": unit_number,
-            "unit_name": unit_name,
-            "surface": surface_area
-        }
-        response = requests.post(f"{API_URL}/functional_units", json=params, cookies=cookies)
-        if response.status_code == 201:
-            return redirect(url_for("unidades_funcionales", consortium_id=consortium_id))
-    response = requests.get(f"{API_URL}/functional_units", params={"consortium_id": consortium_id}).json()
-    functional_units = response["functional_units"] if "functional_units" in response else []
-    address = response["address"] if "address" in response else "Dirección"
-    return render_template("unidades_funcionales.html", active_page='consorcios', units=functional_units, consortium_id=consortium_id, address=address)
-
-@app.route("/unidad_funcional")
-def unidad_funcional():
-    login_check = require_login()
-    if login_check:
-        return login_check
-    consortium_id = request.args.get("consortium_id")
-    unit_id = request.args.get("unit_id")
-    response = requests.get(f"{API_URL}/functional_unit", params={"consortium_id": consortium_id, "unit_id": unit_id}).json()
-    unit = response["functional_unit"] if "functional_unit" in response else None
-    return render_template("vista_local.html", active_page='consorcios', unit=unit)
 
 @app.route("/suscribirse")
 def suscribirse():
