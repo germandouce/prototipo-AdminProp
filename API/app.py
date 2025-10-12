@@ -1,4 +1,7 @@
 import os
+import requests
+import sendgrid
+from sendgrid.helpers.mail import *
 from flask import Flask, request, url_for
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token
 from sqlalchemy import create_engine, text
@@ -7,7 +10,6 @@ from config import *
 from flask import jsonify
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_mail import Mail, Message
 from sqlalchemy import create_engine
 
 from routes.consortiums import consortiums_bp
@@ -16,7 +18,6 @@ from routes.payments import payments_bp
 from routes.expenses import expenses_bp
 from routes.clients import clients_bp
 from database import engine, DEBUG
-from flask_mail import Mail, Message
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "una_clave_super_segura"  # cambiala en producción
@@ -211,12 +212,14 @@ def get_administration_fee():
 
 @app.route("/users/register", methods=["POST"])
 def post_register():
-
     data = request.get_json()
     name = data.get("name")
     surname = data.get("surname")
     email = data.get("email")
     password = generate_password_hash(data.get("password"), method="pbkdf2:sha256")
+
+    if not all([name, surname, email, password]):
+        return {"error": "Faltan datos requeridos"}, 400
 
     query = """
             INSERT INTO users (name, surname, email, password)
@@ -233,22 +236,34 @@ def post_register():
         with engine.begin() as conn:
             result = conn.execute(text(query), params)
         verify_token = create_access_token(
-            identity=email, additional_claims={"action": "verify_email"}
+            identity=email,
+            additional_claims={"action": "verify_email"}
         )
         verify_link = f"{API_BASE_URL}{url_for('verify_email', token=verify_token)}"
-        msg = Message(
-            "Verificá tu cuenta",
-            sender="gsdia186@gmail.com",
-            recipients=[email],
+        sg = sendgrid.SendGridAPIClient(SENDGRID_API_KEY)
+        from_email = FROM_EMAIL
+        to = email
+        subject = "Verificá tu cuenta"
+        content = f"Hola {name}, hacé clic en este enlace para verificar tu cuenta:\n\n{verify_link}\n\nEl enlace expira en 1 hora."
+
+        mail = Mail(
+            from_email=from_email,
+            to_emails=to,
+            subject=subject,
+            plain_text_content=content
         )
-        msg.body = f"Hola {name}, hacé clic en este enlace para verificar tu cuenta:\n\n{verify_link}\n\nEl enlace expira en 1 hora."
-        mail.send(msg)
+        mail_json = mail.get()
+        response = sg.client.mail.send.post(request_body=mail_json)
 
         return {"message": "Usuario creado. Revisá tu correo para verificar la cuenta."}, 201
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
-        return {"error": str(err)}, 500
+        return {"error": "El email ya está registrado."}, 400
+    except Exception as e:
+        if DEBUG:
+            print(f"EMAIL_ERROR: {e}")
+        return {"error": "Error al enviar el email de verificación."}, 500
 
 @app.route("/verify/<token>")
 def verify_email(token):
