@@ -8,33 +8,35 @@ from database import engine, DEBUG
 functional_units_bp = Blueprint("functional_units", __name__)
 
 @functional_units_bp.route("/functional_units", methods=["GET"])
+@jwt_required()
 def get_functional_units():
+    user_id = int(get_jwt_identity())
     consortium_id = request.args.get("consortium_id", type=int)
+
+    if consortium_id is None:
+        return {"error": "consortium_id is required"}, 400
 
     query = """
         SELECT f.id, f.unit_number, f.unit_name, f.surface,
                f.tenant, f.rent_value, f.debt
         FROM functional_units f
         JOIN consortiums c ON f.consortium = c.id
+        WHERE f.consortium = :consortium_id AND c.user_id = :user_id
     """
 
     query_address = """
                     SELECT c.address
                     FROM   consortiums c
-                    WHERE c.id = :consortium_id
+                    WHERE c.id = :consortium_id AND c.user_id = :user_id
                     """
 
-    params = {}
-    if consortium_id is not None:
-        query += " WHERE f.consortium = :consortium_id"
-        params["consortium_id"] = consortium_id
+    params = {"user_id": user_id, "consortium_id": consortium_id}
 
     try:
         conn = engine.connect()
-        if params:
-            result = conn.execute(text(query), params)
-        else:
-            result = conn.execute(text(query))
+        result = conn.execute(text(query), params)
+        if result.rowcount == 0:
+            return {"error": "No functional units or permission denied"}, 404
         consortium_address_result = conn.execute(text(query_address), params).fetchone()
         rows = result.fetchall()
         conn.close()
@@ -64,38 +66,35 @@ def get_functional_units():
     return jsonify(response), 200
 
 @functional_units_bp.route("/functional_unit", methods=["GET"])
+@jwt_required()
 def get_functional_unit():
+    user_id = int(get_jwt_identity())
     consortium_id = request.args.get("consortium_id", type=int)
     unit_id = request.args.get("unit_id", type=int)
 
-    if unit_id is None:
-        return {"error": "Se requiere unit_id"}, 400
+    if not all([consortium_id, unit_id]):
+        return {"error": "consortium_id and unit_id are required"}, 400
 
     query = """
         SELECT f.id, f.unit_number, f.unit_name, f.surface,
-               f.tenant, f.debt, c.address AS consortium_address
+               f.tenant, f.debt, f.rent_value, c.address AS consortium_address
         FROM functional_units f
         JOIN consortiums c ON f.consortium = c.id
-        WHERE f.id = :unit_id
+        WHERE f.id = :unit_id AND f.consortium = :consortium_id AND c.user_id = :user_id
     """
 
-    params = {"unit_id": unit_id}
-
-    if consortium_id is not None:
-        query += " AND f.consortium = :consortium_id"
-        params["consortium_id"] = consortium_id
+    params = {"unit_id": unit_id, "user_id": user_id, "consortium_id": consortium_id}
 
     try:
-        conn = engine.connect()
-        result = conn.execute(text(query), params).fetchone()
-        conn.close()
+        with engine.connect() as conn:
+            result = conn.execute(text(query), params).fetchone()
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
         return {"error": str(err)}, 500
 
     if not result:
-        return {"error": "Unidad no encontrada"}, 404
+        return {"error": "Functional unit not found or permission denied"}, 404
 
     functional_unit = {
         "id": result.id,
@@ -105,7 +104,8 @@ def get_functional_unit():
         "tenant": result.tenant,
         "consortium_address": result.consortium_address,
         "surface": float(result.surface),
-        "debt": float(result.debt)
+        "debt": float(result.debt),
+        "rent_value": float(result.rent_value)
     }
 
     return jsonify({"functional_unit": functional_unit}), 200
@@ -118,29 +118,36 @@ def post_functional_units():
     unit_number = data.get("unit_number")
     unit_name = data.get("unit_name")
     surface = data.get("surface")
+    consortium_id = data.get("consortium_id")
 
     query = """
             INSERT INTO functional_units (unit_number, unit_name, surface, consortium)
             VALUES (:unit_number, :unit_name, :surface, :consortium)
             """
 
-    query_get_consortium = """
-                           SELECT c.id
-                           FROM consortiums c
-                           WHERE c.user_id = :user_id \
-                           """
+    query_consortium = """
+                       SELECT id \
+                       FROM consortiums \
+                       WHERE id = :consortium_id \
+                         AND user_id = :user_id \
+                       """
 
     params = {}
     params["unit_number"] = unit_number
     params["unit_name"] = unit_name
     params["surface"] = surface
+    params["consortium"] = consortium_id
 
     try:
         with engine.begin() as conn:
-            result_consortium_id = conn.execute(text(query_get_consortium), {"user_id": user_id})
-            consortium = result_consortium_id.mappings().first()
-            params["consortium"] = consortium["id"]
-            result = conn.execute(text(query), params)
+            result_consortium = conn.execute(
+                text(query_consortium),
+                {"consortium_id": consortium_id, "user_id": user_id}
+            )
+
+            if result_consortium.fetchone() is None:
+                return {"error": "Consortium not found or permission denied"}, 404
+            conn.execute(text(query), params)
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
@@ -151,6 +158,7 @@ def post_functional_units():
 @functional_units_bp.route("/functional_units/<int:id>", methods=["PATCH"])
 @jwt_required()
 def patch_functional_unit(id):
+    user_id = int(get_jwt_identity())
     data = request.get_json()
 
     optional_data = ["unit_number", "unit_name", "tenant", "debt"]
@@ -159,18 +167,23 @@ def patch_functional_unit(id):
         return {"error": "No fields to update"}, 400
 
     set_clause = ", ".join([f"{key} = :{key}" for key in received_data.keys()])
-    query = f"UPDATE functional_units SET {set_clause} WHERE id = :id"
-    received_data["id"] = id
+    query = f"""
+        UPDATE functional_units
+        SET {set_clause}
+        WHERE id = :id
+        AND consortium IN (SELECT id FROM consortiums WHERE user_id = :user_id)
+    """
+    params = {
+        **received_data,
+        "id": id,
+        "user_id": user_id
+    }
 
     try:
         with engine.begin() as conn:
-            exists = conn.execute(text("SELECT 1 FROM functional_units WHERE id = :id"), {"id": id}).fetchone()
-            if not exists:
-                return {"error": f"Functional unit with id {id} not found"}, 404
-
-            result = conn.execute(text(query), received_data)
+            result = conn.execute(text(query), params)
             if result.rowcount == 0:
-                return {"error": "Functional unit not found"}, 404
+                return {"error": "Functional unit not found or permission denied"}, 404
 
     except SQLAlchemyError as err:
         if DEBUG:
@@ -179,16 +192,26 @@ def patch_functional_unit(id):
 
     return {"message": "Functional unit updated"}, 200
 
+#Deletes a functional unit and its paymnets
 @functional_units_bp.route("/functional_unit/<int:unit_id>", methods=["DELETE"])
+@jwt_required()
 def delete_unit(unit_id):
+    user_id = int(get_jwt_identity())
     query = """
         DELETE FROM functional_units
-        WHERE id = :unit_id 
+        WHERE id = :unit_id
+        AND consortium IN (SELECT id FROM consortiums WHERE user_id = :user_id)
     """
+
+    params = {"unit_id": unit_id, "user_id": user_id}
+    delete_payments_q = "DELETE FROM payments WHERE functional_unit = :unit_id"
 
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(query), {"unit_id": unit_id})
+            conn.execute(text(delete_payments_q), {"unit_id": unit_id})
+            result = conn.execute(text(query), params)
+            if result.rowcount == 0:
+                return {"error": "Functional unit not found or permission denied"}, 404
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")

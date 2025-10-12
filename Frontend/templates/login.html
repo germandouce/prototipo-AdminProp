@@ -30,6 +30,15 @@
                     <div class="input-container">
                         <input type="submit" id="submit-btn" value="Iniciar sesión" class="btn-primary">
                     </div>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for category, message in messages %}
+                          <div class="alert alert-{{ category }}">
+                            {{ message }}
+                          </div>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
                     <p class="message">¿Aún no tienes cuenta? <a href="{{ url_for('register') }}">Crea una</a></p>
                 </form>
             </div>

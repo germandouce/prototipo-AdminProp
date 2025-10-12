@@ -9,7 +9,7 @@ consortiums_bp = Blueprint("consortiums", __name__)
 @consortiums_bp.route("/consortiums", methods=["GET"])
 @jwt_required()
 def get_consortiums():
-    user_id = int(get_jwt_identity())  # <-- convertir a int
+    user_id = int(get_jwt_identity())
     query = """
             SELECT c.id, c.address, COUNT(f.id) AS ufs_amount
             FROM consortiums c
@@ -33,22 +33,36 @@ def get_consortiums():
     ]
     return jsonify({"consortiums": consortiums}), 200
 
+#Deletes a consortium and its payments, expenses and functional units
 @consortiums_bp.route("/consortiums/<int:consortium_id>", methods=["DELETE"])
+@jwt_required()
 def delete_consortium(consortium_id):
+    user_id = int(get_jwt_identity())
     query = """
         DELETE FROM consortiums
-        WHERE id = :consortium_id 
+        WHERE id = :consortium_id AND user_id = :user_id
     """
+
+    delete_payments_q = "DELETE FROM payments WHERE consortium = :consortium_id"
+    delete_expenses_q = "DELETE FROM common_expenses WHERE consortium = :consortium_id"
+    delete_units_q = "DELETE FROM functional_units WHERE consortium = :consortium_id"
+
+    params = {"consortium_id": consortium_id, "user_id": user_id}
 
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(query), {"consortium_id": consortium_id})
+            conn.execute(text(delete_payments_q), {"consortium_id": consortium_id})
+            conn.execute(text(delete_expenses_q), {"consortium_id": consortium_id})
+            conn.execute(text(delete_units_q), {"consortium_id": consortium_id})
+            result = conn.execute(text(query), params)
+            if result.rowcount == 0:
+                return {"error": "Consortium not found or permission denied"}, 404
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
         return {"error": str(err)}, 500
 
-    return {"message": f"Consortium {consortium_id} deleted"}, 200
+    return {"message": f"Consortium {consortium_id} and all its related data deleted"}, 200
 
 @consortiums_bp.route("/consortiums", methods=["POST"])
 @jwt_required()
@@ -86,16 +100,17 @@ def post_consortiums():
 @consortiums_bp.route("/consortiums/<int:id>", methods=["PATCH"])
 @jwt_required()
 def patch_consortiums(id):
+    user_id = int(get_jwt_identity())
     data = request.get_json()
-
     optional_data = ["address"]
     received_data = {key: data.get(key) for key in optional_data if key in data}
     if not received_data:
         return {"error": "No fields to update"}, 400
     
     set_clause = ", ".join([f"{key} = :{key}" for key in received_data.keys()])
-    query = f"UPDATE consortiums SET {set_clause} WHERE id = :id"
+    query = f"UPDATE consortiums SET {set_clause} WHERE id = :id AND user_id = :user_id"
     received_data["id"] = id
+    received_data["user_id"] = user_id
 
     try:
         with engine.begin() as conn:
@@ -105,7 +120,7 @@ def patch_consortiums(id):
 
             result = conn.execute(text(query), received_data)
             if result.rowcount == 0:
-                return {"error": "Consortium not found"}, 404
+                return {"error": "Consortium not found or permission denied"}, 404
             
     except SQLAlchemyError as err:
         if DEBUG:

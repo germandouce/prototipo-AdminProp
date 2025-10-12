@@ -10,111 +10,36 @@
             <tr>
                 <th>Nombre</th>
                 <th>Dirección</th>
-                <th>
-                    Alquiler
-                    <button id="sort-alquiler-desc" title="Ordenar de mayor a menor"><i class="fa-solid fa-arrow-down"></i></button>
-                </th>
-                <th>
-                    Ordinarias
-                    <button id="sort-ordinarias-desc" title="Ordenar de mayor a menor"><i class="fa-solid fa-arrow-down"></i></button>
-                </th>
-                <th>
-                    Extraordinarias
-                    <button id="sort-extraordinarias-desc" title="Ordenar de mayor a menor"><i class="fa-solid fa-arrow-down"></i></button>
-                </th>
-                <th>
-                    Deuda
-                    <button id="sort-deuda-desc" title="Ordenar de mayor a menor"><i class="fa-solid fa-arrow-down"></i></button>
-                </th>
-                <th>
-                    Pago
-                    <button id="sort-pago-desc" title="Ordenar de mayor a menor"><i class="fa-solid fa-arrow-down"></i></button>
-                </th>
+                <th>Alquiler <button title="Ordenar"><i class="fa-solid fa-arrow-down"></i></button></th>
+                <th>Deuda <button title="Ordenar"><i class="fa-solid fa-arrow-down"></i></button></th>
+                <th>Pago <button title="Ordenar"><i class="fa-solid fa-arrow-down"></i></button></th>
                 <th>Pago al día</th>
             </tr>
             </thead>
-            <tbody>
-            <tr>
-                <td>Luciano Wilberger</td>
-                <td>Anchorena 1200 5F</td>
-                <td>$600.000</td>
-                <td>$100.000</td>
-                <td>$0</td>
-                <td>$0</td>
-                <td>$700.000</td>
-                <td>&#9989;</td>
-            </tr>
-            <tr>
-                <td>Zoilo Pazos</td>
-                <td>Av. Santa Fe 3000 1A</td>
-                <td>$800.000</td>
-                <td>$150.000</td>
-                <td>$110.000</td>
-                <td>$120.000</td>
-                <td>$940.000</td>
-                <td>&#10060;</td>
-            </tr>
-            <tr>
-                <td>Carmen Sandiego</td>
-                <td>Charcas 1300</td>
-                <td>$1.600.000</td>
-                <td>$350.000</td>
-                <td>$200.000</td>
-                <td>$0</td>
-                <td>$2.150.000</td>
-                <td>&#9989;</td>
-            </tr>
-            <tr>
-                <td>Flor Ramirez</td>
-                <td>Lavalle 1000</td>
-                <td>$500.000</td>
-                <td>$50.000</td>
-                <td>$0</td>
-                <td>$50.000</td>
-                <td>$500.000</td>
-                <td>&#10060;</td>
-            </tr>
-            <tr>
-                <td>Manuel Iglesias</td>
-                <td>Av.Cordoba 3410</td>
-                <td>$1.500.000 </td>
-                <td>$50.000</td>
-                <td>$0</td>
-                <td>$0</td>
-                <td>$1.550.000</td>
-                <td>&#9989;</td>
-            </tr>
-            <tr>
-                <td>Matias Flores </td>
-                <td>Av. 9 de Julio 2310</td>
-                <td>$2.500.000</td>
-                <td>$50.000</td>
-                <td>$210.000</td>
-                <td>$210.000</td>
-                <td>$2.340.000</td>
-                <td>&#10060;</td>
-            </tr>
-            <tr>
-                <td>Sergio Schwaab</td>
-                <td>Gallo 500</td>
-                <td>$1.100.000</td>
-                <td>$50.000</td>
-                <td>$300.000</td>
-                <td>$300.000</td>
-                <td>$1.150.000</td>
-                <td>&#10060;</td>
-            </tr>
-            <tr>
-                <td>Raquel Rios</td>
-                <td>Arenales 4064</td>
-                <td>$700.000</td>
-                <td>$50.000</td>
-                <td>$0</td>
-                <td>$0</td>
-                <td>$750.000</td>
-                <td>&#9989;</td>
-            </tr>
-            </tbody>
+                   <tbody>
+                        {% for client in clients %}
+                        <tr>
+                            <td>{{ client.nombre }}</td>
+                            <td>{{ client.direccion }}</td>
+
+                            <td data-value="{{ client.alquiler or 0 }}">${{ "{:,.2f}".format(client.alquiler or 0) }}</td>
+                            <td data-value="{{ client.deuda or 0 }}">${{ "{:,.2f}".format(client.deuda or 0) }}</td>
+                            <td data-value="{{ client.pago or 0 }}">${{ "{:,.2f}".format(client.pago or 0) }}</td>
+
+                            <td>
+                                {% if client.pago_al_dia %}
+                                    <span title="Al día">&#9989;</span>
+                                {% else %}
+                                    <span title="Posee deuda">&#10060;</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" style="text-align: center;">No se encontraron clientes.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
         </table>
         <div class="container-caja">
             <div class="caja">
@@ -188,4 +113,47 @@
             </div>
         </div>
     </section>
+    {% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tableBody = document.querySelector('table tbody');
+    const sortButtons = document.querySelectorAll('thead th button');
+
+    sortButtons.forEach((button, index) => {
+        button.addEventListener('click', () => {
+            // Convertir las filas de la tabla en un array para poder ordenarlo
+            const rows = Array.from(tableBody.querySelectorAll('tr'));
+
+            // Obtener la dirección de ordenamiento actual (asc o desc)
+            const currentOrder = button.dataset.order || 'desc';
+            const newOrder = currentOrder === 'desc' ? 'asc' : 'desc';
+            button.dataset.order = newOrder;
+
+            // Cambiar el ícono de la flecha
+            const icon = button.querySelector('i');
+            icon.classList.toggle('fa-arrow-down');
+            icon.classList.toggle('fa-arrow-up');
+
+            rows.sort((rowA, rowB) => {
+                const cellA = rowA.children[index + 2]; // +2 para saltar 'Nombre' y 'Dirección'
+                const cellB = rowB.children[index + 2];
+
+                const valueA = parseFloat(cellA.dataset.value || 0);
+                const valueB = parseFloat(cellB.dataset.value || 0);
+
+                if (newOrder === 'desc') {
+                    return valueB - valueA;
+                } else {
+                    return valueA - valueB;
+                }
+            });
+
+            // Volver a insertar las filas ordenadas en la tabla
+            tableBody.innerHTML = ''; // Limpiar el contenido actual
+            rows.forEach(row => tableBody.appendChild(row));
+        });
+    });
+});
+</script>
+{% endblock %}
 {% endblock %}

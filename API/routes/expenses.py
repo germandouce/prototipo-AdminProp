@@ -8,7 +8,9 @@ from database import engine, DEBUG
 expenses_bp = Blueprint("expenses", __name__)
 
 @expenses_bp.route("/expenses", methods=["GET"])
+@jwt_required()
 def get_expenses():
+    user_id = int(get_jwt_identity())
     consortium_id = request.args.get("consortium_id", type=int)
 
     if consortium_id is None:
@@ -17,10 +19,11 @@ def get_expenses():
     query = """
             SELECT e.id, e.description, e.amount, e.date
             FROM common_expenses e
-            WHERE e.consortium = :consortium_id
+            JOIN consortiums c ON e.consortium = c.id
+            WHERE e.consortium = :consortium_id AND c.user_id = :user_id
             """
 
-    params = {"consortium_id": consortium_id}
+    params = {"consortium_id": consortium_id, "user_id": user_id}
 
     try:
         conn = engine.connect()
@@ -48,15 +51,20 @@ def get_expenses():
     return jsonify(response), 200
 
 @expenses_bp.route("/expenses/<int:expense_id>", methods=["DELETE"])
+@jwt_required()
 def delete_expense(expense_id):
+    user_id = int(get_jwt_identity())
     query = """
         DELETE FROM common_expenses
-        WHERE id = :expense_id 
+        WHERE id = :expense_id
+        AND consortium IN (SELECT id FROM consortiums WHERE user_id = :user_id)
     """
 
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(query), {"expense_id": expense_id})
+            result = conn.execute(text(query), {"expense_id": expense_id, "user_id": user_id})
+            if result.rowcount == 0:
+                return {"error": "Expense not found or permission denied"}, 404
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
@@ -72,29 +80,40 @@ def post_expenses():
     description = data.get("description")
     amount = data.get("amount")
     date = data.get("date")
+    consortium_id = data.get("consortium_id")
+
+    if not all([description, amount, date, consortium_id]):
+        return {"error": "description, amount, date, and consortium_id are required"}, 400
+
+    query_consortium = """
+                            SELECT id \
+                            FROM consortiums \
+                            WHERE id = :consortium_id \
+                              AND user_id = :user_id \
+                            """
 
     query = """
             INSERT INTO common_expenses (description, amount, date, consortium)
             VALUES (:description, :amount, :date, :consortium)
             """
 
-    query_get_consortium = """
-                           SELECT c.id
-                           FROM consortiums c
-                           WHERE c.user_id = :user_id
-                           """
-
     params = {}
     params["description"] = description
     params["amount"] = amount
     params["date"] = date
-
+    params["consortium"] = consortium_id
     try:
         with engine.begin() as conn:
-            result_consortium_id = conn.execute(text(query_get_consortium), {"user_id": user_id})
-            consortium = result_consortium_id.mappings().first()
-            params["consortium"] = consortium["id"]
-            result = conn.execute(text(query), params)
+
+            result_consortium = conn.execute(
+                text(query_consortium),
+                {"consortium_id": consortium_id, "user_id": user_id}
+            )
+
+            if result_consortium.fetchone() is None:
+                return {"error": "Consortium not found or permission denied"}, 404
+
+            conn.execute(text(query), params)
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
@@ -106,6 +125,7 @@ def post_expenses():
 @expenses_bp.route("/expenses/<int:id>", methods=["PATCH"])
 @jwt_required()
 def patch_expenses(id):
+    user_id = int(get_jwt_identity())
     data = request.get_json()
 
     optional_data = ["description", "amount", "date", "consortium"]
@@ -114,18 +134,21 @@ def patch_expenses(id):
         return {"error": "No fields to update"}, 400
 
     set_clause = ", ".join([f"{key} = :{key}" for key in received_data.keys()])
-    query = f"UPDATE common_expenses SET {set_clause} WHERE id = :id"
-    received_data["id"] = id
+    query = (f"UPDATE common_expenses SET {set_clause} "
+             f"WHERE id = :id"
+             f" AND consortium IN (SELECT id FROM consortiums WHERE user_id = :user_id)")
+
+    params = {
+        **received_data,
+        "id": id,
+        "user_id": user_id,
+    }
 
     try:
         with engine.begin() as conn:
-            exists = conn.execute(text("SELECT 1 FROM common_expenses WHERE id = :id"), {"id": id}).fetchone()
-            if not exists:
-                return {"error": f"Common expense with id {id} not found"}, 404
-
-            result = conn.execute(text(query), received_data)
+            result = conn.execute(text(query), params)
             if result.rowcount == 0:
-                return {"error": "Common expense not found"}, 404
+                return {"error": "Expense not found or permission denied"}, 404
 
     except SQLAlchemyError as err:
         if DEBUG:

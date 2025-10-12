@@ -1,11 +1,12 @@
 import requests
-from flask import Flask, render_template, request, make_response, redirect, url_for
+from flask import Flask, render_template, request, make_response, redirect, url_for, flash
 from config import *
 import datetime
 import os
 
 API_URL = f"{API_HOST}:{API_PORT}"
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'admin'
 
 
 # ------------------------------ ERROR HANDLER --------------------------------
@@ -59,6 +60,7 @@ def register():
         password = request.form.get("password")
         response = requests.post(f"{API_URL}/users/register", json={"name":name, "surname":surname, "email": email, "password": password})
         if response.status_code == 201:
+            flash('¡Registro exitoso! Revisa tu email para verificar tu cuenta.', 'success')
             return redirect(url_for("login"))
         else:
             error_msg = response.json().get("error", "Error desconocido")
@@ -70,7 +72,19 @@ def clientes():
     login_check = require_login()
     if login_check:
         return login_check
-    return render_template("clientes.html", active_page='clientes')
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+
+    # Llamamos al nuevo endpoint de la API
+    response = requests.get(f"{API_URL}/api/clients", cookies=cookies)
+
+    clients_data = []
+    if response.status_code == 200:
+        clients_data = response.json().get("clients", [])
+    else:
+        # Manejar el error, tal vez mostrando un mensaje
+        print(f"Error al obtener clientes: {response.status_code}")
+
+    return render_template("clientes.html", active_page='clientes', clients=clients_data)
 
 @app.route("/consorcios", methods=["GET", "POST"])
 def consorcios():
@@ -119,7 +133,7 @@ def unidades_funcionales(consortium_id):
         response = requests.post(f"{API_URL}/functional_units", json=params, cookies=cookies)
         if response.status_code == 201:
             return redirect(url_for("unidades_funcionales", consortium_id=consortium_id))
-    response = requests.get(f"{API_URL}/functional_units", params={"consortium_id": consortium_id}).json()
+    response = requests.get(f"{API_URL}/functional_units", params={"consortium_id": consortium_id}, cookies=cookies).json()
     functional_units = response.get("functional_units", [])
     address = response.get("address", "Dirección")
     return render_template("unidades_funcionales.html", active_page='consorcios', units=functional_units, consortium_id=consortium_id, address=address)
@@ -129,7 +143,8 @@ def unidad_funcional(consortium_id, unit_id):
     login_check = require_login()
     if login_check:
         return login_check
-    response = requests.get(f"{API_URL}/functional_unit", params={"consortium_id": consortium_id, "unit_id": unit_id}).json()
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+    response = requests.get(f"{API_URL}/functional_unit", params={"consortium_id": consortium_id, "unit_id": unit_id}, cookies=cookies).json()
     unit = response["functional_unit"] if "functional_unit" in response else None
     return render_template("vista_local.html", active_page='consorcios', unit=unit, consortium_id=consortium_id)
 
