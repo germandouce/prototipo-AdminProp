@@ -210,17 +210,16 @@ button {
 }
 .container-caja {
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: row;
   gap: 50px;
   align-items: flex-start; /* opcional: alinea por arriba */
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 .caja {
-  width: 200px;
-  height: 200px;
+  flex: 0 0 45%;
+  width: 50%;
 }
 
 img {
@@ -326,4 +325,9 @@ button.upgrade-btn {
   color: #155724;
   background-color: #d4edda;
   border-color: #c3e6cb;
+}
+
+#map {
+    height: 300px; /* O la altura que prefieras */
+    width: 100%;
 }

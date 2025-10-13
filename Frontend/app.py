@@ -76,15 +76,24 @@ def clientes():
 
     # Llamamos al nuevo endpoint de la API
     response = requests.get(f"{API_URL}/api/clients", cookies=cookies)
+    addresses_response = requests.get(f"{API_URL}/api/consortiums/addresses", cookies=cookies)
 
     clients_data = []
-    if response.status_code == 200:
-        clients_data = response.json().get("clients", [])
+    dashboard_data = {}
+    if response.status_code == 200 and addresses_response.status_code == 200:
+        clients_payload = response.json().get("response", [])
+        addresses_payload = addresses_response.json()
+        clients_data = clients_payload.get("clients", [])
+        dashboard_data = {
+            "deuda_total": clients_payload.get("deuda_total", 0),
+            "ingresos": clients_payload.get("ingresos", 0),
+            "direcciones": addresses_payload.get("addresses", [])
+        }
     else:
         # Manejar el error, tal vez mostrando un mensaje
         print(f"Error al obtener clientes: {response.status_code}")
 
-    return render_template("clientes.html", active_page='clientes', clients=clients_data)
+    return render_template("clientes.html", active_page='clientes', clients=clients_data, dashboard_data=dashboard_data)
 
 @app.route("/consorcios", methods=["GET", "POST"])
 def consorcios():

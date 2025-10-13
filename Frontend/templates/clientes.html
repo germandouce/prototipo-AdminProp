@@ -11,6 +11,7 @@
                 <th>Nombre</th>
                 <th>Dirección</th>
                 <th>Alquiler <button title="Ordenar"><i class="fa-solid fa-arrow-down"></i></button></th>
+                <th>Expensas <button title="Ordenar"><i class="fa-solid fa-arrow-down"></i></button></th>
                 <th>Deuda <button title="Ordenar"><i class="fa-solid fa-arrow-down"></i></button></th>
                 <th>Pago <button title="Ordenar"><i class="fa-solid fa-arrow-down"></i></button></th>
                 <th>Pago al día</th>
@@ -23,6 +24,7 @@
                             <td>{{ client.direccion }}</td>
 
                             <td data-value="{{ client.alquiler or 0 }}">${{ "{:,.2f}".format(client.alquiler or 0) }}</td>
+                            <td data-value="{{ client.expensas or 0 }}">${{ "{:,.2f}".format(client.expensas or 0) }}</td>
                             <td data-value="{{ client.deuda or 0 }}">${{ "{:,.2f}".format(client.deuda or 0) }}</td>
                             <td data-value="{{ client.pago or 0 }}">${{ "{:,.2f}".format(client.pago or 0) }}</td>
 
@@ -43,117 +45,121 @@
         </table>
         <div class="container-caja">
             <div class="caja">
-                <h1>Ingresos mensuales</h1>
-                <div class="bar-chart">
-                    <div class="bar" style="height: 80%;">80%</div>
-                    <div class="bar" style="height: 50%;">50%</div>
-                    <div class="bar" style="height: 30%;">30%</div>
-                </div>
-            </div>
-            <div class="caja">
                 <h1>Pagos adeudados</h1>
-                <div class="pie-chart"></div>
+                <div>
+                    <canvas id="deudaIngresosChart"></canvas>
+                </div>
             </div>
             <div class="caja">
                 <h1>Mapa propiedades</h1>
-                <img src="{{ url_for('static', filename='img/city.jpg') }}" alt="alt">
-            </div>
-            <div class="caja">
-                <h1>Calendario</h1>
-                <div class="calendar">
-                    <div class="calendar-header">
-                        <button>&lt;</button>
-                        <h2>Septiembre 2025</h2>
-                        <button>&gt;</button>
-                    </div>
-                    <div class="calendar-weekdays">
-                        <div>Lun</div>
-                        <div>Mar</div>
-                        <div>Mié</div>
-                        <div>Jue</div>
-                        <div>Vie</div>
-                        <div>Sáb</div>
-                        <div>Dom</div>
-                    </div>
-                    <div class="calendar-days">
-                        <div class="empty"></div>
-                        <div class="empty"></div>
-                        <div>1</div>
-                        <div>2</div>
-                        <div>3</div>
-                        <div>4</div>
-                        <div>5</div>
-                        <div>6</div>
-                        <div>7</div>
-                        <div>8</div>
-                        <div>9</div>
-                        <div>10</div>
-                        <div>11</div>
-                        <div>12</div>
-                        <div>13</div>
-                        <div>14</div>
-                        <div>15</div>
-                        <div>16</div>
-                        <div>17</div>
-                        <div>18</div>
-                        <div>19</div>
-                        <div>20</div>
-                        <div>21</div>
-                        <div>22</div>
-                        <div>23</div>
-                        <div>24</div>
-                        <div>25</div>
-                        <div>26</div>
-                        <div>27</div>
-                        <div>28</div>
-                        <div>29</div>
-                        <div>30</div>
-                    </div>
-                </div>
+                <div id="map"></div>
             </div>
         </div>
     </section>
-    {% block scripts %}
+{% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+// La bandera que nos asegura que este código se ejecute UNA SOLA VEZ.
+if (!window.clientesPageInitialized) {
+
+    // 1. DATOS DEL BACKEND
+    const dashboardData = {{ dashboard_data | tojson | safe }};
+    console.log("Inicializando página de clientes con datos:", dashboardData);
+
+    // 2. LÓGICA PARA ORDENAR LA TABLA (CÓDIGO COMPLETO)
     const tableBody = document.querySelector('table tbody');
     const sortButtons = document.querySelectorAll('thead th button');
-
     sortButtons.forEach((button, index) => {
         button.addEventListener('click', () => {
-            // Convertir las filas de la tabla en un array para poder ordenarlo
             const rows = Array.from(tableBody.querySelectorAll('tr'));
-
-            // Obtener la dirección de ordenamiento actual (asc o desc)
             const currentOrder = button.dataset.order || 'desc';
             const newOrder = currentOrder === 'desc' ? 'asc' : 'desc';
             button.dataset.order = newOrder;
 
-            // Cambiar el ícono de la flecha
             const icon = button.querySelector('i');
             icon.classList.toggle('fa-arrow-down');
             icon.classList.toggle('fa-arrow-up');
 
             rows.sort((rowA, rowB) => {
-                const cellA = rowA.children[index + 2]; // +2 para saltar 'Nombre' y 'Dirección'
+                // El índice se ajusta para saltar las primeras 2 columnas no ordenables
+                const cellA = rowA.children[index + 2];
                 const cellB = rowB.children[index + 2];
-
                 const valueA = parseFloat(cellA.dataset.value || 0);
                 const valueB = parseFloat(cellB.dataset.value || 0);
-
-                if (newOrder === 'desc') {
-                    return valueB - valueA;
-                } else {
-                    return valueA - valueB;
-                }
+                return newOrder === 'desc' ? valueB - valueA : valueA - valueB;
             });
 
-            // Volver a insertar las filas ordenadas en la tabla
-            tableBody.innerHTML = ''; // Limpiar el contenido actual
+            tableBody.innerHTML = '';
             rows.forEach(row => tableBody.appendChild(row));
         });
     });
-});
+
+    // 3. LÓGICA PARA EL GRÁFICO DE TORTA
+    const ctx = document.getElementById('deudaIngresosChart');
+    if (ctx) {
+        const existingChart = Chart.getChart(ctx);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        const deudaTotal = parseFloat(dashboardData.deuda_total || 0);
+        const ingresosTotales = parseFloat(dashboardData.ingresos || 0);
+        const pagadoAlDia = ingresosTotales > deudaTotal ? ingresosTotales - deudaTotal : 0;
+
+        if (deudaTotal > 0 || pagadoAlDia > 0) {
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Deuda Total', 'Pagado / Ingresos Restantes'],
+                    datasets: [{
+                        data: [deudaTotal, pagadoAlDia],
+                        backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(75, 192, 192, 0.7)'],
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+    }
+
+    // 4. LÓGICA PARA EL MAPA
+    if (dashboardData.direcciones && dashboardData.direcciones.length > 0) {
+    const mapElement = document.getElementById('map');
+    if (mapElement) {
+        // Retrasamos la inicialización para asegurar que el CSS se haya aplicado
+        setTimeout(function() {
+            // Solo inicializa el mapa si no existe
+            if (!mapElement._leaflet_id) {
+                console.log("Inicializando mapa de Leaflet...");
+
+                const map = L.map('map').setView([-34.6037, -58.3816], 12);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+
+                // !! ESTA ES LA LÍNEA CLAVE !!
+                // Forzamos al mapa a recalcular su tamaño después de un breve instante.
+                setTimeout(() => map.invalidateSize(), 100);
+
+                dashboardData.direcciones.forEach(address => {
+                    const apiUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
+                    fetch(apiUrl)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                const lat = data[0].lat;
+                                const lon = data[0].lon;
+                                L.marker([lat, lon]).addTo(map).bindPopup(`<b>${address}</b>`);
+                            }
+                        })
+                        .catch(error => console.error('Error de geocodificación:', error));
+                });
+            }
+        }, 50); // Pequeño retraso inicial
+    }
+}
+
+    // Ponemos la bandera en true para que este bloque no se vuelva a ejecutar.
+    window.clientesPageInitialized = true;
+}
 </script>
 {% endblock %}
 {% endblock %}
