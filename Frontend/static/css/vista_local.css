@@ -116,9 +116,9 @@
   backdrop-filter: blur(3px);
 }
 
-.boton-desocupar {
-  border: 1px solid #111827;
-  background: #111827;
+.boton-eliminar {
+  border: 1px solid #bb0000;
+  background: #c90000;
   color: #fff;
   padding: .55rem 1.1rem;
   border-radius: 8px;

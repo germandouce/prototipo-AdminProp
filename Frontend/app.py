@@ -175,6 +175,15 @@ def ocupar_unidad(consortium_id, unit_id):
     )
     return redirect(url_for("unidad_funcional", consortium_id=consortium_id, unit_id=unit_id))
 
+@app.route("/consorcios/<int:consortium_id>/unidades_funcionales/<int:unit_id>/eliminar", methods=["DELETE"])
+def eliminar_unidad(consortium_id, unit_id):
+    login_check = require_login()
+    if login_check:
+        return login_check
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+    response = requests.delete(f"{API_URL}/functional_unit/{unit_id}", cookies=cookies)
+    return redirect(url_for("unidades_funcionales", consortium_id=consortium_id))
+
 @app.route("/rendiciones")
 def rendiciones():
     login_check = require_login()

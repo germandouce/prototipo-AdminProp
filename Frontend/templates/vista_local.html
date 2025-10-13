@@ -22,7 +22,7 @@
         <div>
             <h4>Cliente</h4>
             <div style="display:flex; align-items:center; gap:.75rem; justify-content: space-between;">
-                <h1 data-nombre>{{ unit.tenant if unit.tenant else '---' }}</h1>
+                <h1 data-nombre>{{ unit.tenant if unit.tenant }}</h1>
                 {% if unit.tenant %}
                     <button type="button" id="btnDesocupar" class="btn btn-secondary" data-consortium-id="{{ consortium_id }}" data-unit-id="{{ unit.id }}">
                         Desocupar
@@ -68,11 +68,12 @@
         </tr>
     </table>
     <div class="acciones-local">
-        <button type="button" class="boton-desocupar" onclick="toggleTodos()">Desocupar</button>
+        <button type="button" id="btnEliminar" class="boton-eliminar" data-consortium-id="{{ consortium_id }}" data-unit-id="{{ unit.id }}">Eliminar</button>
         <div id="mensaje-boton" style="display:none;"></div>
     </div>
 </section>
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/desocupar_unidad.js') }}"></script>
+<script src="{{ url_for('static', filename='js/eliminar_unidad.js') }}"></script>
 {% endblock %}
