@@ -263,7 +263,7 @@ def post_register():
     except Exception as e:
         if DEBUG:
             print(f"EMAIL_ERROR: {e}")
-        return {"error": "Error al enviar el email de verificación."}, 500
+        return {"error": f"Error al enviar el email de verificación: {e}"}, 500
 
 @app.route("/verify/<token>")
 def verify_email(token):
