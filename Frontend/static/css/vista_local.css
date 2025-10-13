@@ -100,7 +100,11 @@
 
 /* Primera columna un poco más ancha para etiquetas */
 .td-descripcion { width: 40%; font-weight: 600; color: #374151; }
-.td-informacion { width: 60%; color: #111827; }
+.td-informacion { color: #111827; }
+#tdAlquiler {
+    display: flex;
+    align-items: center;
+}
 
 /* ===== Botonera / acciones ===== */
 .acciones-local {

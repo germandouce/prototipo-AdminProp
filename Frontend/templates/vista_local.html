@@ -60,7 +60,11 @@
         </tr>
         <tr>
             <td class="td-descripcion">Valor de alquiler</td>
-            <td class="td-informacion" id="tdAlquiler">${{ unit.rent_value }}</td>
+            <td class="td-informacion" id="tdAlquiler">
+                ${{ unit.rent_value }}<button id="btnEditarAlquiler" class="btn btn-primary" data-unit-id="{{ unit.id }}" data-consortium-id="{{ consortium_id }}">
+                    <span class="fa-solid fa-pen-to-square"></span>
+                </button>
+            </td>
         </tr>
         <tr>
             <td class="td-descripcion">Fin de contrato</td>
@@ -76,4 +80,5 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/desocupar_unidad.js') }}"></script>
 <script src="{{ url_for('static', filename='js/eliminar_unidad.js') }}"></script>
+<script src="{{ url_for('static', filename='js/editar_alquiler.js') }}"></script>
 {% endblock %}

@@ -161,7 +161,7 @@ def patch_functional_unit(id):
     user_id = int(get_jwt_identity())
     data = request.get_json()
 
-    optional_data = ["unit_number", "unit_name", "tenant", "debt"]
+    optional_data = ["unit_number", "unit_name", "tenant", "debt", "rent_value", "surface"]
     received_data = {key: data.get(key) for key in optional_data if key in data}
     if not received_data:
         return {"error": "No fields to update"}, 400
