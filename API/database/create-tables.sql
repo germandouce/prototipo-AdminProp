@@ -94,3 +94,7 @@ SELECT 1, '1A', 75.00,2
     WHERE NOT EXISTS (
     SELECT 1 FROM functional_units WHERE unit_name = "2A" AND consortium = 2
 );
+
+-- AGREGAR UN PAGO DE PRUEBA
+INSERT INTO payments (functional_unit, consortium, tenant, amount, date)
+VALUES (2, 1, 'Carlos López', 57000, '2025-09-30');

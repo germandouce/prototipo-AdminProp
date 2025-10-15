@@ -213,6 +213,26 @@ def eliminar_unidad(consortium_id, unit_id):
     response = requests.delete(f"{API_URL}/functional_unit/{unit_id}", cookies=cookies)
     return redirect(url_for("unidades_funcionales", consortium_id=consortium_id))
 
+@app.route("/pagos/<int:consortium_id>/<int:unit_id>/<tenant>", methods=["GET"])
+def pagos(consortium_id, unit_id, tenant):
+    login_check = require_login()
+    if login_check:
+        return login_check
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+    params = {
+        "tenant_name": tenant,
+        "id_unit": unit_id,
+        "consortium_id": consortium_id
+    }
+    response = requests.get(f"{API_URL}/payments", params=params, cookies=cookies)
+    try:
+        data = response.json()
+        payments = data["payments"]
+    except Exception:
+        return jsonify({"error": "Error inesperado en el backend"}), 500
+
+    return payments, response.status_code
+
 @app.route("/rendiciones")
 def rendiciones():
     login_check = require_login()
