@@ -233,6 +233,8 @@ def pagos(consortium_id, unit_id, tenant):
 
     return payments, response.status_code
 
+from flask import jsonify
+
 @app.route("/registrar_pago/<int:payment_id>", methods=["DELETE"])
 def registrar_pago(payment_id):
     login_check = require_login()
@@ -240,6 +242,17 @@ def registrar_pago(payment_id):
         return login_check
     cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
     response = requests.delete(f"{API_URL}/payments/{payment_id}", cookies=cookies)
+    try:
+        data = response.json()
+    except Exception:
+        data = None
+
+    if response.status_code == 200:
+        return jsonify(data), 200
+    elif data and "error" in data:
+        return jsonify(data), response.status_code
+    else:
+        return jsonify({"error": "Error desconocido"}), response.status_code
 
 @app.route("/rendiciones")
 def rendiciones():

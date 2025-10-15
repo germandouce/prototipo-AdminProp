@@ -26,7 +26,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         );
                         if (response.ok) {
-                            location.reload();
+                            contenedorPrecio.innerHTML = `$${parseFloat(rent_value).toFixed(2)}<button id="btnEditarAlquiler" class="btn btn-primary" data-unit-id="${unitId}" data-consortium-id="${consortiumId}">
+                                <span class="fa-solid fa-pen-to-square"></span>
+                            </button>`;
+                            agregarListenerEditarAlquiler();
                         } else {
                             alert('Error al establecer precio del alquiler');
                         }
@@ -37,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 btnCancelarEdicionAlquiler.addEventListener('click', function () {
                     contenedorPrecio.innerHTML = contenidoActual;
-                    agregarListenerEditarAlquiler(); // Volver a asociar el listener
+                    agregarListenerEditarAlquiler();
                 });
             });
         }
