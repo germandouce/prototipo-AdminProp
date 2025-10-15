@@ -51,6 +51,12 @@ def login():
 #    DESCOMENTAR ARRIBA Y BORRAR ABAJO PARA EL LOGIN FUNCIONAL
 #    return redirect(url_for("inicio"))
 
+@app.route("/logout")
+def logout():
+    resp = make_response(redirect(url_for("base")))
+    resp.delete_cookie("access_token_cookie")
+    return resp
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":

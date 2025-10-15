@@ -23,6 +23,7 @@
                 <li><a href="{{ url_for('comisiones') }}" id="navbar-comisiones" class="{% if active_page == 'comisiones' %}active{% endif %}"><i class="fa-solid fa-dollar-sign"></i>Comisiones</a></li>
                 <li><a href="{{ url_for('configuracion') }}" data-page="configuracion" id="navbar-configuracion" class="{% if active_page == 'configuracion' %}active{% endif %}"><i class="fa-solid fa-gear"></i>Configuración</a></li>
             </ul>
+            <a href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
         </nav>
     </aside>
 
