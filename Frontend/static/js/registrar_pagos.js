@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
         modalOverlay.style.display = 'flex';
         const response = await fetch(`/pagos/${consortiumId}/${unitId}/${tenant}`);
         const pagos = await response.json();
-        console.log(pagos)
 
         tablaPagosBody.innerHTML = '';
 
@@ -31,6 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (pagos.error) {
         tablaPagosBody.innerHTML = `<tr><td colspan="4">${pagos.error}</td></tr>`;
     }
+    });
+
+    btnRegistrarPagos.addEventListener('click', async () => {
+        const checkboxes = document.querySelectorAll('.pago-checkbox:checked');
+        for (const checkbox of checkboxes) {
+            const paymentId = checkbox.getAttribute('data-payment-id');
+            await fetch(`/registrar_pago/${paymentId}`, { method: 'DELETE' });
+        }
+        modalOverlay.style.display = 'none';
+        location.reload();
     });
 
     btnCancelarRegistroPago.addEventListener('click', () => {

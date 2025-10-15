@@ -233,6 +233,14 @@ def pagos(consortium_id, unit_id, tenant):
 
     return payments, response.status_code
 
+@app.route("/registrar_pago/<int:payment_id>", methods=["DELETE"])
+def registrar_pago(payment_id):
+    login_check = require_login()
+    if login_check:
+        return login_check
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+    response = requests.delete(f"{API_URL}/payments/{payment_id}", cookies=cookies)
+
 @app.route("/rendiciones")
 def rendiciones():
     login_check = require_login()

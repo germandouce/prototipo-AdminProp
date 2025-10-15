@@ -97,4 +97,5 @@ SELECT 1, '1A', 75.00,2
 
 -- AGREGAR UN PAGO DE PRUEBA
 INSERT INTO payments (functional_unit, consortium, tenant, amount, date)
-VALUES (2, 1, 'Carlos López', 57000, '2025-09-30');
+VALUES (2, 1, 'Carlos López', 57000, '2025-09-30'),
+        (2, 1, 'Carlos López', 1000, '2025-09-28');
