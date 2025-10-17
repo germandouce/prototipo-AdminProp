@@ -23,7 +23,6 @@ services:
         MYSQL_DATABASE: 'adminprop'
         MYSQL_USER: 'user'
         MYSQL_PASSWORD: 'pass'
-        FRONTEND_URL: 'http://localhost:5000'
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

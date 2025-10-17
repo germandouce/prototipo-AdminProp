@@ -22,7 +22,6 @@ from routes.clients import clients_bp
 from database import engine, DEBUG
 from flask import redirect
 from urllib.parse import quote_plus
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5000")
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "una_clave_super_segura"  # cambiala en producción
