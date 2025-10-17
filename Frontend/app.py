@@ -162,7 +162,13 @@ def unidad_funcional(consortium_id, unit_id):
     cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
     response = requests.get(f"{API_URL}/functional_unit", params={"consortium_id": consortium_id, "unit_id": unit_id}, cookies=cookies).json()
     unit = response["functional_unit"] if "functional_unit" in response else None
-    return render_template("vista_local.html", active_page='consorcios', unit=unit, consortium_id=consortium_id)
+    debt = None
+    if unit:
+        tenant_name = unit.get("tenant")
+        if tenant_name:
+            response_debt = requests.get(f"{API_URL}/functional_units/debt", params={"unit_id": unit_id, "tenant": tenant_name}, cookies=cookies).json()
+            debt = response_debt.get("total_debt")
+    return render_template("vista_local.html", active_page='consorcios', unit=unit, consortium_id=consortium_id, debt=debt)
 
 @app.route("/consorcios/<int:consortium_id>/unidades_funcionales/<int:unit_id>/desocupar", methods=["PATCH"])
 def desocupar_unidad(consortium_id, unit_id):

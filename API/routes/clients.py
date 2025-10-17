@@ -14,7 +14,6 @@ def get_clients():
             SELECT f.tenant                              AS name, \
                    CONCAT(c.address, ' - ', f.unit_name) AS address, \
                    f.rent_value                          AS rent, \
-                   f.debt                                AS debt, \
                    CASE \
                        WHEN cs.total_surface > 0 THEN (f.surface / cs.total_surface) * \
                                                       COALESCE(me.total_monthly_expense, 0) \
@@ -54,10 +53,8 @@ def get_clients():
     clients = []
     for row in rows:
         alquiler = float(row.rent or 0)
-        deuda = float(row.debt or 0)
-        deuda_total += deuda
         expensas = float(row.expensas or 0)
-        pago_total = alquiler + deuda + expensas
+        pago_total = alquiler + expensas
         ingresos += pago_total
         direccion = row.address
         if not direcciones or direcciones[-1] != direccion:

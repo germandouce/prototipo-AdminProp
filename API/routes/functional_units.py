@@ -18,7 +18,7 @@ def get_functional_units():
 
     query = """
         SELECT f.id, f.unit_number, f.unit_name, f.surface,
-               f.tenant, f.rent_value, f.debt
+               f.tenant, f.rent_value
         FROM functional_units f
         JOIN consortiums c ON f.consortium = c.id
         WHERE f.consortium = :consortium_id AND c.user_id = :user_id
@@ -54,7 +54,6 @@ def get_functional_units():
             "occupation_status": True if row.tenant else False,
             "tenant": row.tenant,
             "surface": float(row.surface),
-            "debt": float(row.debt),
             "rent_value": float(row.rent_value)
         })
 
@@ -77,7 +76,7 @@ def get_functional_unit():
 
     query = """
         SELECT f.id, f.unit_number, f.unit_name, f.surface,
-               f.tenant, f.debt, f.rent_value, c.address AS consortium_address
+               f.tenant, f.rent_value, c.address AS consortium_address
         FROM functional_units f
         JOIN consortiums c ON f.consortium = c.id
         WHERE f.id = :unit_id AND f.consortium = :consortium_id AND c.user_id = :user_id
@@ -104,7 +103,6 @@ def get_functional_unit():
         "tenant": result.tenant,
         "consortium_address": result.consortium_address,
         "surface": float(result.surface),
-        "debt": float(result.debt),
         "rent_value": float(result.rent_value)
     }
 
@@ -161,7 +159,7 @@ def patch_functional_unit(id):
     user_id = int(get_jwt_identity())
     data = request.get_json()
 
-    optional_data = ["unit_number", "unit_name", "tenant", "debt", "rent_value", "surface"]
+    optional_data = ["unit_number", "unit_name", "tenant", "rent_value", "surface"]
     received_data = {key: data.get(key) for key in optional_data if key in data}
     if not received_data:
         return {"error": "No fields to update"}, 400
@@ -218,3 +216,38 @@ def delete_unit(unit_id):
         return {"error": str(err)}, 500
 
     return {"message": f"Unit {unit_id} deleted"}, 200
+
+@functional_units_bp.route("/functional_units/debt", methods=["GET"])
+@jwt_required()
+def get_debt():
+    tenant = request.args.get("tenant", type=str)
+    unit_id = request.args.get("unit_id", type=int)
+
+    if not all([tenant, unit_id]):
+        return {"error": "tenant and unit_id are required"}, 400
+
+    query = """
+            SELECT COALESCE(SUM(amount),0) AS total_debt
+            FROM payments p
+            WHERE p.functional_unit = :unit_id \
+              AND p.tenant = :tenant \
+            """
+
+    params = {"unit_id": unit_id, "tenant": tenant}
+
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text(query), params).fetchone()
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    if not result:
+        return {"error": "debts not found or permission denied"}, 404
+
+    response = {
+        "total_debt": result.total_debt,
+    }
+
+    return jsonify(response), 200
