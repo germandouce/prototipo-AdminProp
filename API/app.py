@@ -1,4 +1,6 @@
 import os
+from urllib.parse import quote_plus
+
 import requests
 import sendgrid
 from sendgrid.helpers.mail import *
@@ -18,6 +20,9 @@ from routes.payments import payments_bp
 from routes.expenses import expenses_bp
 from routes.clients import clients_bp
 from database import engine, DEBUG
+from flask import redirect
+from urllib.parse import quote_plus
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5000")
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "una_clave_super_segura"  # cambiala en producción
@@ -273,10 +278,12 @@ def verify_email(token):
         action = decoded.get("action")
 
         if action != "verify_email":
-            return {"error": "Token inválido"}, 400
+            error_message = quote_plus("Token inválido")
+            return redirect(f"{FRONTEND_URL}/verificacion?status=error&message={error_message}")
 
     except Exception as e:
-        return {"error": f"Token inválido o expirado: {e}"}, 400
+        error_message = quote_plus("error: Token inválido o expirado")
+        return redirect(f"{FRONTEND_URL}/verificacion?status=error&message={error_message}")
 
     query = """
         UPDATE users
@@ -288,9 +295,10 @@ def verify_email(token):
         result = conn.execute(text(query), {"email": email})
 
     if result.rowcount == 0:
-        return {"error": "Usuario no encontrado"}, 404
+        error_message = quote_plus("El usuario no fue encontrado.")
+        return redirect(f"{FRONTEND_URL}/verificacion?status=error&message={error_message}")
 
-    return {"message": "Cuenta verificada con éxito. Ya podés iniciar sesión."}, 200
+    return redirect(f"{FRONTEND_URL}/verificacion?status=success")
 
 if __name__ == "__main__":
     app.run("0.0.0.0", API_PORT, debug=DEBUG=="True")

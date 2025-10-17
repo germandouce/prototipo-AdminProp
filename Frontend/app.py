@@ -1,6 +1,7 @@
 import requests
 from flask import Flask, render_template, request, make_response, redirect, url_for, flash
 from config import *
+from flask import jsonify
 import datetime
 import os
 
@@ -233,8 +234,6 @@ def pagos(consortium_id, unit_id, tenant):
 
     return payments, response.status_code
 
-from flask import jsonify
-
 @app.route("/registrar_pago/<int:payment_id>", methods=["DELETE"])
 def registrar_pago(payment_id):
     login_check = require_login()
@@ -278,6 +277,15 @@ def configuracion():
 @app.route("/suscribirse")
 def suscribirse():
     return render_template("suscribirse.html")
+
+@app.route("/verificacion")
+def verification_result():
+    status = request.args.get("status")
+    message = request.args.get("message")
+
+    return render_template("verificacion.html",
+                           status=status,
+                           message=message)
 
 if __name__ == "__main__":
     app.run("0.0.0.0", port=FRONT_PORT, debug=DEBUG=="True")

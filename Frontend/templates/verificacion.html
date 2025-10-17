@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado de Verificación - AdminProp</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        .verification-container {
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-screen" class="login-screen active">
+        <div id="login-form-container" class="auth-form-container">
+            <h1>AdminProp - Verifiación</h1>
+            <div class="buttons">
+                {% if status == 'success' %}
+                    <div class="card">
+                        <h1 style="color: #28a745;">¡Cuenta Verificada! ✅</h1>
+                        <p>Tu cuenta ha sido verificada con éxito.</p>
+                        <p>Ya puedes iniciar sesión con tus credenciales.</p>
+                        <button onclick="window.location.href='{{ url_for('login') }}'" class="btn-primary"> Iniciar Sesión</button>
+                    </div>
+                {% else %}
+                    <div class="card">
+                        <h1 style="color: #dc3545;">Error de Verificación ❌</h1>
+                        <p>Hubo un problema al verificar tu cuenta.</p>
+                        <p><strong>Motivo:</strong> {{ message or "Error desconocido." }}</p>
+                        <button onclick="window.location.href='{{ url_for('login') }}'" class="btn-secondary"> Volver al Inicio</button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
