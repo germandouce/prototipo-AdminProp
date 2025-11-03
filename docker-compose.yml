@@ -6,14 +6,24 @@ services:
       - mysql
     ports:
       - "5001:5001"
+    volumes:
+      - ./API:/app
+    working_dir: /app
+    env_file:
+      - ./API/.env-docker
 
   front:
     build: ./Frontend/
-    command: sh -c "sleep 10s ; python3 app.py"
+    command: sh -c "python3 app.py"
     depends_on:
       - api
     ports:
         - "5000:5000"
+    volumes:
+      - ./Frontend:/app
+    working_dir: /app
+    env_file:
+      - ./Frontend/.env-docker
 
   mysql:
     build: ./API/database/
@@ -23,6 +33,9 @@ services:
         MYSQL_DATABASE: 'adminprop'
         MYSQL_USER: 'user'
         MYSQL_PASSWORD: 'pass'
+    volumes:
+      - ./API/database:/docker-entrypoint-initdb.d
+      - mysql-data:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -36,3 +49,6 @@ services:
       PMA_PASSWORD: pass
     depends_on:
       - mysql
+
+volumes:
+  mysql-data:
