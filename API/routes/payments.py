@@ -31,8 +31,6 @@ def get_payments():
     try:
         conn = engine.connect()
         result = conn.execute(text(query), params)
-        if result.rowcount == 0:
-            return {"error": "No payments made or permission denied"}, 404
         rows = result.fetchall()
         conn.close()
     except SQLAlchemyError as err:
