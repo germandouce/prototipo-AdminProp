@@ -11,7 +11,7 @@ consortiums_bp = Blueprint("consortiums", __name__)
 def get_consortiums():
     user_id = int(get_jwt_identity())
     query = """
-            SELECT c.id, c.address, COUNT(f.id) AS ufs_amount
+            SELECT c.id, c.address, c.name, c.owner_name, c.admin_commission, c.surface, COUNT(f.id) AS ufs_amount
             FROM consortiums c
                      LEFT JOIN functional_units f ON f.consortium = c.id
             WHERE c.user_id = :user_id
@@ -19,7 +19,6 @@ def get_consortiums():
             """
     try:
         with engine.connect() as conn:
-            conn = engine.connect()
             result = conn.execute(text(query), {"user_id": user_id})
             rows = result.mappings().all()
     except SQLAlchemyError as err:
@@ -32,6 +31,45 @@ def get_consortiums():
         for row in rows
     ]
     return jsonify({"consortiums": consortiums}), 200
+
+@consortiums_bp.route("/consortium", methods=["GET"])
+@jwt_required()
+def get_consortium():
+    user_id = int(get_jwt_identity())
+    consortium_id = request.args.get("consortium_id", type=int)
+
+    if not consortium_id:
+        return {"error": "consortium_id is required"}, 400
+
+    query = """
+            SELECT c.id, c.address, c.name, c.owner_name, c.admin_commission, c.surface, COUNT(f.id) AS ufs_amount
+            FROM consortiums c
+                     LEFT JOIN functional_units f ON f.consortium = c.id
+            WHERE c.user_id = :user_id AND c.id = :consortium_id
+            GROUP BY c.id, c.address
+            """
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text(query), {"user_id": user_id, "consortium_id": consortium_id})
+            row = result.fetchone()
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    if row:
+        consortium = {
+            "id": row.id,
+            "address": row.address,
+            "name": row.name,
+            "owner_name": row.owner_name,
+            "admin_commission": row.admin_commission,
+            "surface": row.surface,
+        }
+    else:
+        consortium = {}
+
+    return consortium, 200
 
 #Deletes a consortium and its payments, expenses and functional units
 @consortiums_bp.route("/consortiums/<int:consortium_id>", methods=["DELETE"])
