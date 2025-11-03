@@ -299,5 +299,35 @@ def verify_email(token):
 
     return redirect(f"{FRONTEND_URL}/verificacion?status=success")
 
+@app.route("/users", methods=["GET"])
+@jwt_required()
+def get_user():
+    user_id = int(get_jwt_identity())
+
+    query = """
+            SELECT u.name, u.surname
+            FROM users u
+            WHERE u.id = :user_id;
+            """
+
+    try:
+        with engine.connect() as conn:
+            user_row = conn.execute(text(query), {"user_id": user_id}).fetchone()
+
+        if not user_row:
+            return jsonify({"error": "User not found"}), 404
+
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return jsonify({"error": "A database error occurred"}), 500
+
+    response = {
+        "name": user_row.name,
+        "surname": user_row.surname
+    }
+
+    return jsonify(response), 200
+
 if __name__ == "__main__":
     app.run("0.0.0.0", API_PORT, debug=DEBUG=="True")

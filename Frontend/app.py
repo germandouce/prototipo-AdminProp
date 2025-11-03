@@ -32,7 +32,15 @@ def inicio():
     login_check = require_login()
     if login_check:
         return login_check
-    return render_template("inicio.html", active_page='inicio')
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+    response = requests.get(f"{API_URL}/users", cookies=cookies)
+    if response.status_code == 200:
+        name = response.json().get("name", [])
+        surname = response.json().get("surname", [])
+    else:
+        error_msg = response.json().get("error", "Error desconocido")
+        return render_template("login.html", error=error_msg)
+    return render_template("inicio.html", active_page='inicio', name=name, surname=surname)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
