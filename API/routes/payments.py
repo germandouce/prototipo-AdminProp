@@ -19,7 +19,7 @@ def get_payments():
         return {"error": "tenant_name, id_unit and consortium_id are required"}, 400
 
     query = """
-        SELECT p.id, p.amount, p.date
+        SELECT p.id, p.amount, p.date, p.description
         FROM payments p
         JOIN consortiums c ON p.consortium = c.id
         WHERE p.tenant = :tenant_name AND p.functional_unit = :id_unit AND p.consortium = :consortium_id AND c.user_id = :user_id
@@ -44,7 +44,8 @@ def get_payments():
         payments.append({
             "id": row.id,
             "amount": float(row.amount),
-            "date": str(row.date)
+            "date": str(row.date),
+            "description": str(row.description)
         })
         if i == 0:
             latest_payment = float(row.amount)

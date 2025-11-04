@@ -162,6 +162,8 @@ BEGIN
     WHERE
         -- Evitar división por cero si la superficie del consorcio es 0
         c.surface > 0;
+
+    DELETE FROM common_expenses;
 END
 //
 

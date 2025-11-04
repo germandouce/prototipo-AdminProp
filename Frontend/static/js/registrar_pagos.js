@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${pago.date}</td>
-                    <td>FALTA DESCRIPCIÓN</td>
+                    <td>${pago.description}</td>
                     <td>${pago.amount}</td>
                     <td><input type="checkbox" class="pago-checkbox" data-payment-id="${pago.id}"></td>
                 `;
