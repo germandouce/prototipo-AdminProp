@@ -11,7 +11,7 @@ consortiums_bp = Blueprint("consortiums", __name__)
 def get_consortiums():
     user_id = int(get_jwt_identity())
     query = """
-            SELECT c.id, c.address, c.name, c.owner_name, c.admin_commission, COUNT(f.id) AS ufs_amount
+            SELECT c.id, c.address, c.name, c.owner_name, c.admin_commission, c.surface, COUNT(f.id) AS ufs_amount
             FROM consortiums c
                      LEFT JOIN functional_units f ON f.consortium = c.id
             WHERE c.user_id = :user_id
@@ -42,7 +42,7 @@ def get_consortium():
         return {"error": "consortium_id is required"}, 400
 
     query = """
-            SELECT c.id, c.address, c.name, c.owner_name, c.admin_commission, COUNT(f.id) AS ufs_amount
+            SELECT c.id, c.address, c.name, c.owner_name, c.admin_commission, c.surface, COUNT(f.id) AS ufs_amount
             FROM consortiums c
                      LEFT JOIN functional_units f ON f.consortium = c.id
             WHERE c.user_id = :user_id AND c.id = :consortium_id
@@ -64,6 +64,7 @@ def get_consortium():
             "name": row.name,
             "owner_name": row.owner_name,
             "admin_commission": row.admin_commission,
+            "surface": row.surface,
         }
     else:
         consortium = {}
@@ -110,10 +111,11 @@ def post_consortiums():
     address = data.get("address")
     admin_commission = data.get("admin_commission")
     owner_name = data.get("owner_name")
+    surface = data.get("surface")
 
     query = """
-            INSERT INTO consortiums (name, address, owner_name, admin_commission, user_id)
-            VALUES (:name, :address, :owner_name, :admin_commission, :user_id)
+            INSERT INTO consortiums (name, address, owner_name, admin_commission, user_id, surface)
+            VALUES (:name, :address, :owner_name, :admin_commission, :user_id, :surface)
             """
 
     params = {}
@@ -122,6 +124,7 @@ def post_consortiums():
     params["owner_name"] = owner_name
     params["admin_commission"] = admin_commission
     params["user_id"] = user_id
+    params["surface"] = surface
 
     try:
         with engine.begin() as conn:
@@ -139,7 +142,7 @@ def post_consortiums():
 def patch_consortiums(id):
     user_id = int(get_jwt_identity())
     data = request.get_json()
-    optional_data = ["address"]
+    optional_data = ["address", "surface"]
     received_data = {key: data.get(key) for key in optional_data if key in data}
     if not received_data:
         return {"error": "No fields to update"}, 400

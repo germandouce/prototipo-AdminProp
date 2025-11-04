@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS consortiums (
     address VARCHAR(500) NOT NULL,
     owner_name VARCHAR(80) NOT NULL,
     admin_commission DECIMAL(10,2) NOT NULL,
+    surface DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -66,8 +67,8 @@ SELECT 'Martin', 'Fowler', 'martinfowler@gmail.com', 'pbkdf2:sha256:600000$DBqEi
 );
 
 -- AGREGAR UN CONSORCIO CON UNIDADES FUNCIONALES DE EJEMPLO
-INSERT INTO consortiums (name, address, owner_name, admin_commission, user_id)
-SELECT 'Galerías pacífico', 'Av. Corrientes 1234, CABA', 'Juan Pérez', 10.00, 1
+INSERT INTO consortiums (name, address, owner_name, admin_commission, surface, user_id)
+SELECT 'Galerías pacífico', 'Av. Corrientes 1234, CABA', 'Juan Pérez', 10.00, 100,1
     WHERE NOT EXISTS (
     SELECT 1 FROM consortiums WHERE name = 'Galerías pacífico');
 
@@ -84,8 +85,8 @@ SELECT 2, '1B', 25.00, 1, 'Carlos López', 350000.00
 );
 
 -- AGREGAR OTRO CONSORCIO CON UNIDADES FUNCIONALES DE EJEMPLO
-INSERT INTO consortiums (name, address, owner_name, admin_commission, user_id)
-SELECT 'Condominio La Plata', 'Calle 50 Nro 1234, La Plata', 'María Gómez', 8.00, 1
+INSERT INTO consortiums (name, address, owner_name, admin_commission, surface, user_id)
+SELECT 'Condominio La Plata', 'Calle 50 Nro 1234, La Plata', 'María Gómez', 8.00, 1000,1
     WHERE NOT EXISTS (
     SELECT 1 FROM consortiums WHERE name = 'Condominio La Plata');
 
@@ -126,26 +127,28 @@ BEGIN
         CURDATE() AS date
     FROM
         functional_units AS fu;
-    -- Insertar en 'payments' el cálculo del mes anterior
+    -- Insertar en 'payments' basado en el cálculo del mes anterior
     INSERT INTO payments (functional_unit, consortium, tenant, description, amount, date)
     SELECT
         fu.id AS functional_unit,
         fu.consortium AS consortium,
-        fu.tenant AS tenant,
+        fu.tenant AS tenant, -- Lo tomamos de la tabla functional_units
 
         -- Descripción dinámica, ej: "Expensas Ordinarias - Octubre 2025"
         CONCAT('Expensas Ordinarias - ', DATE_FORMAT(CURDATE() - INTERVAL 1 MONTH, '%M %Y')) AS description,
 
         -- CÁLCULO PROPORCIONAL:
-        -- (Total Gastos Consorcio * (Superficie UF / SUMA(Superficies de todas las UF)))
-        (expenses.total_monthly_expense * (fu.surface / surface_calc.total_consortium_surface)) AS amount,
+        -- (Total Gastos Consorcio * (Superficie UF / Superficie Total Consorcio))
+        (expenses.total_monthly_expense * (fu.surface / c.surface)) AS amount,
 
-        -- Fecha en que se genera el pago (hoy)
-        CURDATE() AS date
+        CURDATE() AS date -- La fecha en que se genera el pago (hoy)
     FROM
         functional_units AS fu
     JOIN
-        -- Subconsulta 1: Gasto total del mes anterior POR consorcio
+        -- Unimos con consorcios para obtener la superficie TOTAL
+        consortiums AS c ON fu.consortium = c.id
+    JOIN
+        -- Subconsulta: Calcula el gasto total del mes anterior POR consorcio
         (SELECT
             consortium,
             SUM(amount) AS total_monthly_expense
@@ -156,17 +159,9 @@ BEGIN
             MONTH(date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
          GROUP BY consortium
         ) AS expenses ON fu.consortium = expenses.consortium
-    JOIN
-        -- Subconsulta 2: Superficie total (calculada por SUMA) POR consorcio
-        (SELECT
-            consortium,
-            SUM(surface) AS total_consortium_surface
-         FROM functional_units
-         GROUP BY consortium
-        ) AS surface_calc ON fu.consortium = surface_calc.consortium
     WHERE
-        -- Cláusula de seguridad para evitar división por cero
-        surface_calc.total_consortium_surface > 0;
+        -- Evitar división por cero si la superficie del consorcio es 0
+        c.surface > 0;
 END
 //
 
