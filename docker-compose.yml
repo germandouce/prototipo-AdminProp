@@ -36,6 +36,7 @@ services:
     volumes:
       - ./API/database:/docker-entrypoint-initdb.d
       - mysql-data:/var/lib/mysql
+    command: ['--event-scheduler=ON']
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -45,8 +46,8 @@ services:
     environment:
       PMA_HOST: mysql
       PMA_PORT: 3306
-      PMA_USER: user
-      PMA_PASSWORD: pass
+      #PMA_USER: user
+      #PMA_PASSWORD: pass
     depends_on:
       - mysql
 
