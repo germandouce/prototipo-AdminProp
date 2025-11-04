@@ -123,7 +123,8 @@ def consorcios():
         address = request.form.get("address")
         admin_commission = request.form.get("admin_commission")
         owner_name = request.form.get("owner_name")
-        response = requests.post(f"{API_URL}/consortiums", json={"name": name, "address": address, "admin_commission": admin_commission, "owner_name": owner_name}, cookies=cookies)
+        surface = request.form.get("surface")
+        response = requests.post(f"{API_URL}/consortiums", json={"name": name, "address": address, "admin_commission": admin_commission, "owner_name": owner_name, "surface": surface}, cookies=cookies)
         if response.status_code == 201:
             return redirect(url_for("consorcios"))
         else:
