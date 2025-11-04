@@ -160,7 +160,64 @@ def unidades_funcionales(consortium_id):
     response = requests.get(f"{API_URL}/functional_units", params={"consortium_id": consortium_id}, cookies=cookies).json()
     functional_units = response.get("functional_units", [])
     address = response.get("address", "Dirección")
-    return render_template("unidades_funcionales.html", active_page='consorcios', units=functional_units, consortium_id=consortium_id, address=address)
+
+    response = requests.get(f"{API_URL}/expenses", params={"consortium_id": consortium_id}, cookies=cookies)
+    common_expenses = []
+    if response.status_code == 200:
+        common_expenses = response.json().get("expenses", [])
+
+    return render_template(
+        "unidades_funcionales.html",
+        active_page='consorcios',
+        units=functional_units,
+        consortium_id=consortium_id,
+        address=address,
+        common_expenses=common_expenses
+    )
+
+@app.route("/consorcios/<int:consortium_id>/gastos_comunes", methods=["POST"])
+def agregar_gasto_comun(consortium_id):
+    login_check = require_login()
+    if login_check:
+        return login_check
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+
+    description = request.form.get("description")
+    amount = request.form.get("amount")
+    date = request.form.get("date")
+    params = {
+        "description": description,
+        "amount": amount,
+        "date": date,
+        "consortium_id": consortium_id
+    }
+    response = requests.post(f"{API_URL}/expenses", json=params, cookies=cookies)
+    if response.status_code == 201:
+        flash("Gasto común agregado exitosamente.", "success")
+    else:
+        flash("Error al agregar el gasto común.", "error")
+    return redirect(url_for("unidades_funcionales", consortium_id=consortium_id))
+
+@app.route("/consorcios/<int:consortium_id>/gastos_comunes", methods=["GET"])
+def fetch_gastos_comunes(consortium_id):
+    login_check = require_login()
+    if login_check:
+        return login_check
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+
+    if DEBUG:
+        print(f"Fetching common expenses for consortium_id: {consortium_id}")  # Debug log
+
+    response = requests.get(f"{API_URL}/expenses", params={"consortium_id": consortium_id}, cookies=cookies)
+    if response.status_code == 200:
+        data = response.json()
+        if DEBUG:
+            print(f"Fetched common expenses: {data}")  # Debug log
+        return jsonify(data), 200
+    else:
+        if DEBUG:
+            print(f"Error fetching common expenses: {response.status_code}, {response.text}")  # Debug log
+        return jsonify({"error": "Error al obtener los gastos comunes"}), response.status_code
 
 @app.route("/consorcios/<int:consortium_id>/unidades_funcionales/<int:unit_id>")
 def unidad_funcional(consortium_id, unit_id):

@@ -22,7 +22,6 @@ def get_expenses():
             JOIN consortiums c ON e.consortium = c.id
             WHERE e.consortium = :consortium_id AND c.user_id = :user_id
             """
-
     params = {"consortium_id": consortium_id, "user_id": user_id}
 
     try:
@@ -35,20 +34,12 @@ def get_expenses():
             print(f"DB_ERROR: {err}")
         return {"error": str(err)}, 500
 
-    expenses = []
-    for row in rows:
-        expenses.append({
-            "id": row.id,
-            "description": row.description,
-            "amount": float(row.amount),
-            "date": str(row.date)
-        })
+    expenses = [{"id": row.id, "description": row.description, "amount": float(row.amount), "date": str(row.date)} for row in rows]
 
-    response = {
-        "expenses": expenses,
-    }
+    if DEBUG:
+        print(f"Fetched expenses: {expenses}")  # Debug log
 
-    return jsonify(response), 200
+    return jsonify({"expenses": expenses}), 200
 
 @expenses_bp.route("/expenses/<int:expense_id>", methods=["DELETE"])
 @jwt_required()
