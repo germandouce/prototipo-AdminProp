@@ -111,10 +111,11 @@ def post_consortiums():
     address = data.get("address")
     admin_commission = data.get("admin_commission")
     owner_name = data.get("owner_name")
+    surface = data.get("surface")
 
     query = """
-            INSERT INTO consortiums (name, address, owner_name, admin_commission, user_id)
-            VALUES (:name, :address, :owner_name, :admin_commission, :user_id)
+            INSERT INTO consortiums (name, address, owner_name, admin_commission, user_id, surface)
+            VALUES (:name, :address, :owner_name, :admin_commission, :user_id, :surface)
             """
 
     params = {}
@@ -123,6 +124,7 @@ def post_consortiums():
     params["owner_name"] = owner_name
     params["admin_commission"] = admin_commission
     params["user_id"] = user_id
+    params["surface"] = surface
 
     try:
         with engine.begin() as conn:
@@ -140,7 +142,7 @@ def post_consortiums():
 def patch_consortiums(id):
     user_id = int(get_jwt_identity())
     data = request.get_json()
-    optional_data = ["address"]
+    optional_data = ["address", "surface"]
     received_data = {key: data.get(key) for key in optional_data if key in data}
     if not received_data:
         return {"error": "No fields to update"}, 400

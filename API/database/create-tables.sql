@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS consortiums (
     address VARCHAR(500) NOT NULL,
     owner_name VARCHAR(80) NOT NULL,
     admin_commission DECIMAL(10,2) NOT NULL,
-    surface DECIMAL(10,2) NOT NULL,
+    surface DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
