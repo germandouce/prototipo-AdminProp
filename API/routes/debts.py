@@ -5,11 +5,11 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from database import engine, DEBUG
 
-payments_bp = Blueprint("payments", __name__)
+debts_bp = Blueprint("debts", __name__)
 
-@payments_bp.route("/payments", methods=["GET"])
+@debts_bp.route("/debts", methods=["GET"])
 @jwt_required()
-def get_payments():
+def get_debts():
     user_id = int(get_jwt_identity())
     tenant_name = request.args.get("tenant_name", type=str)
     id_unit = request.args.get("id_unit", type=int)
@@ -19,11 +19,11 @@ def get_payments():
         return {"error": "tenant_name, id_unit and consortium_id are required"}, 400
 
     query = """
-        SELECT p.id, p.amount, p.date, p.description
-        FROM payments p
-        JOIN consortiums c ON p.consortium = c.id
-        WHERE p.tenant = :tenant_name AND p.functional_unit = :id_unit AND p.consortium = :consortium_id AND c.user_id = :user_id
-        ORDER BY p.date DESC
+        SELECT d.id, d.amount, d.date, d.description
+        FROM debts d
+        JOIN consortiums c ON d.consortium = c.id
+        WHERE d.tenant = :tenant_name AND d.functional_unit = :id_unit AND d.consortium = :consortium_id AND c.user_id = :user_id
+        ORDER BY d.date DESC
     """
 
     params = {"tenant_name": tenant_name, "id_unit": id_unit, "consortium_id": consortium_id, "user_id": user_id}
@@ -38,10 +38,10 @@ def get_payments():
             print(f"DB_ERROR: {err}")
         return {"error": str(err)}, 500
 
-    payments = []
+    debts = []
     latest_payment = 0
     for i, row in enumerate(rows):
-        payments.append({
+        debts.append({
             "id": row.id,
             "amount": float(row.amount),
             "date": str(row.date),
@@ -52,21 +52,21 @@ def get_payments():
 
     response = {
         "tenant": tenant_name,
-        "payments": payments,
+        "debts": debts,
         "latest_payment": latest_payment,
     }
 
     return jsonify(response), 200
 
-@payments_bp.route("/payments_total", methods=["GET"])
+@debts_bp.route("/debts_total", methods=["GET"])
 @jwt_required()
-def get_total_payments():
+def get_total_debts():
     user_id = int(get_jwt_identity())
 
     query = """
-        SELECT SUM(p.amount) AS total
-        FROM payments p
-        JOIN consortiums c ON p.consortium = c.id
+        SELECT SUM(d.amount) AS total
+        FROM debts d
+        JOIN consortiums c ON d.consortium = c.id
         WHERE c.user_id = :user_id
     """
 
@@ -86,31 +86,47 @@ def get_total_payments():
 
     return response, 200
 
-@payments_bp.route("/payments/<int:payment_id>", methods=["DELETE"])
+@debts_bp.route("/debts/<int:payment_id>", methods=["DELETE"])
 @jwt_required()
-def delete_payment(payment_id):
+def delete_debts(payment_id):
     user_id = int(get_jwt_identity())
+
+    query_register_payment = """
+                             INSERT INTO payments (consortium, amount, functional_unit, date, tenant, description)
+                             SELECT consortium, amount, functional_unit, NOW(), tenant, description
+                             FROM debts
+                             WHERE id = :payment_id
+                               AND consortium IN (SELECT id FROM consortiums WHERE user_id = :user_id) \
+                             """
+
     query = """
-        DELETE FROM payments
+        DELETE FROM debts
         WHERE id = :payment_id
         AND consortium IN (SELECT id FROM consortiums WHERE user_id = :user_id)
     """
 
+    params = {"payment_id": payment_id, "user_id": user_id}
+
     try:
         with engine.begin() as conn:
-            result = conn.execute(text(query), {"payment_id": payment_id, "user_id": user_id})
-            if result.rowcount == 0:
+            result_payment = conn.execute(text(query_register_payment), params)
+
+            if result_payment.rowcount == 0:
                 return {"error": "Payment not found or permission denied"}, 404
+
+            result = conn.execute(text(query), params)
+            if result.rowcount == 0:
+                return {"error": "Debt not found or permission denied"}, 404
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
         return {"error": str(err)}, 500
 
-    return {"message": f"Payment {payment_id} deleted"}, 200
+    return {"message": f"Debt {payment_id} deleted"}, 200
 
-@payments_bp.route("/payments", methods=["POST"])
+@debts_bp.route("/debts", methods=["POST"])
 @jwt_required()
-def post_payments():
+def post_debts():
     user_id = int(get_jwt_identity())
     data = request.get_json()
     tenant_name = data.get("tenant_name")
@@ -120,7 +136,7 @@ def post_payments():
     consortium_id = data.get("consortium_id")
 
     query = """
-            INSERT INTO payments (consortium, tenant, functional_unit, date, amount)
+            INSERT INTO debts (consortium, tenant, functional_unit, date, amount)
             VALUES (:consortium, :tenant_name, :id_unit, :date, :amount)
             """
 
@@ -156,9 +172,9 @@ def post_payments():
 
     return {"message": f"payment for unit {id_unit} created"}, 201
 
-@payments_bp.route("/payments/<int:id>", methods=["PATCH"])
+@debts_bp.route("/debts/<int:id>", methods=["PATCH"])
 @jwt_required()
-def patch_payments(id):
+def patch_debts(id):
     user_id = int(get_jwt_identity())
     data = request.get_json()
 
@@ -168,7 +184,7 @@ def patch_payments(id):
         return {"error": "No fields to update"}, 400
 
     set_clause = ", ".join([f"{key} = :{key}" for key in received_data.keys()])
-    query = (f"UPDATE payments SET {set_clause} "
+    query = (f"UPDATE debts SET {set_clause} "
              f"WHERE id = :id"
              f" AND consortium IN (SELECT id FROM consortiums WHERE user_id = :user_id)")
 

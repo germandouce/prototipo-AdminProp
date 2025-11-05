@@ -73,6 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             title: "Hecho",
                             text: "Los pagos se han registrado.",
                             icon: "success"
+                        }).then(() => {
+                            window.location.reload(true);
                         });
                     }
                 }

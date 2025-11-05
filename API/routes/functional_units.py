@@ -202,11 +202,11 @@ def delete_unit(unit_id):
     """
 
     params = {"unit_id": unit_id, "user_id": user_id}
-    delete_payments_q = "DELETE FROM payments WHERE functional_unit = :unit_id"
+    delete_debts_q = "DELETE FROM debts WHERE functional_unit = :unit_id"
 
     try:
         with engine.begin() as conn:
-            conn.execute(text(delete_payments_q), {"unit_id": unit_id})
+            conn.execute(text(delete_debts_q), {"unit_id": unit_id})
             result = conn.execute(text(query), params)
             if result.rowcount == 0:
                 return {"error": "Functional unit not found or permission denied"}, 404
@@ -228,9 +228,9 @@ def get_debt():
 
     query = """
             SELECT COALESCE(SUM(amount),0) AS total_debt
-            FROM payments p
-            WHERE p.functional_unit = :unit_id \
-              AND p.tenant = :tenant \
+            FROM debts d
+            WHERE d.functional_unit = :unit_id \
+              AND d.tenant = :tenant \
             """
 
     params = {"unit_id": unit_id, "tenant": tenant}

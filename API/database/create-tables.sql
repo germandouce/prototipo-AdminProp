@@ -41,6 +41,18 @@ CREATE TABLE IF NOT EXISTS common_expenses (
     FOREIGN KEY (consortium) REFERENCES consortiums(id)
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS debts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    functional_unit INT NOT NULL,
+    consortium INT NOT NULL,
+    tenant VARCHAR(25) NOT NULL,
+    description VARCHAR(100) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    date DATE NOT NULL,
+    FOREIGN KEY (consortium) REFERENCES consortiums(id),
+    FOREIGN KEY (functional_unit) REFERENCES functional_units(id)
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS payments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     functional_unit INT NOT NULL,
@@ -102,7 +114,7 @@ VALUES ('Luz de pasillo (Prueba de Evento)', 10000.00, '2025-10-15', 1);
 INSERT INTO common_expenses (description, amount, date, consortium)
 VALUES ('Seguridad (Prueba de Evento)', 5000.00, '2025-10-15', 1);
 
--- CAMBIO 1: Cambia el delimitador
+-- Cambia el delimitador
 DELIMITER //
 
 CREATE EVENT IF NOT EXISTS ev_process_monthly_expenses
@@ -112,7 +124,7 @@ ON SCHEDULE EVERY 1 MONTH
 DO
 BEGIN
     -- Alquiler mensual
-    INSERT INTO payments (functional_unit, consortium, tenant, description, amount, date)
+    INSERT INTO debts (functional_unit, consortium, tenant, description, amount, date)
     SELECT
         fu.id AS functional_unit,
         fu.consortium AS consortium,
@@ -127,8 +139,8 @@ BEGIN
         CURDATE() AS date
     FROM
         functional_units AS fu;
-    -- Insertar en 'payments' basado en el cálculo del mes anterior
-    INSERT INTO payments (functional_unit, consortium, tenant, description, amount, date)
+    -- Insertar en 'debts' basado en el cálculo del mes anterior
+    INSERT INTO debts (functional_unit, consortium, tenant, description, amount, date)
     SELECT
         fu.id AS functional_unit,
         fu.consortium AS consortium,
@@ -167,5 +179,5 @@ BEGIN
 END
 //
 
--- CAMBIO 3: Restaura el delimitador original
+-- : Restaura el delimitador original
 DELIMITER ;

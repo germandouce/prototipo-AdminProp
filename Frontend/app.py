@@ -40,13 +40,13 @@ def inicio():
     else:
         error_msg = response.json().get("error", "Error desconocido")
         return render_template("login.html", error=error_msg)
-    response = requests.get(f"{API_URL}/payments_total", cookies=cookies)
+    response = requests.get(f"{API_URL}/debts_total", cookies=cookies)
     if response.status_code == 200:
-        total_payments = response.json().get("total", 0)
+        total_debts = response.json().get("total", 0)
     else:
         error_msg = response.json().get("error", "Error desconocido")
         return render_template("login.html", error=error_msg)
-    return render_template("inicio.html", active_page='inicio', name=name, surname=surname, total_payments=total_payments)
+    return render_template("inicio.html", active_page='inicio', name=name, surname=surname, total_debts=total_debts)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -303,14 +303,14 @@ def pagos(consortium_id, unit_id, tenant):
         "id_unit": unit_id,
         "consortium_id": consortium_id
     }
-    response = requests.get(f"{API_URL}/payments", params=params, cookies=cookies)
+    response = requests.get(f"{API_URL}/debts", params=params, cookies=cookies)
     try:
         data = response.json()
-        payments = data["payments"]
+        debts = data["debts"]
     except Exception:
         return jsonify({"error": "Error inesperado en el backend"}), 500
 
-    return payments, response.status_code
+    return debts, response.status_code
 
 @app.route("/registrar_pago/<int:payment_id>", methods=["DELETE"])
 def registrar_pago(payment_id):
@@ -318,7 +318,7 @@ def registrar_pago(payment_id):
     if login_check:
         return login_check
     cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
-    response = requests.delete(f"{API_URL}/payments/{payment_id}", cookies=cookies)
+    response = requests.delete(f"{API_URL}/debts/{payment_id}", cookies=cookies)
     try:
         data = response.json()
     except Exception:

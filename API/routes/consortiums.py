@@ -71,7 +71,7 @@ def get_consortium():
 
     return consortium, 200
 
-#Deletes a consortium and its payments, expenses and functional units
+#Deletes a consortium and its debts, expenses and functional units
 @consortiums_bp.route("/consortiums/<int:consortium_id>", methods=["DELETE"])
 @jwt_required()
 def delete_consortium(consortium_id):
@@ -81,7 +81,7 @@ def delete_consortium(consortium_id):
         WHERE id = :consortium_id AND user_id = :user_id
     """
 
-    delete_payments_q = "DELETE FROM payments WHERE consortium = :consortium_id"
+    delete_debts_q = "DELETE FROM debts WHERE consortium = :consortium_id"
     delete_expenses_q = "DELETE FROM common_expenses WHERE consortium = :consortium_id"
     delete_units_q = "DELETE FROM functional_units WHERE consortium = :consortium_id"
 
@@ -89,7 +89,7 @@ def delete_consortium(consortium_id):
 
     try:
         with engine.begin() as conn:
-            conn.execute(text(delete_payments_q), {"consortium_id": consortium_id})
+            conn.execute(text(delete_debts_q), {"consortium_id": consortium_id})
             conn.execute(text(delete_expenses_q), {"consortium_id": consortium_id})
             conn.execute(text(delete_units_q), {"consortium_id": consortium_id})
             result = conn.execute(text(query), params)

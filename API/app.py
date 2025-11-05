@@ -16,7 +16,7 @@ from sqlalchemy import create_engine
 
 from routes.consortiums import consortiums_bp
 from routes.functional_units import functional_units_bp
-from routes.payments import payments_bp
+from routes.debts import debts_bp
 from routes.expenses import expenses_bp
 from routes.clients import clients_bp
 from database import engine, DEBUG
@@ -53,7 +53,7 @@ def send_query(query: str) -> tuple[bool, any]:
 
 app.register_blueprint(consortiums_bp)
 app.register_blueprint(functional_units_bp)
-app.register_blueprint(payments_bp)
+app.register_blueprint(debts_bp)
 app.register_blueprint(expenses_bp)
 app.register_blueprint(clients_bp, url_prefix='/api')
 
@@ -106,9 +106,9 @@ def get_owners_reports():
     except ValueError:
         return {"error": "month_of_year must be in format YYYY-MM"}, 400
 
-    query_payments = """
-        SELECT COALESCE(SUM(amount),0) AS total_payments
-        FROM payments
+    query_debts = """
+        SELECT COALESCE(SUM(amount),0) AS total_debts
+        FROM debts
         WHERE consortium = :consortium_id
           AND DATE_FORMAT(date, '%Y-%m') = :month_of_year
     """
@@ -124,8 +124,8 @@ def get_owners_reports():
 
     try:
         with engine.connect() as conn:
-            total_payments_row = conn.execute(text(query_payments), params).fetchone()
-            total_income = float(total_payments_row.total_payments)
+            total_debts_row = conn.execute(text(query_debts), params).fetchone()
+            total_income = float(total_debts_row.total_debts)
 
             total_expenses_row = conn.execute(text(query_expenses), params).fetchone()
             total_outcome = float(total_expenses_row.total_expenses)
@@ -174,9 +174,9 @@ def get_administration_fee():
         return {"error": "month_of_year must be in format YYYY-MM"}, 400
 
     query = """
-        SELECT COALESCE(SUM(p.amount),0) AS total_payments, c.address, c.admin_comission
-        FROM payments p
-        JOIN consortiums c ON p.consortium = c.id
+        SELECT COALESCE(SUM(d.amount),0) AS total_debts, c.address, c.admin_comission
+        FROM debts d
+        JOIN consortiums c ON d.consortium = c.id
         WHERE DATE_FORMAT(date, '%Y-%m') = :month_of_year
         GROUP BY c.id, c.address, c.admin_comission
     """
@@ -196,7 +196,7 @@ def get_administration_fee():
     total_administration_fee = 0
     for row in rows:
         row_admin_commission = float(row.admin_comission)
-        row_total_income = float(row.total_payments)
+        row_total_income = float(row.total_debts)
         row_admin_fee = row_total_income * row_admin_commission
         total_administration_fee += row_admin_fee
         details.append({
