@@ -58,6 +58,34 @@ def get_payments():
 
     return jsonify(response), 200
 
+@payments_bp.route("/payments_total", methods=["GET"])
+@jwt_required()
+def get_total_payments():
+    user_id = int(get_jwt_identity())
+
+    query = """
+        SELECT SUM(p.amount) AS total
+        FROM payments p
+        JOIN consortiums c ON p.consortium = c.id
+        WHERE c.user_id = :user_id
+    """
+
+    try:
+        conn = engine.connect()
+        result = conn.execute(text(query), {"user_id": user_id})
+        row = result.fetchone()
+        conn.close()
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    response = {
+        "total": row.total,
+    }
+
+    return response, 200
+
 @payments_bp.route("/payments/<int:payment_id>", methods=["DELETE"])
 @jwt_required()
 def delete_payment(payment_id):
