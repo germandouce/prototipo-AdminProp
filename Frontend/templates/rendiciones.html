@@ -1,88 +1,139 @@
 {% extends "base.html" %}
 {% block title %}Rendiciones - AdminProp{% endblock %}
 {% block head %}
-    <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ui.js') }}"></script>
 {% endblock %}
 {% block content %}
-    <section class="page active">
-        <h1>Gestión de rendiciones a propietarios</h1>
+<section class="page active">
+    <h1>Gestión de rendiciones a propietarios</h1>
 
-        <!-- Filtros -->
+    <!-- Filtros -->
+    <form method="POST">
         <div class="form-row" style="margin-bottom:1rem;">
             <label>Mes/Año
-                <select id="selPeriodo"><option>09/2025</option><option>08/2025</option></select>
+                <select name="periodo" id="selPeriodo" required>
+                    {% for p in periodos %}
+                    <option value="{{ p }}">{{ p }}</option>
+                    {% endfor %}
+                </select>
             </label>
-            <label style="margin-left:1rem;">Propiedad/Consorcio
-                <select id="selAmbito"><option>Edificio San Martín 1234</option><option>Casa Av. Belgrano 456</option></select>
+
+            <label style="margin-left:1rem;">Propiedad / Consorcio
+                <select name="consortium_id" id="selAmbito" required>
+                    {% for c in consortiums %}
+                    <option value="{{ c.id }}">{{ c.address or c.name }}</option>
+                    {% endfor %}
+                </select>
             </label>
-            <button id="btnCalcular" class="btn-primary" style="margin-left:1rem;">Calcular rendición</button>
-            <span id="badgeEstado" class="badge hidden"></span>
-        </div>
 
-        <div class="grid-2" id="bloquesRendicion">
-            <fieldset>
-                <legend>Ingresos</legend>
-                <p>Alquileres cobrados: <b>$500.000</b></p>
-                <p>Expensas cobradas: <b>$100.000</b></p>
-                <p><strong>TOTAL INGRESOS: $600.000</strong></p>
-            </fieldset>
-            <fieldset>
-                <legend>Gastos</legend>
-                <p>Gastos comunes: <b>$200.000</b></p>
-                <p>Reparaciones: <b>$50.000</b></p>
-                <p>Otros: <b>$20.000</b></p>
-                <p><strong>TOTAL GASTOS: $270.000</strong></p>
-            </fieldset>
-            <fieldset>
-                <legend>Comisión</legend>
-                <p>% Comisión: <b>5%</b></p>
-                <p>Monto: <b>$30.000</b></p>
-            </fieldset>
-            <fieldset>
-                <legend>Saldo final</legend>
-                <p style="font-size:1.1rem;"><strong>SALDO NETO A PROPIETARIO: $300.000</strong></p>
-            </fieldset>
+            <button type="submit" id="btnCalcular" class="btn-primary" style="margin-left:1rem;">Calcular rendición</button>
+            <span id="badgeEstado" class="badge {% if not report %}hidden{% endif %}">
+                {% if report %}Cálculo listo para {{ request.form.get('periodo') }} · {{ request.form.get('consortium_id') }}{% endif %}
+            </span>
         </div>
+    </form>
 
-        <div style="margin-top:1rem;">
-            <button id="btnExportPdf" class="btn-secondary" disabled>Exportar PDF</button>
-            <button id="btnExportXls" class="btn-secondary" disabled>Exportar Excel</button>
-            <button class="btn-secondary" style="float:right;" onclick="history.back()">Volver</button>
-        </div>
-    </section>
+    <!-- Bloques de resultados -->
+    <div class="grid-2" id="bloquesRendicion">
+        <fieldset>
+            <legend>Ingresos</legend>
+            <p>Alquileres cobrados: <b>
+                {% if report %}${{ "{:,.0f}".format(report.get('alquileres', report.get('total_incomes', 0))) }}{% else %}$0{% endif %}
+            </b></p>
+            <p>Expensas cobradas: <b>
+                {% if report %}${{ "{:,.0f}".format(report.get('expensas', 0)) }}{% else %}$0{% endif %}
+            </b></p>
+            <p><strong>TOTAL INGRESOS:
+                {% if report %}${{ "{:,.0f}".format(report.get('total_incomes', 0)) }}{% else %}$0{% endif %}
+            </strong></p>
+        </fieldset>
+
+        <fieldset>
+            <legend>Gastos</legend>
+            <p>Gastos comunes: <b>
+                {% if report %}${{ "{:,.0f}".format(report.get('gastos_comunes', report.get('total_outcomes', 0))) }}{% else %}$0{% endif %}
+            </b></p>
+            <p>Reparaciones: <b>
+                {% if report %}${{ "{:,.0f}".format(report.get('gastos_reparaciones', 0)) }}{% else %}$0{% endif %}
+            </b></p>
+            <p>Otros: <b>
+                {% if report %}${{ "{:,.0f}".format(report.get('gastos_otros', 0)) }}{% else %}$0{% endif %}
+            </b></p>
+            <p><strong>TOTAL GASTOS:
+                {% if report %}${{ "{:,.0f}".format(report.get('total_outcomes', 0)) }}{% else %}$0{% endif %}
+            </strong></p>
+        </fieldset>
+
+        <fieldset>
+            <legend>Comisión</legend>
+            <p>% Comisión: <b>
+                {% if report %}{{ (report.get('administration_percentage', 0) * 100)|round(2) }}%{% else %}0%{% endif %}
+            </b></p>
+            <p>Monto: <b>
+                {% if report %}${{ "{:,.0f}".format(report.get('administration_fee', 0)) }}{% else %}$0{% endif %}
+            </b></p>
+        </fieldset>
+
+        <fieldset>
+            <legend>Saldo final</legend>
+            <p style="font-size:1.1rem;">
+                <strong>SALDO NETO A PROPIETARIO:
+                    {% if report %}${{ "{:,.0f}".format(report.get('net_income', 0)) }}{% else %}$0{% endif %}
+                </strong>
+            </p>
+        </fieldset>
+    </div>
+
+    <div style="margin-top:1rem;">
+        <button id="btnExportPdf" class="btn-secondary" {% if not report %}disabled{% endif %}>Exportar PDF</button>
+        <button id="btnExportXls" class="btn-secondary" {% if not report %}disabled{% endif %}>Exportar Excel</button>
+        <button class="btn-secondary" style="float:right;" onclick="history.back()">Volver</button>
+    </div>
+</section>
 {% endblock %}
-<!-- <script>
-    const $=s=>document.querySelector(s);
-    const bloques = $('#bloquesRendicion');
 
-    // 1) Calcular: habilita exportaciones + badge de estado
-    $('#btnCalcular').addEventListener('click', ()=>{
-        $('#btnExportPdf').disabled=false;
-        $('#btnExportXls').disabled=false;
-        const b=$('#badgeEstado');
-        b.textContent='Cálculo listo para ' + $('#selPeriodo').value + ' · ' + $('#selAmbito').value;
-        b.classList.remove('hidden'); b.classList.add('ok','badge');
-        UI.showToast('Rendición calculada');
-    });
+{% block scripts %}
+<script>
+    // Simula interactividad visual al estilo del viejo script
+    const $ = s => document.querySelector(s);
 
-    // 2) Exportar: abre vista previa de lo que se exporta
-    function exportar(tipo){
-        const bodyHTML = `
-      <p><b>Período:</b> ${$('#selPeriodo').value}<br>
-         <b>Ámbito:</b> ${$('#selAmbito').value}</p>
-      ${bloques.outerHTML}
-    `;
-        UI.openModal({
-            title: 'Vista previa de ' + (tipo==='pdf'?'PDF':'Excel'),
-            bodyHTML,
-            onConfirm: ()=>{
-                const fn = `rendicion_${$('#selPeriodo').value.replace('/','-')}_${tipo}.`+(tipo==='pdf'?'pdf':'xlsx');
-                UI.showToast('Exportado: ' + fn, 2500);
-            }
+    // Mostrar badge de estado cuando se calcula la rendición
+    const calcularBtn = $('#btnCalcular');
+    const badge = $('#badgeEstado');
+
+    if (calcularBtn) {
+        calcularBtn.addEventListener('click', () => {
+            $('#btnExportPdf').disabled = false;
+            $('#btnExportXls').disabled = false;
+            badge.textContent = 'Cálculo listo para ' + $('#selPeriodo').value + ' · ' + $('#selAmbito').selectedOptions[0].text;
+            badge.classList.remove('hidden');
+            badge.classList.add('ok', 'badge');
+            if (window.UI && UI.showToast) UI.showToast('Rendición calculada correctamente');
         });
     }
-    $('#btnExportPdf').addEventListener('click', ()=>exportar('pdf'));
-    $('#btnExportXls').addEventListener('click', ()=>exportar('xls'));
+
+    // Exportar vista previa PDF/Excel (mock visual igual que tu primer versión)
+    function exportar(tipo) {
+        const bodyHTML = `
+        <p><b>Período:</b> ${$('#selPeriodo').value}<br>
+           <b>Ámbito:</b> ${$('#selAmbito').selectedOptions[0].text}</p>
+        ${$('#bloquesRendicion').outerHTML}
+        `;
+        if (window.UI && UI.openModal) {
+            UI.openModal({
+                title: 'Vista previa de ' + (tipo === 'pdf' ? 'PDF' : 'Excel'),
+                bodyHTML,
+                onConfirm: () => {
+                    const fn = \`rendicion_\${$('#selPeriodo').value.replace('/','-')}_\${tipo}.\${tipo==='pdf'?'pdf':'xlsx'}\`;
+                    UI.showToast('Exportado: ' + fn, 2500);
+                }
+            });
+        } else {
+            alert('Simulación de exportación a ' + tipo.toUpperCase());
+        }
+    }
+
+    $('#btnExportPdf')?.addEventListener('click', () => exportar('pdf'));
+    $('#btnExportXls')?.addEventListener('click', () => exportar('xls'));
 </script>
-</body>
-</html> -->
+{% endblock %}
