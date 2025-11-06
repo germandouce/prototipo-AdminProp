@@ -3,90 +3,53 @@
 {% block head %}
 <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
 {% endblock %}
+
 {% block content %}
 <section class="page active">
     <h1>Gestión de rendiciones a propietarios</h1>
 
     <!-- Filtros -->
-    <form method="POST">
-        <div class="form-row" style="margin-bottom:1rem;">
-            <label>Mes/Año
-                <select name="periodo" id="selPeriodo" required>
-                    {% for p in periodos %}
-                    <option value="{{ p }}">{{ p }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-
-            <label style="margin-left:1rem;">Propiedad / Consorcio
-                <select name="consortium_id" id="selAmbito" required>
-                    {% for c in consortiums %}
-                    <option value="{{ c.id }}">{{ c.address or c.name }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-
-            <button type="submit" id="btnCalcular" class="btn-primary" style="margin-left:1rem;">Calcular rendición</button>
-            <span id="badgeEstado" class="badge {% if not report %}hidden{% endif %}">
-                {% if report %}Cálculo listo para {{ request.form.get('periodo') }} · {{ request.form.get('consortium_id') }}{% endif %}
-            </span>
-        </div>
-    </form>
+    <div class="form-row" style="margin-bottom:1rem;">
+        <label>Mes/Año
+            <select id="selPeriodo"></select>
+        </label>
+        <label style="margin-left:1rem;">Propiedad / Consorcio
+            <select id="selConsorcio"></select>
+        </label>
+        <button id="btnCalcular" class="btn-primary" style="margin-left:1rem;">Calcular rendición</button>
+        <span id="badgeEstado" class="badge hidden"></span>
+    </div>
 
     <!-- Bloques de resultados -->
-    <div class="grid-2" id="bloquesRendicion">
+    <div class="grid-2" id="bloquesRendicion" style="display:none;">
         <fieldset>
             <legend>Ingresos</legend>
-            <p>Alquileres cobrados: <b>
-                {% if report %}${{ "{:,.0f}".format(report.get('alquileres', report.get('total_incomes', 0))) }}{% else %}$0{% endif %}
-            </b></p>
-            <p>Expensas cobradas: <b>
-                {% if report %}${{ "{:,.0f}".format(report.get('expensas', 0)) }}{% else %}$0{% endif %}
-            </b></p>
-            <p><strong>TOTAL INGRESOS:
-                {% if report %}${{ "{:,.0f}".format(report.get('total_incomes', 0)) }}{% else %}$0{% endif %}
-            </strong></p>
+            <p>Alquileres cobrados: <b id="ing_alquileres">$0</b></p>
+            <p>Expensas cobradas: <b id="ing_expensas">$0</b></p>
+            <p><strong>TOTAL INGRESOS: <span id="ing_total">$0</span></strong></p>
         </fieldset>
 
         <fieldset>
             <legend>Gastos</legend>
-            <p>Gastos comunes: <b>
-                {% if report %}${{ "{:,.0f}".format(report.get('gastos_comunes', report.get('total_outcomes', 0))) }}{% else %}$0{% endif %}
-            </b></p>
-            <p>Reparaciones: <b>
-                {% if report %}${{ "{:,.0f}".format(report.get('gastos_reparaciones', 0)) }}{% else %}$0{% endif %}
-            </b></p>
-            <p>Otros: <b>
-                {% if report %}${{ "{:,.0f}".format(report.get('gastos_otros', 0)) }}{% else %}$0{% endif %}
-            </b></p>
-            <p><strong>TOTAL GASTOS:
-                {% if report %}${{ "{:,.0f}".format(report.get('total_outcomes', 0)) }}{% else %}$0{% endif %}
-            </strong></p>
+            <div id="listaGastos"></div>
+            <p><strong>TOTAL GASTOS: <span id="gastos_total">$0</span></strong></p>
         </fieldset>
 
         <fieldset>
             <legend>Comisión</legend>
-            <p>% Comisión: <b>
-                {% if report %}{{ (report.get('administration_percentage', 0) * 100)|round(2) }}%{% else %}0%{% endif %}
-            </b></p>
-            <p>Monto: <b>
-                {% if report %}${{ "{:,.0f}".format(report.get('administration_fee', 0)) }}{% else %}$0{% endif %}
-            </b></p>
+            <p>% Comisión: <b id="comision_pct">0%</b></p>
+            <p>Monto: <b id="comision_monto">$0</b></p>
         </fieldset>
 
         <fieldset>
             <legend>Saldo final</legend>
-            <p style="font-size:1.1rem;">
-                <strong>SALDO NETO A PROPIETARIO:
-                    {% if report %}${{ "{:,.0f}".format(report.get('net_income', 0)) }}{% else %}$0{% endif %}
-                </strong>
-            </p>
+            <p style="font-size:1.1rem;"><strong>SALDO NETO A PROPIETARIO: <span id="saldo_neto">$0</span></strong></p>
         </fieldset>
     </div>
 
     <div style="margin-top:1rem;">
-        <button id="btnExportPdf" class="btn-secondary" {% if not report %}disabled{% endif %}>Exportar PDF</button>
-        <button id="btnExportXls" class="btn-secondary" {% if not report %}disabled{% endif %}>Exportar Excel</button>
+        <button id="btnExportPdf" class="btn-secondary" disabled>Exportar PDF</button>
+        <button id="btnExportXls" class="btn-secondary" disabled>Exportar Excel</button>
         <button class="btn-secondary" style="float:right;" onclick="history.back()">Volver</button>
     </div>
 </section>
@@ -94,46 +57,118 @@
 
 {% block scripts %}
 <script>
-    // Simula interactividad visual al estilo del viejo script
-    const $ = s => document.querySelector(s);
+    const fmt = v => '$' + Number(v || 0).toLocaleString('es-AR');
 
-    // Mostrar badge de estado cuando se calcula la rendición
-    const calcularBtn = $('#btnCalcular');
-    const badge = $('#badgeEstado');
+    // Al cargar la página
+    document.addEventListener("DOMContentLoaded", async () => {
+        cargarPeriodos();
+        await cargarConsorcios();
+        document.getElementById("btnCalcular").addEventListener("click", calcularRendicion);
+    });
 
-    if (calcularBtn) {
-        calcularBtn.addEventListener('click', () => {
-            $('#btnExportPdf').disabled = false;
-            $('#btnExportXls').disabled = false;
-            badge.textContent = 'Cálculo listo para ' + $('#selPeriodo').value + ' · ' + $('#selAmbito').selectedOptions[0].text;
-            badge.classList.remove('hidden');
-            badge.classList.add('ok', 'badge');
-            if (window.UI && UI.showToast) UI.showToast('Rendición calculada correctamente');
-        });
-    }
-
-    // Exportar vista previa PDF/Excel (mock visual igual que tu primer versión)
-    function exportar(tipo) {
-        const bodyHTML = `
-        <p><b>Período:</b> ${$('#selPeriodo').value}<br>
-           <b>Ámbito:</b> ${$('#selAmbito').selectedOptions[0].text}</p>
-        ${$('#bloquesRendicion').outerHTML}
-        `;
-        if (window.UI && UI.openModal) {
-            UI.openModal({
-                title: 'Vista previa de ' + (tipo === 'pdf' ? 'PDF' : 'Excel'),
-                bodyHTML,
-                onConfirm: () => {
-                    const fn = \`rendicion_\${$('#selPeriodo').value.replace('/','-')}_\${tipo}.\${tipo==='pdf'?'pdf':'xlsx'}\`;
-                    UI.showToast('Exportado: ' + fn, 2500);
-                }
-            });
-        } else {
-            alert('Simulación de exportación a ' + tipo.toUpperCase());
+    // === Generar últimos 4 meses ===
+    function cargarPeriodos() {
+        const sel = document.getElementById("selPeriodo");
+        const hoy = new Date();
+        for (let i = 0; i < 4; i++) {
+            const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+            const mes = String(d.getMonth() + 1).padStart(2, "0");
+            const anio = d.getFullYear();
+            const opt = document.createElement("option");
+            opt.value = `${anio}-${mes}`;
+            opt.textContent = `${mes}/${anio}`;
+            sel.appendChild(opt);
         }
     }
 
-    $('#btnExportPdf')?.addEventListener('click', () => exportar('pdf'));
-    $('#btnExportXls')?.addEventListener('click', () => exportar('xls'));
+    // === Cargar consorcios desde el front (no al backend) ===
+    async function cargarConsorcios() {
+        try {
+            const res = await fetch("/consorcios_json");
+            const data = await res.json();
+
+            const sel = document.getElementById("selConsorcio");
+            sel.innerHTML = "";
+
+            if (!data.consortiums || data.consortiums.length === 0) {
+                sel.innerHTML = "<option>Sin consorcios disponibles</option>";
+                sel.disabled = true;
+                return;
+            }
+
+            data.consortiums.forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = c.id;
+                opt.textContent = c.address; // muestra dirección
+                sel.appendChild(opt);
+            });
+        } catch (err) {
+            console.error("Error al cargar consorcios:", err);
+            alert("Error al cargar consorcios");
+        }
+    }
+
+
+    // === Calcular rendición ===
+    async function calcularRendicion() {
+        const consortium_id = document.getElementById("selConsorcio").value;
+        const month = document.getElementById("selPeriodo").value;
+
+        const res = await fetch(`/rendiciones?consortium_id=${consortium_id}&month=${month}`);
+        if (!res.ok) {
+            alert("Error al obtener la rendición");
+            return;
+        }
+
+        const data = await res.json();
+        const r = data.owner_report;
+        if (!r) {
+            alert("Sin datos disponibles");
+            return;
+        }
+
+        document.getElementById("bloquesRendicion").style.display = "grid";
+        document.getElementById("ing_alquileres").textContent = fmt(r.total_incomes - r.total_outcomes);
+        document.getElementById("ing_expensas").textContent = fmt(r.total_outcomes);
+        document.getElementById("ing_total").textContent = fmt(r.total_incomes);
+        document.getElementById("gastos_total").textContent = fmt(r.total_outcomes);
+        document.getElementById("comision_pct").textContent = (r.administration_percentage * 100).toFixed(2) + "%";
+        document.getElementById("comision_monto").textContent = fmt(r.administration_fee);
+        document.getElementById("saldo_neto").textContent = fmt(r.net_income);
+
+        // === Armar la tabla de gastos comunes ===
+        const div = document.getElementById("listaGastos");
+        div.innerHTML = "";
+        if (r.common_expenses && r.common_expenses.length > 0) {
+            let html = `<table style="width:100%; border-collapse:collapse;">
+        <thead><tr style="border-bottom:1px solid #ccc;">
+          <th style="text-align:left;">Descripción</th>
+          <th style="text-align:right;">Monto</th>
+          <th style="text-align:center;">Fecha</th>
+        </tr></thead><tbody>`;
+            r.common_expenses.forEach(g => {
+                html += `<tr>
+          <td>${g.description}</td>
+          <td style="text-align:right;">${fmt(g.amount)}</td>
+          <td style="text-align:center;">${g.date}</td>
+        </tr>`;
+            });
+            html += `</tbody></table>`;
+            div.innerHTML = html;
+        } else {
+            div.innerHTML = "<p style='color:#666;'>No hubo gastos comunes este mes.</p>";
+        }
+
+        // Mostrar badge
+        const badge = document.getElementById("badgeEstado");
+        badge.classList.remove("hidden");
+        badge.textContent = `Cálculo listo (${month} · ${document.getElementById("selConsorcio").selectedOptions[0].text})`;
+        badge.style.background = "#28a745";
+        badge.style.color = "#fff";
+
+        // Habilitar exportaciones
+        document.getElementById("btnExportPdf").disabled = false;
+        document.getElementById("btnExportXls").disabled = false;
+    }
 </script>
 {% endblock %}

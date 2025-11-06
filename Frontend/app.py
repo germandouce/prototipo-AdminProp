@@ -340,42 +340,37 @@ def registrar_pago(payment_id):
     else:
         return jsonify({"error": "Error desconocido"}), response.status_code
 
-@app.route("/rendiciones", methods=["GET", "POST"])
+@app.route("/consorcios_json", methods=["GET"])
+def consorcios_json():
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+    res = requests.get(f"{API_URL}/consortiums", cookies=cookies)
+    return jsonify(res.json()), res.status_code
+
+@app.route("/rendiciones", methods=["GET"])
 def rendiciones():
     login_check = require_login()
     if login_check:
         return login_check
 
-    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
-    # 1️⃣ Cargar consorcios igual que en /consorcios
-    response = requests.get(f"{API_URL}/consortiums", cookies=cookies)
-    consortiums = response.json().get("consortiums", []) if response.status_code == 200 else []
+    # Si la request pide datos (AJAX con parámetros)
+    consortium_id = request.args.get("consortium_id", type=int)
+    month = request.args.get("month")
 
-    # 2️⃣ Generar los últimos 12 meses
-    hoy = datetime.date.today()
-    periodos = [
-        f"{(hoy.month - i - 1) % 12 + 1:02d}/{hoy.year if hoy.month - i > 0 else hoy.year - 1}"
-        for i in range(12)
-    ]
+    # Si vienen parámetros, significa que el HTML pidió datos → respondemos JSON
+    if consortium_id and month:
+        # Normalizamos el formato del mes
+        if "/" in month:
+            mm, yyyy = month.split("/")
+            month = f"{yyyy}-{mm.zfill(2)}"
 
-    # 3️⃣ Si se presionó “Calcular rendición”, obtener resultados de la API
-    report = None
-    if request.method == "POST":
-        consortium_id = request.form.get("consortium_id")
-        periodo = request.form.get("periodo")
-        params = {"consortium_id": consortium_id, "month_of_year": periodo}
+        cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+        params = {"consortium_id": consortium_id, "month_of_year": month}
         resp = requests.get(f"{API_URL}/owners_reports", params=params, cookies=cookies)
-        if resp.status_code == 200:
-            report = resp.json().get("owner_report", {})
 
-    # 4️⃣ Enviar todo al template
-    return render_template(
-        "rendiciones.html",
-        active_page='rendiciones',
-        consortiums=consortiums,
-        periodos=periodos,
-        report=report
-    )
+        return jsonify(resp.json()), resp.status_code
+
+    # Si no hay parámetros → render normal de la página HTML vacía
+    return render_template("rendiciones.html", active_page="rendiciones")
 
 
 @app.route("/comisiones")
