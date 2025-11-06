@@ -6,6 +6,19 @@
     <script src="{{ url_for('static', filename='js/cambio_periodo_expensas.js') }}"></script>
 {% endblock %}
 {% block content %}
+
+        <div id="flash-messages-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        </div>
+
         <div id="address">
             <h1 id="direccion-complejo">{{ address }}</h1>
         </div>
@@ -84,7 +97,6 @@
                             <!-- <button id="add-expense-unit-btn">+ Agregar gasto</button> -->
                         </div>
                     </caption>
-
                     <thead>
                         <tr role="row">
                             <th scope="col">Fecha</th>

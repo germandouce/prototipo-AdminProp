@@ -174,11 +174,11 @@ def get_administration_fee():
         return {"error": "month_of_year must be in format YYYY-MM"}, 400
 
     query = """
-        SELECT COALESCE(SUM(d.amount),0) AS total_debts, c.address, c.admin_comission
-        FROM debts d
-        JOIN consortiums c ON d.consortium = c.id
+        SELECT COALESCE(SUM(p.amount),0) AS total_payments, c.address, c.admin_commission
+        FROM payments p
+        JOIN consortiums c ON p.consortium = c.id
         WHERE DATE_FORMAT(date, '%Y-%m') = :month_of_year
-        GROUP BY c.id, c.address, c.admin_comission
+        GROUP BY c.id, c.address, c.admin_commission
     """
 
     params = {"month_of_year": month_of_year}
@@ -195,9 +195,9 @@ def get_administration_fee():
     details = []
     total_administration_fee = 0
     for row in rows:
-        row_admin_commission = float(row.admin_comission)
-        row_total_income = float(row.total_debts)
-        row_admin_fee = row_total_income * row_admin_commission
+        row_admin_commission = float(row.admin_commission)
+        row_total_income = float(row.total_payments)
+        row_admin_fee = row_total_income * (row_admin_commission/100)
         total_administration_fee += row_admin_fee
         details.append({
             "consortium_address": row.address,
@@ -206,13 +206,13 @@ def get_administration_fee():
             "administration_fee": row_admin_fee,
         })
 
-    administration_fee = {
+    response = {
         "month_of_year": month_of_year,
         "total_administration_fee": total_administration_fee,
         "details": details,
     }
 
-    return jsonify({"administration_fee": administration_fee}), 200
+    return response, 200
 
 @app.route("/users/register", methods=["POST"])
 def post_register():

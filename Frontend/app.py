@@ -46,7 +46,16 @@ def inicio():
     else:
         error_msg = response.json().get("error", "Error desconocido")
         return render_template("login.html", error=error_msg)
-    return render_template("inicio.html", active_page='inicio', name=name, surname=surname, total_debts=total_debts)
+
+    date = datetime.datetime.now()
+    year_month = date.strftime('%Y-%m')
+    response = requests.get(f"{API_URL}/administration_fee", params={"month_of_year":year_month}, cookies=cookies)
+    if response.status_code == 200:
+        administration_income = response.json().get("total_administration_fee", 0)
+    else:
+        error_msg = response.json().get("error", "Error desconocido")
+        return render_template("login.html", error=error_msg)
+    return render_template("inicio.html", active_page='inicio', name=name, surname=surname, total_debts=total_debts, administration_income=administration_income)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

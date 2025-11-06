@@ -126,3 +126,14 @@ tbody tr:hover {
     justify-content: flex-end;
     gap: 10px;
 }
+
+#flash-messages-container {
+    position: fixed;   /* Se queda fijo en la pantalla aunque hagas scroll */
+    top: 20px;         /* 20px desde arriba */
+    right: 20px;       /* 20px desde la derecha */
+    width: 350px;      /* Un ancho máximo para que no ocupe toda la pantalla */
+    z-index: 1050;     /* Un z-index alto para que aparezca sobre otros elementos */
+    display: flex;
+    flex-direction: column; /* Apila las alertas verticalmente */
+    gap: 10px;         /* Espacio entre alertas, si hay más de una */
+}
