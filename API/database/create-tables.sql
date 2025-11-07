@@ -41,6 +41,15 @@ CREATE TABLE IF NOT EXISTS common_expenses (
     FOREIGN KEY (consortium) REFERENCES consortiums(id)
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS common_expenses_record (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(100) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    date DATE NOT NULL,
+    consortium INT NOT NULL,
+    FOREIGN KEY (consortium) REFERENCES consortiums(id)
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS debts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     functional_unit INT NOT NULL,
@@ -175,6 +184,16 @@ BEGIN
         -- Evitar división por cero si la superficie del consorcio es 0
         c.surface > 0;
 
+    INSERT INTO common_expenses_record (description, amount, date, consortium)
+    SELECT
+        description,
+        amount,
+        date,
+        consortium
+    FROM
+        common_expenses;
+
+    DELETE FROM common_expenses;
 END
 //
 
