@@ -171,4 +171,44 @@
         document.getElementById("btnExportXls").disabled = false;
     }
 </script>
+<script>
+    document.getElementById("btnExportPdf").addEventListener("click", () => {
+        const periodo = document.getElementById("selPeriodo").value;
+        const consorcio = document.getElementById("selConsorcio").selectedOptions[0]?.text || "—";
+        const saldo = document.getElementById("saldo_neto").textContent;
+
+        // Crear contenido de vista previa
+        const previewHTML = `
+    <h3>Vista previa de Rendición</h3>
+    <p><b>Período:</b> ${periodo}</p>
+    <p><b>Consorcio:</b> ${consorcio}</p>
+    <p><b>Saldo Neto:</b> ${saldo}</p>
+    <p>🧾 Aquí iría la exportación real a PDF...</p>
+  `;
+
+        // Mostrar modal improvisado
+        const modal = document.createElement("div");
+        modal.style.position = "fixed";
+        modal.style.top = "0";
+        modal.style.left = "0";
+        modal.style.width = "100%";
+        modal.style.height = "100%";
+        modal.style.background = "rgba(0,0,0,0.6)";
+        modal.style.display = "flex";
+        modal.style.alignItems = "center";
+        modal.style.justifyContent = "center";
+        modal.innerHTML = `
+    <div style="background:white;padding:2rem;border-radius:10px;max-width:400px;">
+      ${previewHTML}
+      <div style="text-align:right;margin-top:1rem;">
+        <button id="cerrarModal">Cerrar</button>
+      </div>
+    </div>
+  `;
+        document.body.appendChild(modal);
+
+        document.getElementById("cerrarModal").onclick = () => modal.remove();
+    });
+</script>
+
 {% endblock %}
