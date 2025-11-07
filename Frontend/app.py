@@ -352,7 +352,64 @@ def comisiones():
     login_check = require_login()
     if login_check:
         return login_check
-    return render_template("comisiones.html", active_page='comisiones')
+
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+    periodo = request.args.get("periodo")
+    consorcio_id = request.args.get("consorcio_id", type=int)
+
+    # Obtener consorcios del usuario
+    response = requests.get(f"{API_URL}/consortiums", cookies=cookies)
+    all_consortiums = response.json().get("consortiums", []) if response.status_code == 200 else []
+
+    # Filtrar consorcio si se seleccionó uno
+    if consorcio_id:
+        consortiums = [c for c in all_consortiums if c["id"] == consorcio_id]
+    else:
+        consortiums = all_consortiums
+
+    # Obtener unidades funcionales para cada consorcio
+    for consortium in consortiums:
+        uf_response = requests.get(
+            f"{API_URL}/functional_units",
+            params={"consortium_id": consortium["id"], "period": periodo},
+            cookies=cookies
+        )
+        consortium["units"] = uf_response.json().get("functional_units", []) if uf_response.status_code == 200 else []
+
+    selected_consortium = next((c for c in all_consortiums if c["id"] == consorcio_id), None)
+
+    # Obtener unidades solo del consorcio seleccionado
+    if selected_consortium:
+        uf_response = requests.get(
+            f"{API_URL}/functional_units",
+            params={"consortium_id": selected_consortium["id"], "period": periodo},
+            cookies=cookies
+        )
+        selected_consortium["units"] = uf_response.json().get("functional_units", []) if uf_response.status_code == 200 else []
+
+
+    return render_template("comisiones.html", active_page='comisiones', consortiums=consortiums)
+
+
+@app.route("/consortiums/<int:consortium_id>", methods=["PATCH"])
+def patch_consortium(consortium_id):
+    login_check = require_login()
+    if login_check:
+        return login_check
+
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+    data = request.get_json()
+
+    response = requests.patch(
+        f"{API_URL}/consortiums/{consortium_id}",
+        json=data,
+        cookies=cookies
+    )
+
+    return jsonify(response.json()), response.status_code
+
+
+
 
 @app.route("/configuracion")
 def configuracion():

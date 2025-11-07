@@ -53,3 +53,44 @@ details.tablebox table {width:100%}
 .modal header {display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 
 .modal footer {display:flex;justify-content:flex-end;gap:.5rem;margin-top:12px}
+
+
+
+.comision_total {
+    font-size: large;
+    font-weight:600;
+}
+
+
+
+
+table, tr, td, thead, th{
+    border: none !important;
+}
+
+.table-wrap {
+    width: 60%;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0 0.2em;
+}
+
+
+#gastos-comunes-table-caption {
+    margin-top: 2.5em;
+}
+
+tbody tr {
+    background-color: #e3e3e3;
+    transition: filter 0.2s ease;
+    td:first-child {
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+    td:last-child {
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+}

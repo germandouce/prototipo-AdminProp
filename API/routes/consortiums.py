@@ -15,7 +15,7 @@ def get_consortiums():
             FROM consortiums c
                      LEFT JOIN functional_units f ON f.consortium = c.id
             WHERE c.user_id = :user_id
-            GROUP BY c.id, c.address
+            GROUP BY c.id, c.address, c.admin_commission
             """
     try:
         with engine.connect() as conn:
@@ -27,7 +27,7 @@ def get_consortiums():
         return {"error": str(err)}, 500
 
     consortiums = [
-        {"id": row["id"], "address": row["address"], "ufs_amount": int(row["ufs_amount"] or 0)}
+        {"id": row["id"], "address": row["address"], "ufs_amount": int(row["ufs_amount"] or 0),"admin_commission": int(row["admin_commission"])}
         for row in rows
     ]
     return jsonify({"consortiums": consortiums}), 200
@@ -142,8 +142,9 @@ def post_consortiums():
 def patch_consortiums(id):
     user_id = int(get_jwt_identity())
     data = request.get_json()
-    optional_data = ["address", "surface"]
-    received_data = {key: data.get(key) for key in optional_data if key in data}
+    optional_data = ["address", "surface", "admin_commission"]
+    received_data = {key: data[key] for key in optional_data if key in data}
+
     if not received_data:
         return {"error": "No fields to update"}, 400
     
@@ -167,4 +168,4 @@ def patch_consortiums(id):
             print(f"DB_ERROR: {err}")
         return {"error": str(err)}, 500
 
-    return {"message": "updated consortium"}, 200
+    return jsonify({"msg": "Comisión actualizada correctamente"}), 200

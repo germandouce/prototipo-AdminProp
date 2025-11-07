@@ -27,7 +27,7 @@ services:
 
   mysql:
     build: ./API/database/
-    restart: always
+    restart: always    
     environment:
         MYSQL_ROOT_PASSWORD: 'pass'
         MYSQL_DATABASE: 'adminprop'
