@@ -21,6 +21,7 @@ from routes.consortiums import consortiums_bp
 from routes.functional_units import functional_units_bp
 from routes.debts import debts_bp
 from routes.expenses import expenses_bp
+from routes.expenses_record import expenses_record_bp
 from routes.clients import clients_bp
 from database import engine, DEBUG
 from flask import redirect
@@ -58,6 +59,7 @@ app.register_blueprint(consortiums_bp)
 app.register_blueprint(functional_units_bp)
 app.register_blueprint(debts_bp)
 app.register_blueprint(expenses_bp)
+app.register_blueprint(expenses_record_bp)
 app.register_blueprint(clients_bp, url_prefix='/api')
 
 
