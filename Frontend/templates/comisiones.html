@@ -4,21 +4,40 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/comisiones_styles.css') }}" />
 {% endblock %}
 {% block content %}
+
+
     <section class="page active">
         <h1>Gestión de comisión del administrador</h1>
+
+
+        {% set ns_consorcio_elegido = namespace(consorcio_elegido='no se ha seleccionado el consorcio') %}
+        {% if selected_consortium %}
+            {% set ns_consorcio_elegido.consorcio_elegido = selected_consortium.address %}
+        {% endif %}
+
 
         <!-- Filtros (un solo Calcular) -->
         <div class="form-row" style="margin-bottom:.5rem;">
             <label>Mes/Año
                 <select id="selPeriodo">
-                    <option>09/2025</option><option>08/2025</option><option>07/2025</option>
+                    <option>2025-09</option>
+                    <option>2025-08</option>
+                    <option>2025-07</option>
                 </select>
             </label>
             <label>Propiedad/Consorcio
                 <select id="selAmbito">
-                    <option>Edificio San Martín 1234</option>
-                    <option>Casa Av. Belgrano 456</option>
+                    {% for consortium in consortiums %}
+                        <option value="{{ consortium.id }}"
+                            {% if selected_consortium and consortium.id == selected_consortium.id %}selected{% endif %}>
+                            Dirección: {{ consortium.address }}
+                        </option>
+                        {% endfor %}
+                        
                 </select>
+
+
+
             </label>
             <button id="btnCalcular" class="btn-primary">Calcular</button>
         </div>
@@ -26,18 +45,6 @@
         <!-- Banner de estado (verde) -->
         <div id="status" class="status">Cálculo listo.</div>
 
-        <!-- Configuración (simple, sin botón duplicado) -->
-        <fieldset style="margin:.5rem 0 0;">
-            <legend>Configuración</legend>
-            <div class="form-row">
-                <label>% Comisión:
-                    <input id="inpPct" type="number" value="5" min="0" max="100" style="width:80px;" /> %
-                </label>
-                <label><input type="radio" name="base" value="bruto" checked> Ingresos brutos</label>
-                <label><input type="radio" name="base" value="neto"> Ingresos netos</label>
-            </div>
-            <label><input id="chkExcl" type="checkbox"> Excluir si admin = propietario</label>
-        </fieldset>
 
         <!-- Resumen (como en propietarios) -->
         <div id="kpiWrap" class="kpis" style="display:none">
@@ -49,7 +56,7 @@
         <!-- Detalle colapsable -->
         <details id="detTabla" class="tablebox" open>
             <summary>Ver/ocultar detalle por unidad</summary>
-            <table id="tbl">
+            <table id="tbl" >
                 <thead>
                 <tr>
                     <th>Propiedad / Unidad</th>
@@ -60,28 +67,90 @@
                     <th>Estado</th>
                 </tr>
                 </thead>
+
+
                 <tbody>
-                <tr>
-                    <td>Dpto 1 - Piso 1</td><td>Juan P.</td><td>100000</td><td>5</td><td>5000</td><td>Incl.</td>
-                </tr>
-                <tr>
-                    <td>Dpto 2 - Piso 1</td><td>Ana G.</td><td>120000</td><td>5</td><td>6000</td><td>Incl.</td>
-                </tr>
-                <tr>
-                    <td>Dpto 3 - Piso 2</td><td>Vacío</td><td>0</td><td>-</td><td>-</td><td>Excl.</td>
-                </tr>
+
+                    {% set ns_comi = namespace(total_comi=0) %}
+
+                    {% for consortium in consortiums %}
+                        {% for unit in consortium.units %}
+                            {% set comi = (unit.rent_value or 0) * (consortium.admin_commission or 0) / 100 %}
+                            {% set ns_comi.total_comi = ns_comi.total_comi + comi %}
+                            <tr>
+                                <td>{{ consortium.address }} - {{ unit.unit_name }}</td>    
+                                <td>{{ unit.tenant if unit.tenant else "Vacío" }}</td>      
+                                <td>{{ unit.rent_value if unit.rent_value else 0 }}</td>    
+                                <td>{{ consortium.admin_commission }}</td>                    
+                                <td>{{ comi }}</td>   
+                                <td>{{ "Incl." if unit.tenant else "Excl." }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+
+  
                 </tbody>
+
+
+                
             </table>
-            <p id="totales" style="margin-top:.4rem;">Totales: 10 incl. | 2 excl. | Comisión total: $55.000</p>
+           
+                
+        <p id="totales" style="margin-top:.4rem;">
+                    
+            {% if selected_consortium %}
+                {% set total_ufs = selected_consortium.units|length if selected_consortium else 0 %}
+
+                Totales: {{ total_ufs }} unidades | 0 excl. | Comisión total: {{ ns_comi.total_comi }}
+        
+            {% else %}
+            
+                {% set total_ufs = selected_consortium.units|length if selected_consortium else 0 %}
+
+
+                {% set ns_total_ufs = namespace(total_ufs=0) %}
+                {% for consortium in consortiums %}
+
+                    {% for unit in consortium.units %}
+                        {% if unit.tenant %}
+                            {% set ns_total_ufs.total_ufs = ns_total_ufs.total_ufs + 1 %}
+                        {% endif %}
+                    {% endfor %}
+
+                {% endfor %}
+
+
+                Totales: {{ns_total_ufs.total_ufs}} unidades | 0 excl. 
+                <br>
+                <p class="comision_total">
+                    Comisión total: {{ns_comi.total_comi}}
+                </p>
+            {% endif %}
+
+        </p>
+
+
         </details>
 
-        <!-- Acciones finales -->
+        <div id="formularioParametros" style="display:none; margin-top:1rem;">
+            <form id="formParametros">
+                <label for="valorInput">Actualizar porcentaje de comisión:</label>
+                <input type="number" id="valorInput" name="valorInput" placeholder="Ingrese el nuevo porcentaje de comisión" required />
+                <button type="submit" class="btn-primary">Actualizar</button>
+            </form>
+        </div>
+
+
+        <!-- Acciones finales
         <div class="actions">
             <button id="btnAplicar" class="btn-primary" disabled>Aplicar a rendición</button>
             <button id="btnExportar" class="btn-secondary" disabled>Exportar</button>
-        </div>
+        </div> -->
     </section>
 {% endblock %}
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/comisiones_toast&modal.js') }}"></script>
 {% endblock %}
+
+
+

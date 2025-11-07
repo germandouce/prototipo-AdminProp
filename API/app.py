@@ -137,10 +137,10 @@ def get_owners_reports():
             consortium_address = addr_row.address if addr_row else None
 
             admin_commission_row = conn.execute(
-                text("SELECT admin_comission FROM consortiums WHERE id = :id"),
+                text("SELECT admin_commission FROM consortiums WHERE id = :id"),
                 {"id": consortium_id}
             ).fetchone()
-            admin_commission = float(admin_commission_row.admin_comission) if admin_commission_row else 0.0
+            admin_commission = float(admin_commission_row.admin_commission) if admin_commission_row else 0.0
     except SQLAlchemyError as err:
         if DEBUG:
             print(f"DB_ERROR: {err}")
@@ -221,6 +221,7 @@ def post_register():
     surname = data.get("surname")
     email = data.get("email")
     password = generate_password_hash(data.get("password"), method="pbkdf2:sha256")
+    print(password)
 
     if not all([name, surname, email, password]):
         return {"error": "Faltan datos requeridos"}, 400

@@ -44,21 +44,118 @@ function refrescarKPI(){
 }
 
 // CALCULAR
+// $('#btnCalcular').addEventListener('click', ()=>{
+//     // feedback de avance
+//     const periodo = $('#selPeriodo').value, amb = $('#selAmbito').value;
+//     $('#status').textContent = `Cálculo listo para ${periodo} · ${amb}`;
+//     $('#status').classList.add('active');
+
+//     // mostrar KPIs, habilitar acciones
+//     $('#kpiWrap').style.display='grid';
+//     $('#btnAplicar').disabled=false;
+//     $('#btnExportar').disabled=false;
+
+//     // recalcular KPIs (usando la tabla actual como demo)
+//     refrescarKPI();
+//     showToast('Comisiones calculadas');
+// });
+
 $('#btnCalcular').addEventListener('click', ()=>{
-    // feedback de avance
-    const periodo = $('#selPeriodo').value, amb = $('#selAmbito').value;
-    $('#status').textContent = `Cálculo listo para ${periodo} · ${amb}`;
-    $('#status').classList.add('active');
+    const periodo = $('#selPeriodo').value;
+    const consorcioId = $('#selAmbito').value;
 
-    // mostrar KPIs, habilitar acciones
-    $('#kpiWrap').style.display='grid';
-    $('#btnAplicar').disabled=false;
-    $('#btnExportar').disabled=false;
-
-    // recalcular KPIs (usando la tabla actual como demo)
-    refrescarKPI();
-    showToast('Comisiones calculadas');
+    window.location.href = `/comisiones?periodo=${periodo}&consorcio_id=${consorcioId}`;
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const formDiv = document.getElementById("formularioParametros");
+
+  if (formDiv && params.toString()) {
+    formDiv.style.display = "block";
+  }
+
+  const form = document.getElementById("formParametros");
+  if (form) {
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const valor = document.getElementById("valorInput").value;
+      const select = document.getElementById("selAmbito");
+      const consortiumId = select ? select.value : null;
+
+      if (!consortiumId) {
+        Swal.fire({
+          title: "Error",
+          text: "Debe seleccionar un consorcio antes de actualizar.",
+          icon: "error"
+        });
+        return;
+      }
+
+      const parsedValor = parseFloat(valor);
+      if (isNaN(parsedValor)) {
+        Swal.fire({
+          title: "Valor inválido",
+          text: "Ingrese un valor numérico válido para la comisión.",
+          icon: "warning"
+        });
+        return;
+      }
+
+      Swal.fire({
+        title: "¿Desea actualizar la comisión?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí, actualizar",
+        cancelButtonText: "Cancelar"
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch(`/consortiums/${consortiumId}`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ admin_commission: parsedValor })
+            });
+
+            if (response.ok) {
+              Swal.fire({
+                title: "Comisión actualizada",
+                icon: "success"
+              }).then(() => { 
+                window.location.href = "/comisiones";
+              });
+            } else {
+              let errorData;
+              try {
+                errorData = await response.json();
+              } catch {
+                errorData = { error: await response.text() };
+              }
+
+              Swal.fire({
+                title: "Error",
+                text: errorData.error || "No se pudo actualizar la comisión.",
+                icon: "error"
+              });
+            }
+          } catch (err) {
+            console.error("Error en la solicitud PATCH:", err);
+            Swal.fire({
+              title: "Error de red",
+              text: "No se pudo conectar con el servidor.",
+              icon: "error"
+            });
+          }
+        }
+      });
+    });
+  }
+});
+
 
 // APLICAR A RENDICIÓN
 $('#btnAplicar').addEventListener('click', ()=>{
