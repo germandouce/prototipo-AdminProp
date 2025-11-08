@@ -136,7 +136,7 @@ def owners_reports():
         # ---- Gastos del mes ----
         query_outcomes = """
                          SELECT COALESCE(SUM(amount), 0) AS total_outcomes
-                         FROM common_expenses
+                         FROM common_expenses_record
                          WHERE consortium = :consortium_id
                            AND DATE_FORMAT(date, '%Y-%m') = :month_of_year \
                          """
@@ -144,7 +144,7 @@ def owners_reports():
         # ---- Detalle de gastos comunes ----
         query_expenses_list = """
                               SELECT description, amount, date
-                              FROM common_expenses
+                              FROM common_expenses_record
                               WHERE consortium = :consortium_id
                                 AND DATE_FORMAT(date, '%Y-%m') = :month_of_year \
                               """
