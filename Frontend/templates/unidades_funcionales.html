@@ -2,8 +2,6 @@
 {% block title %}Unidades funcionales - AdminProp{% endblock %}
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ufs_style.css') }}">
-    <script src="{{ url_for('static', filename='js/agregar_unidad.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/cambio_periodo_expensas.js') }}"></script>
 {% endblock %}
 {% block content %}
 
@@ -18,36 +16,103 @@
           {% endif %}
         {% endwith %}
         </div>
+        <div id="main-panels">
+            <div id="left-main-panel">
+                <div id="address">
+                    <h1 id="direccion-complejo">{{ address }}</h1>
+                    <button><i class="fa-solid fa-pen-to-square"></i></button>
+                </div>
+                <section id="unidades-funcionales" class="page active">
+                    <div class="table-wrap" class="container">
+                        <table role="table" aria-describedby="tabla-ayuda">
+                            <caption id="units-table-caption">
+                                <div>
+                                    <div>Unidades</div>
+                                    <button id="add-unit-btn">+ Agregar unidad</button>
+                                </div>
+                            </caption>
 
-        <div id="address">
-            <h1 id="direccion-complejo">{{ address }}</h1>
-        </div>
-        <section id="unidades-funcionales" class="page active">
-            <div class="table-wrap" class="container">
-                <table role="table" aria-describedby="tabla-ayuda">
-                    <caption id="units-table-caption">
-                        <div>
-                            <div>Unidades</div>
-                            <button id="add-unit-btn">+ Agregar unidad</button>
-                        </div>
-                    </caption>
+                            <thead>
+                                <tr role="row">
+                                    <th scope="col">Unidad</th>
+                                    <th scope="col">Inquilino</th>
+                                    <th scope="col">Alquiler</th>
+                                    <th scope="col">Estado de pago</th>
+                                </tr>
+                            </thead>
+                            <tbody class="unidades-container">
+                                {% for unit in units %}
+                                    {% include "_components/_unidad_funcional_tr.html" %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
 
-                    <thead>
-                        <tr role="row">
-                            <th scope="col">Unidad</th>
-                            <th scope="col">Inquilino</th>
-                            <th scope="col">Alquiler</th>
-                            <th scope="col">Estado de pago</th>
-                        </tr>
-                    </thead>
-                    <tbody class="unidades-container">
-                        {% for unit in units %}
-                            {% include "_components/_unidad_funcional_tr.html" %}
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <section id="gastos-comunes" class="page active">
+                    <div class="table-wrap">
+                        <table role="table" aria-describedby="tabla-ayuda" id="tabla-expensas">
+                            <caption id="gastos-comunes-table-caption">
+                                <div class="titulo-tabla-y-boton">
+                                    <div>Gastos comunes</div>
+                                    <!-- Button to trigger the modal -->
+                                    <button id="add-expense-btn">Agregar Gasto Común</button>
+                                    <!-- <button id="add-expense-unit-btn">+ Agregar gasto</button> -->
+                                </div>
+                            </caption>
+                            <thead>
+                                <tr role="row">
+                                    <th scope="col">Fecha</th>
+                                    <th scope="col">Detalle</th>
+                                    <th scope="col">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if DEBUG %}
+                                    <tr>
+                                        <td colspan="3">
+                                            <pre>{{ common_expenses | tojson }}</pre> <!-- Debug: Display raw data -->
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                {% for expense in common_expenses %}
+                                    <tr>
+                                        <td data-label="Fecha">{{ expense.date }}</td>
+                                        <td data-label="Detalle">{{ expense.description }}</td>
+                                        <td data-label="Monto">${{ expense.amount }}</td>
+                                    </tr>
+                                {% endfor %}
+                                {% if common_expenses|length == 0 %}
+                                    <tr>
+                                        <td colspan="3" style="text-align: center;">No hay gastos comunes registrados.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
             </div>
-        </section>
+
+            <div id="right-main-panel">
+                <section id="consortium-info">
+                    <div class="container">
+                        <h2>Información</h2>
+                        <div class="row">
+                            <p><b>Propietario: </b>{{ consortium_info.owner_name }}</p>
+                        </div>
+                        <div class="row">
+                            <p><b>Superficie total: </b>{{ consortium_info.surface }} m²</p>
+                        </div>
+                        {% if consortium_info.admin_commission %}
+                        <div class="row">
+                            <p><b>Comisión de admin.: </b>{{ consortium_info.admin_commission }}%</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+            </div>
+        </div>
+
         <section id="formulario-agregar-unidad">
             <!-- Modal oculto por defecto -->
             <div id="modal-overlay" class="modal-overlay" style="display: none;">
@@ -72,60 +137,6 @@
                         </div>
                     </form>
                 </div>
-            </div>
-
-        </section>
-        <section id="gastos-comunes" class="page active">
-            <div class="table-wrap">
-                <table role="table" aria-describedby="tabla-ayuda" id="tabla-expensas">
-                    <caption id="gastos-comunes-table-caption">
-                        <div class="titulo-tabla-y-boton">
-                            <div>Gastos comunes</div>
-                            <!-- Button to trigger the modal -->
-                            <button id="add-expense-btn">Agregar Gasto Común</button>
-
-                            <script>
-                                // JavaScript to handle modal visibility
-                                document.getElementById("add-expense-btn").addEventListener("click", function () {
-                                    document.getElementById("modal-overlay-expenses").style.display = "block";
-                                });
-
-                                document.getElementById("cancel-expense-btn").addEventListener("click", function () {
-                                    document.getElementById("modal-overlay-expenses").style.display = "none";
-                                });
-                            </script>
-                            <!-- <button id="add-expense-unit-btn">+ Agregar gasto</button> -->
-                        </div>
-                    </caption>
-                    <thead>
-                        <tr role="row">
-                            <th scope="col">Fecha</th>
-                            <th scope="col">Detalle</th>
-                            <th scope="col">Monto</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if DEBUG %}
-                            <tr>
-                                <td colspan="3">
-                                    <pre>{{ common_expenses | tojson }}</pre> <!-- Debug: Display raw data -->
-                                </td>
-                            </tr>
-                        {% endif %}
-                        {% for expense in common_expenses %}
-                            <tr>
-                                <td data-label="Fecha">{{ expense.date }}</td>
-                                <td data-label="Detalle">{{ expense.description }}</td>
-                                <td data-label="Monto">${{ expense.amount }}</td>
-                            </tr>
-                        {% endfor %}
-                        {% if common_expenses|length == 0 %}
-                            <tr>
-                                <td colspan="3" style="text-align: center;">No hay gastos comunes registrados.</td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
             </div>
         </section>
 
@@ -155,22 +166,9 @@
                 </div>
             </div>
         </section>
-
-        <!-- Button to trigger the modal -->
-        <!-- <button id="add-expense-btn">Agregar Gasto Común</button>
-
-        <script>
-            // JavaScript to handle modal visibility
-            document.getElementById("add-expense-btn").addEventListener("click", function () {
-                document.getElementById("modal-overlay-expenses").style.display = "block";
-            });
-
-            document.getElementById("cancel-expense-btn").addEventListener("click", function () {
-                document.getElementById("modal-overlay-expenses").style.display = "none";
-            });
-        </script> -->
 {% endblock %}
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/agregar_unidad.js') }}"></script>
-<!--<script src="{{ url_for('static', filename='js/cambio_periodo_expensas.js') }}"></script>-->
+<script src="{{ url_for('static', filename='js/flash_vanish.js') }}"></script>
+<script src="{{ url_for('static', filename='js/formulario_nuevo_gasto.js') }}"></script>
 {% endblock %}

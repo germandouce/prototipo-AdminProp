@@ -7,14 +7,112 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        .comparativa-table { width: 100%; border-collapse: collapse; margin: 2em 0; }
-        .comparativa-table th, .comparativa-table td { border: 1px solid #ccc; padding: 1em; text-align: center; }
-        .comparativa-table th { background: #f5f5f5; }
-        .premium { color: #ffd700; font-weight: bold; }
-        .check { color: green; }
-        .cross { color: red; }
-        .suscribirse-btn { background: #ffd700; color: #333; padding: 1em 2em; border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; }
+        body {
+            background: #f5f7fa;
+            color: #222;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        main.container {
+            max-width: 800px;
+            margin: 40px auto 0 auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 6px 32px rgba(30, 55, 120, 0.10);
+            padding: 2.5em 2em 2em 2em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h2 {
+            margin-bottom: 1.5em;
+            font-size: 2em;
+            text-align: center;
+        }
+        .comparativa-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 2em;
+            background: #f9fafb;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(30, 55, 120, 0.07);
+        }
+        .comparativa-table th, .comparativa-table td {
+            padding: 1.2em 1em;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        .comparativa-table th {
+            background: #e3eafc;
+            color: #1a237e;
+            font-size: 1.15em;
+            border-bottom: 2px solid #c7d2fe;
+        }
+        .comparativa-table td {
+            background: #fff;
+            border-bottom: 1px solid #e3eafc;
+        }
+        .comparativa-table tr:last-child td {
+            border-bottom: none;
+        }
+        .comparativa-table td.premium-col, .comparativa-table th.premium {
+            background: #fffbe6;
+            color: #bfa100;
+            border-left: 2px solid #ffe066;
+            font-weight: bold;
+        }
+        .comparativa-table th.premium {
+            background: #fff3bf;
+            color: #bfa100;
+            border-left: 2px solid #ffe066;
+        }
+        .comparativa-table td.gratis-col, .comparativa-table th.gratis {
+            background: #e3fcec;
+            color: #1b5e20;
+            font-weight: bold;
+        }
+        .comparativa-table th.gratis {
+            background: #c8f7e5;
+            color: #1b5e20;
+        }
+        .comparativa-table td:first-child, .comparativa-table th:first-child {
+            background: #f5f7fa;
+            color: #222;
+            font-weight: 500;
+            text-align: left;
+            border-left: none;
+        }
+        .check {
+            color: #14a76c;
+            font-size: 1.4em;
+        }
+        .cross {
+            color: #d64545;
+            font-size: 1.4em;
+        }
+        .suscribirse-btn {
+            background: linear-gradient(90deg, #ffd700 60%, #fffbe6 100%);
+            color: #333;
+            padding: 1em 2.5em;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.10);
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .suscribirse-btn:hover {
+            background: linear-gradient(90deg, #ffe066 60%, #fffbe6 100%);
+            transform: scale(1.04);
+        }
+        @media (max-width: 700px) {
+            main.container { padding: 1em 0.5em; }
+            .comparativa-table th, .comparativa-table td { padding: 0.7em 0.3em; font-size: 1em; }
+        }
     </style>
+
 </head>
 <body>
 <header class="top-bar">

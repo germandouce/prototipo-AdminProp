@@ -176,6 +176,16 @@ def unidades_funcionales(consortium_id):
     response = requests.get(f"{API_URL}/functional_units", params={"consortium_id": consortium_id}, cookies=cookies).json()
     functional_units = response.get("functional_units", [])
     address = response.get("address", "Dirección")
+    for functional_unit in functional_units:
+        if functional_unit["tenant"]:
+            functional_unit["debt_state"] = "paid"
+            response_debt = requests.get(f"{API_URL}/functional_units/debt", params={"unit_id": functional_unit["id"], "tenant": functional_unit["tenant"]}, cookies=cookies).json()
+            debt = response_debt.get("total_debt")
+            if float(debt) > 0:
+                functional_unit["debt_state"] = "pending"
+
+    consortium_info_response = requests.get(f"{API_URL}/consortium", params={"consortium_id": consortium_id}, cookies=cookies)
+    consortium_info = consortium_info_response.json()
 
     response = requests.get(f"{API_URL}/expenses", params={"consortium_id": consortium_id}, cookies=cookies)
     common_expenses = []
@@ -188,6 +198,7 @@ def unidades_funcionales(consortium_id):
         units=functional_units,
         consortium_id=consortium_id,
         address=address,
+        consortium_info=consortium_info,
         common_expenses=common_expenses
     )
 

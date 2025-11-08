@@ -15,6 +15,19 @@
     /*--radius: 14px;*/
 }
 
+#address {
+    display: flex;
+    justify-content: space-between;
+}
+
+#main-panels {
+    display: flex;
+    justify-content: space-between;
+    .container {
+        height: initial;
+    }
+}
+
 #unidades-funcionales {
     display: flex;
 }
@@ -23,8 +36,12 @@ table, tr, td, thead, th{
     border: none !important;
 }
 
+#left-main-panel {
+    width: 60%
+}
+
 .table-wrap {
-    width: 60%;
+    width: 100%;
 }
 
 table {
@@ -88,9 +105,35 @@ tbody tr:hover {
     display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 12px; letter-spacing: .02em;
     padding: 8px 10px; border-radius: 999px; border: 1px solid transparent;
     }
-    .status.paid { background: color-mix(in oklab, var(--success) 14%, var(--chip)); color: color-mix(in oklab, var(--success) 85%, var(--text)); border-color: color-mix(in oklab, var(--success) 35%, var(--border)); }
-    .status.pending { background: color-mix(in oklab, var(--warning) 14%, var(--chip)); color: color-mix(in oklab, var(--warning) 85%, var(--text)); border-color: color-mix(in oklab, var(--warning) 35%, var(--border)); }
-    .status.late { background: color-mix(in oklab, var(--danger) 14%, var(--chip)); color: color-mix(in oklab, var(--danger) 90%, var(--text)); border-color: color-mix(in oklab, var(--danger) 35%, var(--border)); }
+
+.status.paid {
+    background: color-mix(in oklab, var(--success) 14%, var(--chip));
+    color: color-mix(in oklab, var(--success) 85%, var(--text));
+    border-color: color-mix(in oklab, var(--success) 35%, var(--border));
+}
+
+.status.pending {
+    background: color-mix(in oklab, var(--warning) 14%, var(--chip));
+    color: color-mix(in oklab, var(--warning) 85%, var(--text));
+    border-color: color-mix(in oklab, var(--warning) 35%, var(--border));
+}
+
+.status.late {
+    background: color-mix(in oklab, var(--danger) 14%, var(--chip));
+    color: color-mix(in oklab, var(--danger) 90%, var(--text));
+    border-color: color-mix(in oklab, var(--danger) 35%, var(--border));
+}
+
+#right-main-panel {
+    padding: 0 2%;
+    background: #e3e3e3;
+    border-radius: 10px;
+    width: 20%;
+    #consortium-info .container {
+        display: flex;
+        flex-direction: column;
+    }
+}
 
 .modal-overlay {
     position: fixed;
