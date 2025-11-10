@@ -73,7 +73,7 @@
 
                     {% set ns_comi = namespace(total_comi=0) %}
 
-                    {% for consortium in consortiums %}
+                    {% for consortium in consortiums_for_table %}
                         {% for unit in consortium.units %}
                             {% set comi = (unit.rent_value or 0) * (consortium.admin_commission or 0) / 100 %}
                             {% set ns_comi.total_comi = ns_comi.total_comi + comi %}
@@ -109,7 +109,7 @@
 
 
                 {% set ns_total_ufs = namespace(total_ufs=0) %}
-                {% for consortium in consortiums %}
+                {% for consortium in consortiums_for_table %}
 
                     {% for unit in consortium.units %}
                         {% if unit.tenant %}

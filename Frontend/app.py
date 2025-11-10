@@ -414,31 +414,50 @@ def comisiones():
     periodo = request.args.get("periodo")
     consorcio_id = request.args.get("consorcio_id", type=int)
 
-    # 1. Obtener TODOS los consorcios SIEMPRE
+    # 1. Obtener TODOS los consorcios (para el dropdown)
     response = requests.get(f"{API_URL}/consortiums", cookies=cookies)
     all_consortiums = response.json().get("consortiums", []) if response.status_code == 200 else []
 
     # 2. Encontrar el consorcio seleccionado (si existe)
     selected_consortium = next((c for c in all_consortiums if c["id"] == consorcio_id), None)
 
-    # 3. Obtener unidades SOLO para el consorcio seleccionado
-    #    (Tu código original lo hacía dos veces, esto es más limpio)
+    # 3. Preparar la lista de datos PARA LA TABLA
+    consortiums_for_table = []
+
     if selected_consortium:
+        # 4a. SI HAY SELECCIÓN: Cargar unidades solo para ESE consorcio
         uf_response = requests.get(
             f"{API_URL}/functional_units",
             params={"consortium_id": selected_consortium["id"], "period": periodo},
             cookies=cookies
         )
-        # Añadimos las unidades directamente al diccionario del consorcio seleccionado
-        selected_consortium["units"] = uf_response.json().get("functional_units", []) if uf_response.status_code == 200 else []
+        selected_consortium["units"] = uf_response.json().get("functional_units",
+                                                              []) if uf_response.status_code == 200 else []
 
-    # 4. Enviar SIEMPRE la lista completa (all_consortiums) al template
-    #    Y también el seleccionado por separado.
+        # La tabla solo mostrará este
+        consortiums_for_table = [selected_consortium]
+
+    else:
+        # 4b. NO HAY SELECCIÓN (Carga inicial): Cargar unidades para TODOS
+        # ¡ADVERTENCIA! Esto es lento (N+1 llamadas a la API)
+        for c in all_consortiums:
+            uf_response = requests.get(
+                f"{API_URL}/functional_units",
+                params={"consortium_id": c["id"], "period": periodo},
+                cookies=cookies
+            )
+            c["units"] = uf_response.json().get("functional_units", []) if uf_response.status_code == 200 else []
+
+        # La tabla mostrará todos
+        consortiums_for_table = all_consortiums
+
+    # 5. Enviar ambas listas al template
     return render_template(
         "comisiones.html",
         active_page='comisiones',
-        consortiums=all_consortiums,  # <--- ¡LA LISTA COMPLETA!
-        selected_consortium=selected_consortium # <--- El seleccionado (o None)
+        consortiums=all_consortiums,  # Para el <select>
+        selected_consortium=selected_consortium,  # Para el 'if' del <select>
+        consortiums_for_table=consortiums_for_table  # ¡NUEVO! Para la <tbody>
     )
 
 
