@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Clientes - AdminProp{% endblock %}
+{% block title %}Deudores - AdminProp{% endblock %}
 {% block head %}{% endblock %}
 
 {% block content %}
@@ -16,7 +16,7 @@
             </thead>
                    <tbody>
                         {% for client in clients %}
-                        <tr>
+                        <tr class="debtor" onclick="window.location.href='{{ url_for('unidad_funcional', consortium_id=client.consortium_id, unit_id=client.unit_id) }}';" style="cursor: pointer;">
                             <td>{{ client.nombre }}</td>
                             <td>{{ client.direccion }}</td>
 

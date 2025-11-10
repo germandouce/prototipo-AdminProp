@@ -15,7 +15,9 @@ SELECT
     f.tenant AS nombre,
     CONCAT(c.address, ' - ', f.unit_name) AS direccion,
     f.rent_value AS alquiler,
+    f.id AS unit_id,
     c.address AS direccion_consorcio,
+    c.id AS consortium_id,
     
     -- 1. Reemplazo de 'last_expensa' (Subconsulta Correlacionada)
     --    Esto busca la última expensa para ESTA fila (f.id)
@@ -98,7 +100,9 @@ WHERE
                 "expensas": expensas,
                 "deuda": deuda if deuda > 0 else 0,
                 "pago": pago_total,
-                "pago_al_dia": deuda == 0
+                "pago_al_dia": deuda == 0,
+                "consortium_id": row.consortium_id,
+                "unit_id": row.unit_id
             })
 
     response = {

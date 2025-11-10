@@ -374,3 +374,11 @@ button.upgrade-btn {
     height: 300px; /* O la altura que prefieras */
     width: 100%;
 }
+
+.debtor {
+    transition: background 0.2s ease;
+}
+
+.debtor:hover {
+    background: #c9c9c9;
+}

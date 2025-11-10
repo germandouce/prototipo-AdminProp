@@ -111,7 +111,7 @@ def register():
             return render_template("register.html", error=error_msg)
     return render_template("register.html")
 
-@app.route("/clientes")
+@app.route("/deudores")
 def clientes():
     login_check = require_login()
     if login_check:

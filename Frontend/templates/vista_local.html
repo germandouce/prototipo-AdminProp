@@ -16,11 +16,11 @@
             <h1 id="consorcioNombre">{{ unit.consortium_address }}</h1>
         </div>
         <div>
-            <h4>Local Número</h4>
+            <h4>Unidad</h4>
             <h1 id="numeroLocal">{{ unit.unit_name }}</h1>
         </div>
         <div>
-            <h4>Cliente</h4>
+            <h4>Inquilino</h4>
             <div style="display:flex; align-items:center; gap:.75rem; justify-content: space-between;">
                 <h1 data-nombre>{{ unit.tenant if unit.tenant }}</h1>
                 {% if unit.tenant %}
@@ -79,20 +79,12 @@
             <td class="td-informacion" id="tdOcupado">{{ 'Si' if unit.occupation_status else 'No' }}</td>
         </tr>
         <tr>
-            <td class="td-descripcion">Último mes pago</td>
-            <td class="td-informacion" id="tdUltimoMes">Septiembre 2025</td>
-        </tr>
-        <tr>
             <td class="td-descripcion">Valor de alquiler</td>
             <td class="td-informacion" id="tdAlquiler">
                 ${{ unit.rent_value }}<button id="btnEditarAlquiler" class="btn btn-primary" data-unit-id="{{ unit.id }}" data-consortium-id="{{ consortium_id }}">
                     <span class="fa-solid fa-pen-to-square"></span>
                 </button>
             </td>
-        </tr>
-        <tr>
-            <td class="td-descripcion">Fin de contrato</td>
-            <td class="td-informacion" id="tdFinContrato">—</td>
         </tr>
     </table>
     <div class="acciones-local">
