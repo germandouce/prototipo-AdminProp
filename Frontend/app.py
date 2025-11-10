@@ -25,7 +25,7 @@ def base():
 
 def require_login():
     if not request.cookies.get("access_token_cookie"):
-        return redirect(url_for("base"))
+        return redirect(url_for("login"))
 
 @app.route("/inicio")
 def inicio():
@@ -163,6 +163,15 @@ def consorcios():
     if len(consortiums) > 0:
         free_limit_reached = True
     return render_template("consorcios.html", active_page='consorcios', free_limit_reached=free_limit_reached, consortiums=consortiums)
+
+@app.route("/consorcios/<int:consortium_id>/eliminar", methods=["DELETE"])
+def eliminar_consorcio(consortium_id):
+    login_check = require_login()
+    if login_check:
+        return login_check
+    cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
+    response = requests.delete(f"{API_URL}/consortiums/{consortium_id}", cookies=cookies)
+    return redirect(url_for("consorcios"))
 
 @app.route("/consorcios/<int:consortium_id>/unidades_funcionales", methods=["GET", "POST"])
 def unidades_funcionales(consortium_id):

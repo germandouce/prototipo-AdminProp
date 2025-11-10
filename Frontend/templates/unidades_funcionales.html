@@ -112,6 +112,10 @@
                 </section>
             </div>
         </div>
+        <div id="container-btn-eliminar">
+            <button id="btnEliminarConsorcio" data-consortium-id="{{ consortium_id }}"><i class="fa-solid fa-trash"></i> Eliminar consorcio</button>
+        </div>
+
 
         <section id="formulario-agregar-unidad">
             <!-- Modal oculto por defecto -->
@@ -171,4 +175,5 @@
 <script src="{{ url_for('static', filename='js/agregar_unidad.js') }}"></script>
 <script src="{{ url_for('static', filename='js/flash_vanish.js') }}"></script>
 <script src="{{ url_for('static', filename='js/formulario_nuevo_gasto.js') }}"></script>
+<script src="{{ url_for('static', filename='js/eliminar_consorcio.js') }}"></script>
 {% endblock %}

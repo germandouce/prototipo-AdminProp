@@ -135,6 +135,18 @@ tbody tr:hover {
     }
 }
 
+#container-btn-eliminar {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    width: 100%;
+    margin-top: 2em;
+    button {
+        background: var(--danger);
+        color: white;
+    }
+}
+
 .modal-overlay {
     position: fixed;
     inset: 0; /* top:0; right:0; bottom:0; left:0 */

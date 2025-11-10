@@ -108,12 +108,14 @@ def delete_consortium(consortium_id):
 
     delete_debts_q = "DELETE FROM debts WHERE consortium = :consortium_id"
     delete_expenses_q = "DELETE FROM common_expenses WHERE consortium = :consortium_id"
+    delete_expenses_record_q = "DELETE FROM common_expenses_record WHERE consortium = :consortium_id"
     delete_units_q = "DELETE FROM functional_units WHERE consortium = :consortium_id"
 
     params = {"consortium_id": consortium_id, "user_id": user_id}
 
     try:
         with engine.begin() as conn:
+            conn.execute(text(delete_expenses_record_q), {"consortium_id": consortium_id})
             conn.execute(text(delete_debts_q), {"consortium_id": consortium_id})
             conn.execute(text(delete_expenses_q), {"consortium_id": consortium_id})
             conn.execute(text(delete_units_q), {"consortium_id": consortium_id})
