@@ -4,17 +4,14 @@
 
 {% block content %}
     <section id="clientes" class="page active">
-        <h1>Clientes</h1>
+        <h1>Deudores</h1>
         <table>
             <thead>
             <tr>
                 <th>Nombre</th>
                 <th>Dirección</th>
                 <th>Alquiler <button title="Ordenar"><i class="fa-solid fa-arrow-down"></i></button></th>
-                <th>Expensas <button title="Ordenar"><i class="fa-solid fa-arrow-down"></i></button></th>
-                <th>Deuda <button title="Ordenar"><i class="fa-solid fa-arrow-down"></i></button></th>
-                <th>Pago <button title="Ordenar"><i class="fa-solid fa-arrow-down"></i></button></th>
-                <th>Pago al día</th>
+                <th class="header-flex"><div>Deuda<p style="font-size: xx-small">(Contempla expensas)</p></div><button title="Ordenar"><i class="fa-solid fa-arrow-down"></i></button></th>
             </tr>
             </thead>
                    <tbody>
@@ -24,17 +21,7 @@
                             <td>{{ client.direccion }}</td>
 
                             <td data-value="{{ client.alquiler or 0 }}">${{ "{:,.2f}".format(client.alquiler or 0) }}</td>
-                            <td data-value="{{ client.expensas or 0 }}">${{ "{:,.2f}".format(client.expensas or 0) }}</td>
                             <td data-value="{{ client.deuda or 0 }}">${{ "{:,.2f}".format(client.deuda or 0) }}</td>
-                            <td data-value="{{ client.pago or 0 }}">${{ "{:,.2f}".format(client.pago or 0) }}</td>
-
-                            <td>
-                                {% if client.pago_al_dia %}
-                                    <span title="Al día">&#9989;</span>
-                                {% else %}
-                                    <span title="Posee deuda">&#10060;</span>
-                                {% endif %}
-                            </td>
                         </tr>
                         {% else %}
                         <tr>
@@ -45,13 +32,7 @@
         </table>
         <div class="container-caja">
             <div class="caja">
-                <h1>Pagos adeudados</h1>
-                <div>
-                    <canvas id="deudaIngresosChart"></canvas>
-                </div>
-            </div>
-            <div class="caja">
-                <h1>Mapa propiedades</h1>
+                <h1>Mapa propiedades deudores</h1>
                 <div id="map"></div>
             </div>
         </div>
@@ -93,34 +74,7 @@ if (!window.clientesPageInitialized) {
         });
     });
 
-    // 3. LÓGICA PARA EL GRÁFICO DE TORTA
-    const ctx = document.getElementById('deudaIngresosChart');
-    if (ctx) {
-        const existingChart = Chart.getChart(ctx);
-        if (existingChart) {
-            existingChart.destroy();
-        }
-
-        const deudaTotal = parseFloat(dashboardData.deuda_total || 0);
-        const ingresosTotales = parseFloat(dashboardData.ingresos || 0);
-        const pagadoAlDia = ingresosTotales > deudaTotal ? ingresosTotales - deudaTotal : 0;
-
-        if (deudaTotal > 0 || pagadoAlDia > 0) {
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Deuda Total', 'Pagado / Ingresos Restantes'],
-                    datasets: [{
-                        data: [deudaTotal, pagadoAlDia],
-                        backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(75, 192, 192, 0.7)'],
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-    }
-
-    // 4. LÓGICA PARA EL MAPA
+    // 3. LÓGICA PARA EL MAPA
     if (dashboardData.direcciones && dashboardData.direcciones.length > 0) {
     const mapElement = document.getElementById('map');
     if (mapElement) {

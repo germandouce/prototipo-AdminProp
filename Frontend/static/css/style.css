@@ -49,12 +49,55 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
+    /*table-layout: fixed;*/
 }
 table th, table td {
     border: 1px solid #ccc;
     padding: 8px;
     text-align: left;
 }
+
+table th:nth-child(1), table td:nth-child(1) {
+    /*width: 20%;*/
+}
+
+/* Columna 2: Dirección */
+table th:nth-child(2), table td:nth-child(2) {
+   /* width: 25%;*/ /* Dale más espacio a la dirección */
+}
+
+/* Columna 3: Alquiler */
+table th:nth-child(3), table td:nth-child(3) {
+    /*width: 15%;*/
+}
+
+/* Columna 4: Deuda */
+table th:nth-child(4), table td:nth-child(4) {
+   /* width: 40%;*/
+    display: flex;
+    div{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        bottom: 0;
+    }
+}
+
+.header-flex {
+  display: flex;              /* Activa el modo Flexbox */
+  align-items: center;        /* Centra verticalmente el texto y el botón */
+  gap: 8px;                   /* Añade un espacio por si se juntan */
+}
+
+/* Importante: Los <p> tienen márgenes por defecto.
+  Esto los resetea para que la alineación se vea perfecta.
+*/
+.header-flex div p {
+  margin: 0;
+  padding: 0;
+}
+
 .login-screen {
     position: fixed; /* <- Importante */
     top: 0;

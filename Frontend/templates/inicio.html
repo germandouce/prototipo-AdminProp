@@ -7,13 +7,106 @@
         <h1>Bienvenido {{ name }} {{ surname }}</h1>
         <div class="dashboard">
             <div class="card">
-                <h2>Ingresos mensuales</h2>
-                <p>${{ administration_income }}</p>
+                <h2>Ingresos mensuales al propietario</h2>
+                <p>${{ total_payments if total_payments else 0}}</p>
             </div>
             <div class="card">
-                <h2>Pagos adeudados</h2>
-                <p>${{ total_debts }}</p>
+                <h2>Deudas de inquilinos</h2>
+                <p>${{ total_debts if total_debts else 0}}</p>
+            </div>
+        </div>
+        <div class="container-caja">
+            <div class="caja">
+                <h1 id="titulo-grafico">Relación</h1>
+                <div>
+                    <canvas id="deudaIngresosChart"></canvas>
+                </div>
+            </div>
+            <div class="caja">
+                <h1>Mapa propiedades</h1>
+                <div id="map"></div>
             </div>
         </div>
     </section>
+    {% block scripts %}
+<script>
+// La bandera que nos asegura que este código se ejecute UNA SOLA VEZ.
+if (!window.clientesPageInitialized) {
+
+    // 1. DATOS DEL BACKEND
+    const dashboardData = {{ dashboard_data | tojson | safe }};
+    console.log("Inicializando página de inicio:", dashboardData);
+
+    // 2. LÓGICA PARA EL GRÁFICO DE TORTA
+    const ctx = document.getElementById('deudaIngresosChart');
+    if (ctx) {
+        const existingChart = Chart.getChart(ctx);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+
+        const deudaTotal = parseFloat({{ total_debts if total_debts else 0 }} || 0);
+        const pagosTotal = parseFloat({{ total_payments if total_payments else 0}} || 0);
+
+        if (deudaTotal || pagosTotal) {
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Ingresos', 'Deuda'],
+                    datasets: [{
+                        data: [pagosTotal, deudaTotal],
+                        backgroundColor: ['rgba(75,192,81,0.7)', 'rgba(244,21,29,0.7)'],
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+        else {
+            const titulo = document.getElementById("titulo-grafico");
+            titulo.style.display = "none";
+        }
+    }
+
+    // 4. LÓGICA PARA EL MAPA
+    if (dashboardData.direcciones && dashboardData.direcciones.length > 0) {
+    const mapElement = document.getElementById('map');
+    if (mapElement) {
+        // Retrasamos la inicialización para asegurar que el CSS se haya aplicado
+        setTimeout(function() {
+            // Solo inicializa el mapa si no existe
+            if (!mapElement._leaflet_id) {
+                console.log("Inicializando mapa de Leaflet...");
+
+                const map = L.map('map').setView([-34.6037, -58.3816], 12);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+
+                // !! ESTA ES LA LÍNEA CLAVE !!
+                // Forzamos al mapa a recalcular su tamaño después de un breve instante.
+                setTimeout(() => map.invalidateSize(), 100);
+
+                dashboardData.direcciones.forEach(address => {
+                    const apiUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
+                    fetch(apiUrl)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.length > 0) {
+                                const lat = data[0].lat;
+                                const lon = data[0].lon;
+                                L.marker([lat, lon]).addTo(map).bindPopup(`<b>${address}</b>`);
+                            }
+                        })
+                        .catch(error => console.error('Error de geocodificación:', error));
+                });
+            }
+        }, 50); // Pequeño retraso inicial
+    }
+}
+
+    // Ponemos la bandera en true para que este bloque no se vuelva a ejecutar.
+    window.clientesPageInitialized = true;
+}
+</script>
+{% endblock %}
 {% endblock %}

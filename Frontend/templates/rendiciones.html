@@ -24,9 +24,9 @@
     <div class="grid-2" id="bloquesRendicion" style="display:none;">
         <fieldset>
             <legend>Ingresos</legend>
-            <p>Alquileres cobrados: <b id="ing_alquileres">$0</b></p>
-            <p>Expensas cobradas: <b id="ing_expensas">$0</b></p>
-            <p><strong>TOTAL INGRESOS: <span id="ing_total">$0</span></strong></p>
+            <p>Ingresos: <b id="ing_alquileres">$0</b></p>
+            <p>Gastos: <b id="ing_expensas">$0</b></p>
+            <p><strong>TOTAL: <span id="ing_total">$0</span></strong><i style="margin-left: 0.2em" title="ingresos - gastos" class="fa-solid fa-circle-question fa-xs"></i></p>
         </fieldset>
 
         <fieldset>
@@ -128,9 +128,9 @@
         }
 
         document.getElementById("bloquesRendicion").style.display = "grid";
-        document.getElementById("ing_alquileres").textContent = fmt(r.total_incomes - r.total_outcomes);
+            document.getElementById("ing_alquileres").textContent = fmt(r.total_incomes);
         document.getElementById("ing_expensas").textContent = fmt(r.total_outcomes);
-        document.getElementById("ing_total").textContent = fmt(r.total_incomes);
+        document.getElementById("ing_total").textContent = fmt(r.total_incomes - r.total_outcomes);
         document.getElementById("gastos_total").textContent = fmt(r.total_outcomes);
         document.getElementById("comision_pct").textContent = (r.administration_percentage * 100).toFixed(2) + "%";
         document.getElementById("comision_monto").textContent = fmt(r.administration_fee);

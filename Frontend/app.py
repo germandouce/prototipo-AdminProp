@@ -55,7 +55,21 @@ def inicio():
     else:
         error_msg = response.json().get("error", "Error desconocido")
         return render_template("login.html", error=error_msg)
-    return render_template("inicio.html", active_page='inicio', name=name, surname=surname, total_debts=total_debts, administration_income=administration_income)
+
+    addresses_response = requests.get(f"{API_URL}/api/consortiums/addresses", cookies=cookies)
+    addresses_response = addresses_response.json().get("addresses", [])
+    dashboard_data = {
+        "direcciones": addresses_response
+    }
+
+    response = requests.get(f"{API_URL}/payments_total", cookies=cookies)
+    if response.status_code == 200:
+        total_payments = response.json().get("total", 0)
+    else:
+        error_msg = response.json().get("error", "Error desconocido")
+        return render_template("login.html", error=error_msg)
+
+    return render_template("inicio.html", active_page='inicio', name=name, surname=surname, total_debts=total_debts, administration_income=administration_income, dashboard_data=dashboard_data, total_payments=total_payments)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -104,20 +118,17 @@ def clientes():
         return login_check
     cookies = {"access_token_cookie": request.cookies.get("access_token_cookie")}
 
-    # Llamamos al nuevo endpoint de la API
     response = requests.get(f"{API_URL}/api/clients", cookies=cookies)
-    addresses_response = requests.get(f"{API_URL}/api/consortiums/addresses", cookies=cookies)
 
     clients_data = []
     dashboard_data = {}
-    if response.status_code == 200 and addresses_response.status_code == 200:
+    if response.status_code == 200:
         clients_payload = response.json().get("response", [])
-        addresses_payload = addresses_response.json()
         clients_data = clients_payload.get("clients", [])
         dashboard_data = {
             "deuda_total": clients_payload.get("deuda_total", 0),
             "ingresos": clients_payload.get("ingresos", 0),
-            "direcciones": addresses_payload.get("addresses", [])
+            "direcciones": clients_payload.get("direcciones", []),
         }
     else:
         # Manejar el error, tal vez mostrando un mensaje
@@ -394,38 +405,32 @@ def comisiones():
     periodo = request.args.get("periodo")
     consorcio_id = request.args.get("consorcio_id", type=int)
 
-    # Obtener consorcios del usuario
+    # 1. Obtener TODOS los consorcios SIEMPRE
     response = requests.get(f"{API_URL}/consortiums", cookies=cookies)
     all_consortiums = response.json().get("consortiums", []) if response.status_code == 200 else []
 
-    # Filtrar consorcio si se seleccionó uno
-    if consorcio_id:
-        consortiums = [c for c in all_consortiums if c["id"] == consorcio_id]
-    else:
-        consortiums = all_consortiums
-
-    # Obtener unidades funcionales para cada consorcio
-    for consortium in consortiums:
-        uf_response = requests.get(
-            f"{API_URL}/functional_units",
-            params={"consortium_id": consortium["id"], "period": periodo},
-            cookies=cookies
-        )
-        consortium["units"] = uf_response.json().get("functional_units", []) if uf_response.status_code == 200 else []
-
+    # 2. Encontrar el consorcio seleccionado (si existe)
     selected_consortium = next((c for c in all_consortiums if c["id"] == consorcio_id), None)
 
-    # Obtener unidades solo del consorcio seleccionado
+    # 3. Obtener unidades SOLO para el consorcio seleccionado
+    #    (Tu código original lo hacía dos veces, esto es más limpio)
     if selected_consortium:
         uf_response = requests.get(
             f"{API_URL}/functional_units",
             params={"consortium_id": selected_consortium["id"], "period": periodo},
             cookies=cookies
         )
+        # Añadimos las unidades directamente al diccionario del consorcio seleccionado
         selected_consortium["units"] = uf_response.json().get("functional_units", []) if uf_response.status_code == 200 else []
 
-
-    return render_template("comisiones.html", active_page='comisiones', consortiums=consortiums)
+    # 4. Enviar SIEMPRE la lista completa (all_consortiums) al template
+    #    Y también el seleccionado por separado.
+    return render_template(
+        "comisiones.html",
+        active_page='comisiones',
+        consortiums=all_consortiums,  # <--- ¡LA LISTA COMPLETA!
+        selected_consortium=selected_consortium # <--- El seleccionado (o None)
+    )
 
 
 @app.route("/consortiums/<int:consortium_id>", methods=["PATCH"])

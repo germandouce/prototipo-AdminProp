@@ -71,6 +71,31 @@ def get_consortium():
 
     return consortium, 200
 
+@consortiums_bp.route("/consortiums/addresses", methods=["GET"])
+@jwt_required()
+def get_addresses():
+    user_id = int(get_jwt_identity())
+    query = """
+            SELECT c.address
+            FROM consortiums c
+            WHERE c.user_id = :user_id 
+            """
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(text(query), {"user_id": user_id})
+            rows = result.mappings().all()
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    addresses = set()
+
+    for row in rows:
+        addresses.add(row["address"])
+
+    return jsonify({"addresses": list(addresses)})
+
 #Deletes a consortium and its debts, expenses and functional units
 @consortiums_bp.route("/consortiums/<int:consortium_id>", methods=["DELETE"])
 @jwt_required()

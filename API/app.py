@@ -357,5 +357,34 @@ def get_user():
 
 app.register_blueprint(owners_reports_bp)
 
+@app.route("/payments_total", methods=["GET"])
+@jwt_required()
+def get_total_payments():
+    user_id = int(get_jwt_identity())
+
+    query = """
+        SELECT SUM(p.amount) AS total
+        FROM payments p
+        JOIN consortiums c ON p.consortium = c.id
+        WHERE c.user_id = :user_id AND MONTH(p.date) = MONTH(CURDATE())
+        AND YEAR(p.date) = YEAR(CURDATE());
+    """
+
+    try:
+        conn = engine.connect()
+        result = conn.execute(text(query), {"user_id": user_id})
+        row = result.fetchone()
+        conn.close()
+    except SQLAlchemyError as err:
+        if DEBUG:
+            print(f"DB_ERROR: {err}")
+        return {"error": str(err)}, 500
+
+    response = {
+        "total": row.total,
+    }
+
+    return response, 200
+
 if __name__ == "__main__":
     app.run("0.0.0.0", API_PORT, debug=DEBUG=="True")

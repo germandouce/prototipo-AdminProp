@@ -18,7 +18,7 @@
 
         <!-- Filtros (un solo Calcular) -->
         <div class="form-row" style="margin-bottom:.5rem;">
-            <label>Mes/Año
+            <label style="display: none">Mes/Año
                 <select id="selPeriodo">
                     <option>2025-09</option>
                     <option>2025-08</option>
@@ -32,7 +32,7 @@
                             {% if selected_consortium and consortium.id == selected_consortium.id %}selected{% endif %}>
                             Dirección: {{ consortium.address }}
                         </option>
-                        {% endfor %}
+                    {% endfor %}
                         
                 </select>
 

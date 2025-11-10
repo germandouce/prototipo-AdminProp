@@ -188,7 +188,7 @@ BEGIN
     SELECT
         description,
         amount,
-        date,
+        CURRENT_DATE,
         consortium
     FROM
         common_expenses;
