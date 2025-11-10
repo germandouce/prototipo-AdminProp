@@ -32,7 +32,7 @@
         </table>
         <div class="container-caja">
             <div class="caja">
-                <h1>Mapa propiedades deudores</h1>
+                <h1 id="titulo-mapa">Mapa propiedades deudores</h1>
                 <div id="map"></div>
             </div>
         </div>
@@ -110,6 +110,10 @@ if (!window.clientesPageInitialized) {
         }, 50); // Pequeño retraso inicial
     }
 }
+    else {
+            const titulo = document.getElementById("titulo-mapa");
+            titulo.style.display = "none";
+        }
 
     // Ponemos la bandera en true para que este bloque no se vuelva a ejecutar.
     window.clientesPageInitialized = true;
